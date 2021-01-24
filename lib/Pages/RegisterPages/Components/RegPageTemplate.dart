@@ -46,7 +46,7 @@ with TickerProviderStateMixin
                 width:_screenSize.width ,
                 height: _screenSize.height-(193.0*_screenSize.width/375.0),
                 margin: EdgeInsets.only(top: (193.0*_screenSize.width/375.0)-25),
-                padding: EdgeInsets.only(left: 15,right: 15),
+                padding: EdgeInsets.only(left: 35,right: 35),
                 //color: Colors.green,
                 child: ListView(
                   children: widget.children,
