@@ -29,6 +29,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.1
   adobe_xd:
+  shared_preferences:
+  modal_progress_hud:
+  device_info:
+  http:
 
 dev_dependencies:
   flutter_test:
