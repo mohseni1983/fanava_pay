@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parto_v/Pages/OperativePages/Components/OperativePagesTemplate.dart';
 import 'package:parto_v/UI/Colors.dart';
+import 'package:parto_v/UI/Widgets/CButton.dart';
 import 'package:parto_v/UI/Widgets/bubble.dart';
 class ChargePage extends StatefulWidget {
   @override
@@ -124,7 +125,13 @@ class _ChargePageState extends State<ChargePage> {
 
                 ],
               ),
-            )
+            ),
+              CButton(
+                label: 'پرداخت',
+                onClick: (){
+
+                },
+              )
 
             ],
           ))
