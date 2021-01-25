@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:parto_v/Pages/Charge.dart';
 import 'package:parto_v/UI/Widgets/CAlertDialog.dart';
+import 'package:parto_v/UI/Widgets/CButton.dart';
 
 import 'Components/OperativePagesTemplate.dart';
 class MainPage extends StatefulWidget {
@@ -11,7 +13,46 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(child: OperativePagesTemplate(
-      child: Center(child: Text('Hello World'),),
+      child: Expanded(
+        child: ListView(
+          children: [
+            Padding(padding: EdgeInsets.only(top: 30)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CButton(
+                  label: 'شارژ',
+                  onClick: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargePage(),));
+                  },
+                ),
+                CButton(
+                  label: 'بسته اینترنت',
+                  onClick: (){},
+                ),
+
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CButton(
+                  label: 'قبض',
+                  onClick: (){},
+                ),
+                CButton(
+                  label: 'مانده کارت',
+                  onClick: (){},
+                ),
+
+              ],
+            ),
+
+
+
+          ],
+        ),
+      )
     ),
 
         onWillPop: ()=>showDialog(context: context,

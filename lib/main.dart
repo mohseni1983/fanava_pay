@@ -70,6 +70,18 @@ class MyApp extends StatelessWidget {
             fontSize: 16.0,
             color: PColor.blueparto,
 
+          ),
+          subtitle1: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 13.0,
+            color: PColor.blueparto,
+
+          ),
+          headline1: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16.0,
+            color: PColor.blueparto,
+
           )
         )
 

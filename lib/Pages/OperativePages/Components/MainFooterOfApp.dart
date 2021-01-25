@@ -13,21 +13,10 @@ class MainFooterOfApp extends StatelessWidget {
     return Stack(
       children: <Widget>[
         //Container(),
-        Pinned.fromSize(
-          bounds: Rect.fromLTWH(0.0, 0.0, MediaQuery.of(context).size.width, 62.0*MediaQuery.of(context).size.width/375.0),
-          size: Size(MediaQuery.of(context).size.width, 62.0*MediaQuery.of(context).size.width/375.0),
-          pinLeft: true,
-          pinRight: true,
-          pinTop: true,
-          pinBottom: true,
-          child: SvgPicture.string(
-            _svg_houo9n,
-            allowDrawingOutsideViewBox: true,
-            fit: BoxFit.fill,
-          ),
-        ),
+        FooterBack(),
 
 
+/*
         Pinned.fromSize(
           bounds: Rect.fromLTWH(9.0, 35.6, 107.0, 55.4),
           size: Size(375.0, 91.0),
@@ -140,6 +129,7 @@ class MainFooterOfApp extends StatelessWidget {
             }).toList(),
           ),
         ),
+*/
 
       ],
     );

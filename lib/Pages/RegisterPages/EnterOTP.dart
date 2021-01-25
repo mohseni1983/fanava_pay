@@ -30,6 +30,7 @@ class _EnterOTPState extends State<EnterOTP> {
   bool _progress=false;
 
   void startTimer() {
+
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
