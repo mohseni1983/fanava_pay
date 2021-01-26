@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:parto_v/Pages/OperativePages/MainPage.dart';
-import 'package:parto_v/UI/Widgets/CAlertDialog.dart';
-import 'package:parto_v/UI/Widgets/CButton.dart';
+import 'package:parto_v/pages//main_page.dart';
+import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
+import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../UI/Colors.dart';
-import '../../UI/Colors.dart';
-import '../../UI/Widgets/CTextField.dart';
-import 'Components/RegPageTemplate.dart';
+import 'package:parto_v/ui/cust_colors.dart';
+import 'package:parto_v/custom_widgets/cust_textfield.dart';
+import 'package:parto_v/components/reg_page_template.dart';
 class EnterOTP extends StatefulWidget {
   @override
   _EnterOTPState createState() => _EnterOTPState();
@@ -25,7 +22,7 @@ class _EnterOTPState extends State<EnterOTP> {
   String _deviceId='';
   int _OS_id=0;
   TextEditingController _otp=new TextEditingController();
-  Timer _timer;
+   Timer _timer;
   int _start = 60;
   bool _progress=false;
 

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:parto_v/UI/Widgets/CButton.dart';
+import 'package:parto_v/ui/cust_colors.dart';
 
-import '../Colors.dart';
-import '../Colors.dart';
 class CAlertDialog extends StatefulWidget {
   final String content;
   final String subContent;
   final List<Widget> buttons;
 
-  const CAlertDialog({Key key, this.content, this.buttons,this.subContent}) : super(key: key);
+  const CAlertDialog({ Key key, this.content,  this.buttons, this.subContent=''}):super(key: key) ;
   @override
   _CAlertDialogState createState() => _CAlertDialogState();
 }

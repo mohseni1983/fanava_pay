@@ -1,15 +1,13 @@
-import 'dart:ffi';
 import 'dart:ui';
-
+import 'package:parto_v/ui/cust_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../Colors.dart';
 class CButton extends StatefulWidget {
   final VoidCallback onClick;
   final String label;
   final double minWidth;
 
-  const CButton({Key key, this.onClick,this.label,this.minWidth}) : super(key: key);
+  const CButton({Key key, this.onClick, this.label, this.minWidth}) :super(key: key);
   @override
   _CButtonState createState() => _CButtonState();
 }

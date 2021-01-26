@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../Colors.dart';
 class CTextField extends StatefulWidget {
   final TextEditingController controller;
   final TextAlign textAlign;
   final int maxLenght;
   final TextInputType keyboardType;
 
-  const CTextField({Key key, this.controller,this.textAlign,this.maxLenght=50,this.keyboardType=TextInputType.text}) : super(key: key);
+  const CTextField({ Key key, this.controller, this.textAlign,this.maxLenght=50,this.keyboardType=TextInputType.text}):super(key: key) ;
   @override
   _CTextFieldState createState() => _CTextFieldState();
 }

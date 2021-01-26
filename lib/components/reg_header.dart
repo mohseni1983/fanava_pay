@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:adobe_xd/pinned.dart';
-import './RegPageHeaderBack.dart';
+import 'reg_header_back.dart';
 
 class RegPageHeader extends StatelessWidget {
-  RegPageHeader({
-    Key key,
-  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Stack(

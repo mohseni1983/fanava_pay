@@ -3,9 +3,7 @@ import 'package:adobe_xd/pinned.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class RegPageHeaderBack extends StatelessWidget {
-  RegPageHeaderBack({
-    Key key,
-  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Stack(

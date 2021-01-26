@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'RegPageHeader.dart';
+import 'reg_header.dart';
 class RegPageTemplate extends StatefulWidget  {
   final List<Widget> children;
 
-  const RegPageTemplate({Key key, this.children}) : super(key: key);
+  const RegPageTemplate({ Key key, this.children}):super(key: key) ;
   @override
   _RegPageTemplateState createState() => _RegPageTemplateState();
 }

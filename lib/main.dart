@@ -1,20 +1,19 @@
 import 'dart:convert';
-
-import 'package:device_info/device_info.dart';
+ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:parto_v/Pages/OperativePages/MainPage.dart';
-import 'package:parto_v/Pages/RegisterPages/Components/RegPageTemplate.dart';
-import 'package:parto_v/UI/Colors.dart';
-import 'package:parto_v/UI/Widgets/CAlertDialog.dart';
-import 'package:parto_v/UI/Widgets/CButton.dart';
-import 'package:parto_v/UI/Widgets/CTextField.dart';
+import 'package:parto_v/components/reg_page_template.dart';
+import 'package:parto_v/UI/cust_colors.dart';
+import 'package:parto_v/pages/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 
-import 'Pages/RegisterPages/EnterOTP.dart';
+import 'custom_widgets/cust_alert_dialog.dart';
+import 'custom_widgets/cust_button.dart';
+import 'custom_widgets/cust_textfield.dart';
+import 'pages/enter_otp.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
@@ -88,16 +87,14 @@ class MyApp extends StatelessWidget {
       ),
 
 
-      home: MyHomePage(title: 'نرم افزار پرتو'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
 
 
-  final String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();

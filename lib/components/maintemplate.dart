@@ -1,36 +1,31 @@
-import 'package:flutter/material.dart';
-import './HeaderBack.dart';
-import './TopWallet.dart';
-import './MainFooterOfApp.dart';
-import 'FooterBackImg.dart';
-import 'FooterBtn.dart';
-import 'HomeMasterBtn.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:adobe_xd/pinned.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class OperativePagesTemplate extends StatefulWidget {
-  final Widget child;
+import 'TopWallet.dart';
+class MasterTemplate extends StatefulWidget {
+  final Widget wchild;
 
-  const OperativePagesTemplate({Key key, this.child}) : super(key: key);
+  const MasterTemplate({Key key, this.wchild}) : super(key: key);
   @override
-  _MainPageState createState() => _MainPageState();
+  _MasterTemplateState createState() => _MasterTemplateState();
 }
 
-class _MainPageState extends State<OperativePagesTemplate> {
+class _MasterTemplateState extends State<MasterTemplate> {
   @override
   Widget build(BuildContext context) {
     return
       Directionality(textDirection: TextDirection.rtl,
           child:       Scaffold(
             //backgroundColor: const Color(0xffe9e9e9),
-           // backgroundColor: Colors.red,
+            // backgroundColor: Colors.red,
             body: Stack(
               children: <Widget>[
                 Container(
                   //color: Colors.blueAccent,
                   margin: EdgeInsets.only(left:10,top:160,right:10,bottom: 0),
 
-                  child: widget.child,
+                  child: widget.wchild,
                 ),
 
 
@@ -262,52 +257,7 @@ class _MainPageState extends State<OperativePagesTemplate> {
 
 
 
-/*
-                Transform.translate(
-                  offset: Offset(121.0, 31.0),
-                  child: SizedBox(
-                    width: 133.0,
-                    height: 123.0,
-                    child: TopWallet(),
-                  ),
-                ),
-*/
-/*
-                Transform.translate(
-                  offset: Offset(10.0, 756.6),
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 55.0,
-                    child: FooterBtn(),
-                  ),
-                ),
-                Transform.translate(
-                  offset: Offset(72.0, 756.6),
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 55.0,
-                    child: FooterBtn(),
-                  ),
-                ),
-                Transform.translate(
-                  offset: Offset(263.0, 756.6),
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 55.0,
-                    child: FooterBtn(),
-                  ),
-                ),
-*/
-/*
-                Transform.translate(
-                  offset: Offset(325.0, 756.6),
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 55.0,
-                    child: FooterBtn(),
-                  ),
-                ),
-*/
+
               ],
             ),
           )
