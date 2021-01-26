@@ -19,7 +19,7 @@ class ChargePage extends StatefulWidget {
 class _ChargePageState extends State<ChargePage> {
   Future<SharedPreferences> _prefs=SharedPreferences.getInstance();
   TextEditingController _mobile= new TextEditingController();
-  int _topUpOperator=0;
+  int _topUpOperator=10;
 
 
   List<OperatorsWithLogo> _operatorsWithLogo=[
@@ -244,7 +244,8 @@ class _ChargePageState extends State<ChargePage> {
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                         color: Colors.white,
-                                        border: Border.all(color: index==_topUpOperator?PColor.orangeparto:Colors.grey,width: 1),
+                                        border: Border.all(color: index==_topUpOperator?PColor.blueparto:Colors.grey,width: 1),
+                                        boxShadow: index==_topUpOperator?[BoxShadow(color: PColor.blueparto,offset: Offset(0,0),spreadRadius: 1,blurRadius: 1)]:[BoxShadow(color: PColor.orangeparto,offset: Offset(0,0),spreadRadius: 0,blurRadius: 0)],
                                         image: DecorationImage(
                                           image: AssetImage(index==_topUpOperator?_operatorsWithLogo[index].colorImage:_operatorsWithLogo[index].grayImage),
                                           fit: BoxFit.fill,
@@ -429,7 +430,7 @@ class _ChargePageState extends State<ChargePage> {
         default:
           {
             setState(() {
-              _topUpOperator=-1;
+              _topUpOperator=10;
             });
             setState(() {
 
