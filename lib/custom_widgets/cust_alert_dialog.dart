@@ -12,6 +12,7 @@ class CAlertDialog extends StatefulWidget {
 }
 
 class _CAlertDialogState extends State<CAlertDialog> {
+
   @override
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl,
