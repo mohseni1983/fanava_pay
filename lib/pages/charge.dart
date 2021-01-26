@@ -22,6 +22,14 @@ class _ChargePageState extends State<ChargePage> {
   int _topUpOperator=0;
 
 
+  List<OperatorsWithLogo> _operatorsWithLogo=[
+    new OperatorsWithLogo(id: 0,name: 'ایرانسل',colorImage: 'assets/images/mtn-color.jpg',grayImage: 'assets/images/mtn-gray.jpg'),
+    new OperatorsWithLogo(id: 1,name: 'همراه اول',colorImage: 'assets/images/mci-color.jpg',grayImage: 'assets/images/mci-gray.jpg'),
+    new OperatorsWithLogo(id:3,name: 'رایتل',colorImage: 'assets/images/rightel-color.jpg',grayImage: 'assets/images/rightel-gray.jpg'),
+    new OperatorsWithLogo(id:4,name: 'شاتل موبایل',colorImage: 'assets/images/shatel-color.jpg',grayImage: 'assets/images/shatel-gray.jpg')
+  ];
+
+
 
   void _sendToPayment(){
 
@@ -201,6 +209,7 @@ class _ChargePageState extends State<ChargePage> {
                           ),
                           Divider(color: Colors.white,thickness: 2,),
                           Text('در صورت ترابرد خط، اپراتور را تغییر دهید',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal,fontSize: 12),textAlign: TextAlign.start,),
+/*
                           GroupButton(
                             direction: Axis.horizontal,
                             buttons: ['ایرانسل','همراه اول','رایتل','شاتل موبایل'],
@@ -218,7 +227,41 @@ class _ChargePageState extends State<ChargePage> {
 
 
                           )
+*/
+                            Container(
+                              alignment: Alignment.center,
+                              color: Colors.transparent,
+                              height: 80,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _operatorsWithLogo.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    child: Container(
+                                      height: 70,
+                                      width: 70,
+                                      margin: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                        border: Border.all(color: index==_topUpOperator?PColor.orangeparto:Colors.grey,width: 1),
+                                        image: DecorationImage(
+                                          image: AssetImage(index==_topUpOperator?_operatorsWithLogo[index].colorImage:_operatorsWithLogo[index].grayImage),
+                                          fit: BoxFit.fill,
+                                        )
 
+                                      ),
+                                    ),
+                                    onTap: (){
+                                      setState(() {
+                                        _topUpOperator=index;
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
+
+                            )
 
 
 
@@ -266,6 +309,7 @@ class _ChargePageState extends State<ChargePage> {
 
                                   ),
                                   height: 70,
+                                  //width: 70,
                                   padding: EdgeInsets.all(5),
                                   margin: EdgeInsets.all(5),
                                   child: Center(
@@ -317,7 +361,8 @@ class _ChargePageState extends State<ChargePage> {
                         }
 
                       },
-                    )
+                    ),
+                    Padding(padding: EdgeInsets.only(bottom: 100)),
 
                   ],
                 )
@@ -338,10 +383,9 @@ class _ChargePageState extends State<ChargePage> {
       var _firstCharacter=number.substring(0,3);
       switch(_firstCharacter){
         case '091':
-        case '099':
           {
             setState(() {
-              _selectedOperator=['همراه اول'];
+              _topUpOperator=1;
 
             });
             setState(() {
@@ -354,7 +398,7 @@ class _ChargePageState extends State<ChargePage> {
         case '094':
         {
           setState(() {
-            _selectedOperator = ['ایرانسل'];
+            _topUpOperator=0;
           });
           setState(() {
 
@@ -364,17 +408,28 @@ class _ChargePageState extends State<ChargePage> {
         case '092':
           {
             setState(() {
-              _selectedOperator = ['رایتل'];
+              _topUpOperator=2;
             });
             setState(() {
 
             });
           }
           break;
+        case '099':
+          {
+            setState(() {
+              _topUpOperator=3;
+            });
+            setState(() {
+
+            });
+          }
+          break;
+
         default:
           {
             setState(() {
-              _selectedOperator = [];
+              _topUpOperator=-1;
             });
             setState(() {
 
@@ -389,6 +444,16 @@ class _ChargePageState extends State<ChargePage> {
       }
     }
   }
+}
+
+
+class OperatorsWithLogo{
+  int id;
+  String name;
+  String grayImage;
+  String colorImage;
+
+  OperatorsWithLogo({this.id, this.name, this.grayImage, this.colorImage});
 }
 
 

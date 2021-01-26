@@ -62,6 +62,14 @@ flutter:
     - assets/images/RegisterFooterImg.png
     - assets/images/home.png
     - assets/images/wallet.png
+    - assets/images/mtn-color.jpg
+    - assets/images/mtn-gray.jpg
+    - assets/images/rightel-color.jpg
+    - assets/images/rightel-gray.jpg
+    - assets/images/shatel-color.jpg
+    - assets/images/shatel-gray.jpg
+    - assets/images/mci-color.jpg
+    - assets/images/mci-gray.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

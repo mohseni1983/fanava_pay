@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.samohseni.parto_v">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="parto_v"
+        android:label="پرداخت پرتو"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
