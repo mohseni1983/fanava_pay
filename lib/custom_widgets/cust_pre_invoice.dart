@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'package:flutter/cupertino.dart';
+import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
@@ -26,40 +27,52 @@ class PreInvoice extends StatefulWidget {
 }
 
 class _PreInvoiceState extends State<PreInvoice> {
+  String _errorText='';
+
+
   Future<SharedPreferences> _prefs=SharedPreferences.getInstance();
 
   Future<void> _payChargeWithCard(TopUp topUp) async{
-   SharedPreferences _p=await SharedPreferences.getInstance();
-   String _token=_p.getString('token');
-   var sss=topUpToJson(topUp);
-   var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+    if(await auth.reAuth())
+      {
+        SharedPreferences _p=await SharedPreferences.getInstance();
+        String _token=_p.getString('token');
+        var sss=topUpToJson(topUp);
+        var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/TopUp',
 
-   headers: {
-     'Authorization': 'Bearer $_token',
-     'Content-Type': 'application/json'
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
 
-   },
-     body: topUpToJson(topUp)
-   );
-   if(result.statusCode==200){
-     var jres=json.decode(result.body);
-     if(jres['ResponseCode']==0){
-       var _url=jres['Url'];
-       if(await canLaunch(_url))
-         await launch(_url);
-       else
-         CAlertDialog(
-           content: 'امکان اتصال به درگاه پرداخت وجود ندارد',
+            },
+            body: topUpToJson(topUp)
+        );
+        if(result.statusCode==200){
+          var jres=json.decode(result.body);
+          if(jres['ResponseCode']==0){
+            var _url=jres['Url'];
+            if(await canLaunch(_url))
+              await launch(_url);
+            else
+             setState(() {
+               _errorText=jres['ResponseMessage'];
+             });
+          }else{
+            setState(() {
+              _errorText=jres['ResponseMessage'];
+            });
 
-         );
-     }else{
-       CAlertDialog(
-         content: jres['ResponseMessage'],
+          }
+        }
 
-       );
 
-     }
-   }
+
+      }
+    else
+      CAlertDialog(
+        content: 'خطا در ارتباط با سرور',
+
+      );
 
 
 
@@ -176,6 +189,27 @@ class _PreInvoiceState extends State<PreInvoice> {
 
                           ],
                         ),
+
+                        _errorText.isNotEmpty?
+                            Container(
+                              margin: EdgeInsets.fromLTRB(5, 15, 5, 0),
+                              padding: EdgeInsets.all(5),
+                              color: Colors.red.shade900,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.yellow,
+                                    foregroundColor: Colors.red,
+                                    child: Icon(Icons.error_outline_rounded,size: 40,),
+                                  ),
+                                  Text(_errorText,style: TextStyle(color: Colors.white),softWrap: true,)
+                                ],
+                              ),
+                            ):
+                            Container(height: 0,)
+
 
 
 
