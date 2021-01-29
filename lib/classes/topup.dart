@@ -55,3 +55,23 @@ class TopUp {
     "UseWallet": useWallet,
   };
 }
+
+class StraightChargeOperators{
+  int id;
+  String name;
+  String grayImage;
+  String colorImage;
+  List<ChargeTypesWithPrice> chargeTypes;
+
+  StraightChargeOperators({this.id, this.name, this.grayImage, this.colorImage,this.chargeTypes});
+}
+
+
+class ChargeTypesWithPrice{
+  int id;
+
+  String name;
+  List<int> prices;
+  String coverImage;
+  ChargeTypesWithPrice({this.id,this.name,this.prices,this.coverImage});
+}

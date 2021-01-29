@@ -22,11 +22,11 @@ class _ChargePageState extends State<ChargePage> {
   int _topUpOperator=10;
 
 
-  List<OperatorsWithLogo> _operatorsWithLogo=[
-    new OperatorsWithLogo(id: 0,name: 'ایرانسل',colorImage: 'assets/images/mtn-color.jpg',grayImage: 'assets/images/mtn-gray.jpg'),
-    new OperatorsWithLogo(id: 1,name: 'همراه اول',colorImage: 'assets/images/mci-color.jpg',grayImage: 'assets/images/mci-gray.jpg'),
-    new OperatorsWithLogo(id:3,name: 'رایتل',colorImage: 'assets/images/rightel-color.jpg',grayImage: 'assets/images/rightel-gray.jpg'),
-    new OperatorsWithLogo(id:4,name: 'شاتل موبایل',colorImage: 'assets/images/shatel-color.jpg',grayImage: 'assets/images/shatel-gray.jpg')
+  List<StraightChargeOperators> _operatorsWithLogo=[
+    new StraightChargeOperators(id: 0,name: 'ایرانسل',colorImage: 'assets/images/mtn-color.jpg',grayImage: 'assets/images/mtn-gray.jpg'),
+    new StraightChargeOperators(id: 1,name: 'همراه اول',colorImage: 'assets/images/mci-color.jpg',grayImage: 'assets/images/mci-gray.jpg'),
+    new StraightChargeOperators(id:3,name: 'رایتل',colorImage: 'assets/images/rightel-color.jpg',grayImage: 'assets/images/rightel-gray.jpg'),
+    new StraightChargeOperators(id:4,name: 'شاتل موبایل',colorImage: 'assets/images/shatel-color.jpg',grayImage: 'assets/images/shatel-gray.jpg')
   ];
 
 
@@ -45,9 +45,11 @@ class _ChargePageState extends State<ChargePage> {
       _current.topUpOperator=_topUpOperator;
       _current.uniqCode="";
     }).then((value) {
+/*
     showDialog(
       context: context,
       builder: (context) => PreInvoice(paymentType: paymentTypes.Charge,paymentInfo: _current,));
+*/
     });
 
 
@@ -160,7 +162,8 @@ class _ChargePageState extends State<ChargePage> {
 
                       ),
                       padding: EdgeInsets.all(5),
-                      child: Column(
+                      child:
+                      Column(
 
                         children: [
                           Text('شماره همراه مورد نظر را وارد و یا از دفترچه تلفن انتخاب کنید',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal,fontSize: 12),textAlign: TextAlign.center,),
@@ -448,13 +451,5 @@ class _ChargePageState extends State<ChargePage> {
 }
 
 
-class OperatorsWithLogo{
-  int id;
-  String name;
-  String grayImage;
-  String colorImage;
-
-  OperatorsWithLogo({this.id, this.name, this.grayImage, this.colorImage});
-}
 
 

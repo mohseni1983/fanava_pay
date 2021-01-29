@@ -26,7 +26,7 @@ class RegPageHeader extends StatelessWidget {
             'ورود ',
             style: TextStyle(
               fontFamily: 'IRANSans(FaNum)',
-              fontSize: 30,
+              fontSize: 22,
               color: const Color(0xffffffff),
               fontWeight: FontWeight.w700,
             ),

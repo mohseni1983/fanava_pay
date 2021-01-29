@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:parto_v/classes/wallet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WalletWidget extends StatefulWidget {
+
+
+  const WalletWidget({Key key}) : super(key: key);
   @override
   _WalletWidgetState createState() => _WalletWidgetState();
 }
 
-class _WalletWidgetState extends State<WalletWidget> {
+class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMixin {
+  Future<SharedPreferences> _prefs=SharedPreferences.getInstance();
+  double _walletAmount=0;
+  bool _flag = false;
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _prefs.then((value) {
+      if(value.containsKey('wallet_amount'))
+        setState(() {
+          _walletAmount=value.getDouble('wallet_amount');
+        });
+    });
+
+  }
   @override
   Widget build(BuildContext context) {
     return
@@ -41,13 +64,30 @@ class _WalletWidgetState extends State<WalletWidget> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(child: Center(child: Text('250000'),)),
+                    Expanded(child: Center(child: Text('${_walletAmount.toInt()}'),)),
                     CircleAvatar(
                       backgroundColor: Color.fromRGBO(224, 114, 67, 1),
                       radius: 13,
 
 
-                      child: Icon(Icons.refresh,color: Colors.white,size: 18,),
+                      child: GestureDetector(
+                        child: _flag?CircularProgressIndicator():Icon(Icons.refresh,color: Colors.white,size: 18,),
+                        onTap: (){
+                          setState(() {
+                            _flag=true;
+                            setState(() {
+
+                            });
+                          });
+                          setWalletAmount().then((value) {
+                            setState(() {
+                              _flag=false;
+                            });
+                          });
+                        },
+                      )
+
+                      //Icon(Icons.refresh,color: Colors.white,size: 18,),
                     )
                   ],
                 ),

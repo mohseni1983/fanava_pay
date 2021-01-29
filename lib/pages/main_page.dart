@@ -1,29 +1,51 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:parto_v/classes/profile.dart';
 import 'package:parto_v/classes/topup.dart';
+
 import 'package:parto_v/components/maintemplate.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
+import 'package:parto_v/pages/chareg2.dart';
 import 'package:parto_v/pages/charge.dart';
 import 'package:parto_v/ui/cust_colors.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:parto_v/classes/wallet.dart' ;
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  TopUp _ttt=new TopUp(amount: 50000,cellNumber: '9105105282',chargeType: 0,localDate: DateTime.now(),sign: 'adsadasd',topUpOperator: 0,uniqCode: 'sadsadsa');
+  double _walletAmount=150;
+
+
+@override
+  void initState() {
+    // TODO: implement initState
+
+  setWalletAmount();
+    super.initState();
+
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(child:
         MasterTemplate(
+          isHome: true,
+
           wchild:     GridView.count(
             crossAxisCount: 2,
              padding: EdgeInsets.only(top: 50,left: 15,right: 15,bottom: 50),
              children: [
                GestureDetector(
-                 onTap: ()=>                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargePage(),))
+                 onTap: ()=>                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),))
                  ,
                  child:Container(
                    decoration: BoxDecoration(

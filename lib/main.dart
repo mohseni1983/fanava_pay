@@ -9,6 +9,7 @@ import 'package:parto_v/pages/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:parto_v/classes/auth.dart' as auth;
 
 import 'custom_widgets/cust_alert_dialog.dart';
 import 'custom_widgets/cust_button.dart';
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
         textTheme: TextTheme(
           caption: TextStyle(
             fontWeight: FontWeight.normal,
-            fontSize: 16.0,
+            fontSize: 14.0,
             color: PColor.blueparto,
 
           ),
@@ -141,10 +142,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
     }
     _prefs.then((value) {
+      var _sign=value.getString('sign');
+      
       if(value.containsKey('token'))
-        setState(() {
-          _isAuthunticated=true;
-        });
+        auth.checkAuth().then((value) {
+          if(value)
+            setState(() {
+              _isAuthunticated=true;
+            });
+        }
+
+        );
+
+
     });
 
   }

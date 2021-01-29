@@ -1,267 +1,286 @@
 import 'package:adobe_xd/pinned.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:parto_v/pages/main_page.dart';
+import 'package:parto_v/pages/profile.dart';
 
 import 'TopWallet.dart';
 class MasterTemplate extends StatefulWidget {
   final Widget wchild;
+  final bool inProgress;
+  final bool isHome;
 
-  const MasterTemplate({Key key, this.wchild}) : super(key: key);
+
+  const MasterTemplate({Key key, this.wchild,this.inProgress=false,this.isHome=false,}) : super(key: key);
   @override
   _MasterTemplateState createState() => _MasterTemplateState();
 }
 
-class _MasterTemplateState extends State<MasterTemplate> {
+class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStateMixin{
+  AnimationController _animationController;
+
   @override
   Widget build(BuildContext context) {
     return
-      Directionality(textDirection: TextDirection.rtl,
-          child:       Scaffold(
-            //backgroundColor: const Color(0xffe9e9e9),
-            // backgroundColor: Colors.red,
-            body: Stack(
-              children: <Widget>[
-                Container(
-                  //color: Colors.blueAccent,
-                  margin: EdgeInsets.only(left:10,top:160,right:10,bottom: 0),
+      ModalProgressHUD(inAsyncCall: widget.inProgress,
+          child: Directionality(textDirection: TextDirection.rtl,
+              child:       Scaffold(
+                //backgroundColor: const Color(0xffe9e9e9),
+                // backgroundColor: Colors.red,
+                body: Stack(
+                  children: <Widget>[
+                    Container(
+                      //color: Colors.blueAccent,
+                      margin: EdgeInsets.only(left:10,top:160,right:10,bottom: 0),
 
-                  child: widget.wchild,
-                ),
+                      child: widget.wchild,
+                    ),
 
 
 
-                Transform.translate(
-                  offset: Offset(0.0, MediaQuery.of(context).size.height-62.0*MediaQuery.of(context).size.width/375),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 62.0*MediaQuery.of(context).size.width/375,
-                    child: Stack(
-                      children: [
-                        Pinned.fromSize(
-                          bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 62.0),
-                          size: Size(375.0, 62.0),
-                          pinLeft: true,
-                          pinRight: true,
-                          pinTop: true,
-                          pinBottom: true,
-                          child: SvgPicture.string(
-                            _svg_houo9n,
-                            allowDrawingOutsideViewBox: true,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                    Transform.translate(
+
+                      offset: Offset(0.0, MediaQuery.of(context).size.height-62.0*MediaQuery.of(context).size.width/375),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: 62.0*MediaQuery.of(context).size.width/375,
+                        child: Stack(
                           children: [
-                            GestureDetector(
-                              onTap: (){},
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.supervised_user_circle_sharp,color: Colors.white,size: 30,),
-                                  Text('پروفایل',style: Theme.of(context).textTheme.subtitle1,)
-                                ],
+                            Pinned.fromSize(
+                              bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 62.0),
+                              size: Size(375.0, 62.0),
+                              pinLeft: true,
+                              pinRight: true,
+                              pinTop: true,
+                              pinBottom: true,
+                              child: SvgPicture.string(
+                                _svg_houo9n,
+                                allowDrawingOutsideViewBox: true,
+                                fit: BoxFit.fill,
                               ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(),));
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.supervised_user_circle_sharp,color: Colors.white,size: 30,),
+                                      Text('پروفایل',style: Theme.of(context).textTheme.subtitle1,)
+                                    ],
+                                  ),
+
+                                ),
+                                GestureDetector(
+                                  onTap: (){},
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.list_alt,color: Colors.white,size: 30,),
+                                      Text('تراکنشها',style: Theme.of(context).textTheme.subtitle1,)
+                                    ],
+                                  ),
+
+                                ),
+                                Container(
+                                  width: 90,
+                                ),
+                                GestureDetector(
+                                  onTap: (){},
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.add_to_queue_sharp,color: Colors.white,size: 30,),
+                                      Text('پشتیبانی',style: Theme.of(context).textTheme.subtitle1,)
+                                    ],
+                                  ),
+
+                                ),
+                                GestureDetector(
+                                  onTap: (){},
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.account_balance_wallet_rounded,color: Colors.white,size: 30,),
+                                      Text('کیف پول',style: Theme.of(context).textTheme.subtitle1,)
+                                    ],
+                                  ),
+
+                                )
+
+
+
+                              ],
 
                             ),
-                            GestureDetector(
-                              onTap: (){},
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.list_alt,color: Colors.white,size: 30,),
-                                  Text('تراکنشها',style: Theme.of(context).textTheme.subtitle1,)
-                                ],
-                              ),
 
-                            ),
-                            Container(
-                              width: 90,
-                            ),
-                            GestureDetector(
-                              onTap: (){},
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_to_queue_sharp,color: Colors.white,size: 30,),
-                                  Text('پشتیبانی',style: Theme.of(context).textTheme.subtitle1,)
-                                ],
-                              ),
-
-                            ),
-                            GestureDetector(
-                              onTap: (){},
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.account_balance_wallet_rounded,color: Colors.white,size: 30,),
-                                  Text('کیف پول',style: Theme.of(context).textTheme.subtitle1,)
-                                ],
-                              ),
-
-                            )
 
 
 
                           ],
 
+
                         ),
-
-
-
-
-                      ],
-
-
+                      ),
                     ),
-                  ),
-                ),
 
-                Transform.translate(
-                  offset: Offset(((MediaQuery.of(context).size.width/2)-((87.0*MediaQuery.of(context).size.width/375)/2))*-1, MediaQuery.of(context).size.height-90.0*MediaQuery.of(context).size.width/375),
-                  child: SizedBox(
-                    width: 87.0*MediaQuery.of(context).size.width/375,
-                    height: 87.0*MediaQuery.of(context).size.width/375,
-                    child: Stack(
-                      children: [
-                        Pinned.fromSize(
-                          bounds: Rect.fromLTWH(0.0, 0.0, 87.0, 87.0),
-                          size: Size(87.0, 87.0),
-                          pinLeft: true,
-                          pinRight: true,
-                          pinTop: true,
-                          pinBottom: true,
-                          child:
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.elliptical(9999.0, 9999.0)),
-                              color: const Color(0xff26445d),
-                              border: Border.all(width: 1.0, color: const Color(0xff26445d)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xffe07243),
-                                  offset: Offset(0, 3),
-                                  blurRadius: 6,
+                    Transform.translate(
+                      offset: Offset(((MediaQuery.of(context).size.width/2)-((87.0*MediaQuery.of(context).size.width/375)/2))*-1, MediaQuery.of(context).size.height-90.0*MediaQuery.of(context).size.width/375),
+                      child: GestureDetector(
+                        child:                       SizedBox(
+                          width: 87.0*MediaQuery.of(context).size.width/375,
+                          height: 87.0*MediaQuery.of(context).size.width/375,
+                          child: Stack(
+                            children: [
+                              Pinned.fromSize(
+                                bounds: Rect.fromLTWH(0.0, 0.0, 87.0, 87.0),
+                                size: Size(87.0, 87.0),
+                                pinLeft: true,
+                                pinRight: true,
+                                pinTop: true,
+                                pinBottom: true,
+                                child:
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.elliptical(9999.0, 9999.0)),
+                                    color: const Color(0xff26445d),
+                                    border: Border.all(width: 1.0, color: const Color(0xff26445d)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xffe07243),
+                                        offset: Offset(0, 3),
+                                        blurRadius: 6,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Pinned.fromSize(
-                          bounds: Rect.fromLTWH(17.0, 17.0, 54.0, 53.0),
-                          size: Size(87.0, 87.0),
-                          pinLeft: true,
-                          pinRight: true,
-                          pinTop: true,
-                          pinBottom: true,
-                          child:
-                          // Adobe XD layer: 'home' (shape)
-                          Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: const AssetImage('assets/images/home.png'),
-                                fit: BoxFit.fill,
+                              ),
+                              Pinned.fromSize(
+                                bounds: Rect.fromLTWH(17.0, 17.0, 54.0, 53.0),
+                                size: Size(87.0, 87.0),
+                                pinLeft: true,
+                                pinRight: true,
+                                pinTop: true,
+                                pinBottom: true,
+                                child:
+                                // Adobe XD layer: 'home' (shape)
+                                Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: const AssetImage('assets/images/home.png'),
+                                      fit: BoxFit.fill,
+                                    ),
+
+                                  ),
+                                ),
                               ),
 
-                            ),
+
+
+
+                            ],
+
+
                           ),
                         ),
-
-
-
-
-                      ],
-
-
+                        onTap: (){
+                          if(!widget.isHome)
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MainPage(),));
+                        },
+                          
+                      )
                     ),
-                  ),
+
+
+
+
+
+
+
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: 200.0,
+                      child: Stack(
+                        children: [
+                          Pinned.fromSize(
+                            bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
+                            size: Size(375.0, 200.0),
+                            pinLeft: true,
+                            pinRight: true,
+                            pinTop: true,
+                            pinBottom: true,
+                            child: SvgPicture.string(
+                              _svg_mq30wu,
+                              allowDrawingOutsideViewBox: true,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          Pinned.fromSize(
+                            bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
+                            size: Size(375.0, 200.0),
+                            pinLeft: true,
+                            pinRight: true,
+                            pinTop: true,
+                            pinBottom: true,
+                            child: SvgPicture.string(
+                              _svg_2rup1j,
+                              allowDrawingOutsideViewBox: true,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          Pinned.fromSize(
+                            bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
+                            size: Size(375.0, 200.0),
+                            pinLeft: true,
+                            pinRight: true,
+                            pinTop: true,
+                            pinBottom: true,
+                            child: SvgPicture.string(
+                              _svg_30ph6e,
+                              allowDrawingOutsideViewBox: true,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          Pinned.fromSize(
+                            bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
+                            size: Size(375.0, 200.0),
+                            pinLeft: true,
+                            pinRight: true,
+                            pinTop: true,
+                            pinBottom: true,
+                            child: SvgPicture.string(
+                              _svg_jyq2pk,
+                              allowDrawingOutsideViewBox: true,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+
+                          Center(child: Container(
+                            height: 120,
+                            width: 140,
+                            child: WalletWidget(),
+                          ),)
+                        ],
+                      ),
+                    ),
+
+
+
+
+                  ],
                 ),
-
-
-
-
-
-
-
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: 200.0,
-                  child: Stack(
-                    children: [
-                      Pinned.fromSize(
-                        bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
-                        size: Size(375.0, 200.0),
-                        pinLeft: true,
-                        pinRight: true,
-                        pinTop: true,
-                        pinBottom: true,
-                        child: SvgPicture.string(
-                          _svg_mq30wu,
-                          allowDrawingOutsideViewBox: true,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      Pinned.fromSize(
-                        bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
-                        size: Size(375.0, 200.0),
-                        pinLeft: true,
-                        pinRight: true,
-                        pinTop: true,
-                        pinBottom: true,
-                        child: SvgPicture.string(
-                          _svg_2rup1j,
-                          allowDrawingOutsideViewBox: true,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      Pinned.fromSize(
-                        bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
-                        size: Size(375.0, 200.0),
-                        pinLeft: true,
-                        pinRight: true,
-                        pinTop: true,
-                        pinBottom: true,
-                        child: SvgPicture.string(
-                          _svg_30ph6e,
-                          allowDrawingOutsideViewBox: true,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      Pinned.fromSize(
-                        bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 200.0),
-                        size: Size(375.0, 200.0),
-                        pinLeft: true,
-                        pinRight: true,
-                        pinTop: true,
-                        pinBottom: true,
-                        child: SvgPicture.string(
-                          _svg_jyq2pk,
-                          allowDrawingOutsideViewBox: true,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-
-                      Center(child: Container(
-                        height: 120,
-                        width: 140,
-                        child: WalletWidget(),
-                      ),)
-                    ],
-                  ),
-                ),
-
-
-
-
-              ],
-            ),
-          )
-      )
+              )
+          ))
     ;
   }
 

@@ -10,18 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
-enum paymentTypes{
-  Charge,
-  Bill,
-  InternetPackage
-}
+
 
 class PreInvoice extends StatefulWidget {
-  final TopUp paymentInfo;
-  final paymentTypes paymentType;
+  final String title;
+  final String subTitle;
+  final double amount;
+  final double walletAmount;
+  final String paymentLink;
+  final bool canUseWallet;
 
 
-  const PreInvoice({ Key key, this.paymentInfo, this.paymentType }):super(key: key) ;
+
+  const PreInvoice({ Key key, this.title,this.subTitle,this.amount,this.walletAmount=0,this.paymentLink,this.canUseWallet }):super(key: key) ;
   @override
   _PreInvoiceState createState() => _PreInvoiceState();
 }
@@ -33,7 +34,7 @@ class _PreInvoiceState extends State<PreInvoice> {
   Future<SharedPreferences> _prefs=SharedPreferences.getInstance();
 
   Future<void> _payChargeWithCard(TopUp topUp) async{
-    if(await auth.reAuth())
+    if(await auth.checkAuth())
       {
         SharedPreferences _p=await SharedPreferences.getInstance();
         String _token=_p.getString('token');
@@ -78,36 +79,8 @@ class _PreInvoiceState extends State<PreInvoice> {
 
   }
 
-  List<String> _OperatorName=[
-    'ایرانسل',
-    'همراه اول',
-    'رایتل',
-    'شاتل موبایل'
-  ];
 
-  List<String> _ChargeVariety=[
-    'معمولی',
-    'شگفت انگیز',
-    'بانوان',
-    'جوانان'
-  ];
 
-  String _getPaymentTypeName(paymentTypes type){
-    switch(type){
-      case paymentTypes.Bill:
-        return 'پرداخت قبض';
-        break;
-      case paymentTypes.Charge:
-        return 'خرید شارژ';
-        break;
-      case paymentTypes.InternetPackage:
-        return 'خرید بسته اینترنت';
-        break;
-      default:
-        return 'دیگر پرداخت ها';
-        break;
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Directionality(textDirection: TextDirection.rtl,
@@ -146,7 +119,7 @@ class _PreInvoiceState extends State<PreInvoice> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('نوع پرداخت',style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.normal),),
-                            Text('${_getPaymentTypeName(widget.paymentType)}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),)
+                            Text('${widget.title}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),)
                           ],
                         ),
                         Row(
@@ -154,9 +127,8 @@ class _PreInvoiceState extends State<PreInvoice> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('نوع تراکنش',style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.normal),),
-                            widget.paymentType==paymentTypes.Charge?
-                            Text('${_ChargeVariety[widget.paymentInfo.chargeType]}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),):
-                                Container(height: 0,)
+
+                            Text('${widget.subTitle}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),)
                           ],
 
                         ),
@@ -165,17 +137,7 @@ class _PreInvoiceState extends State<PreInvoice> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('مبلغ تراکنش',style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.normal),),
-                            Text('${widget.paymentInfo.amount}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('مالیات',style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.normal),),
-                            Text('${(widget.paymentInfo.amount*0.09).toInt()}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),),
-
-
+                            Text('${widget.amount}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.bold),)
                           ],
                         ),
                         Divider(color: Colors.white,thickness: 2,height: 4,indent: 5,endIndent: 5,),
@@ -184,11 +146,27 @@ class _PreInvoiceState extends State<PreInvoice> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('مبلغ قابل پرداخت',style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.normal),),
-                            Text('${(widget.paymentInfo.amount*0.09+widget.paymentInfo.amount).toInt()}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 16,fontWeight: FontWeight.bold),),
+                            Text('${(widget.amount).toInt()}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 16,fontWeight: FontWeight.bold),),
 
 
                           ],
                         ),
+                        Divider(color: Colors.white,thickness: 2,height: 4,indent: 5,endIndent: 5,),
+                        widget.canUseWallet?Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('موجودی کیف پول',style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.normal),),
+                            Text('${(widget.walletAmount).toInt()}ریال',style: TextStyle(color: PColor.blueparto,fontSize: 16,fontWeight: FontWeight.bold),),
+
+
+                          ],
+                        ):
+                            Container(height: 0,),
+
+
+
+
 
                         _errorText.isNotEmpty?
                             Container(
@@ -242,25 +220,47 @@ class _PreInvoiceState extends State<PreInvoice> {
                     right: 0,
                     child: ButtonBar(
                       alignment: MainAxisAlignment.spaceAround,
-                      children: [
+                      children:
+                      widget.canUseWallet?[
                         CButton(
                         label: 'پرداخت با درگاه بانکی',
                           onClick: () async{
-                          switch(widget.paymentType){
-                            case paymentTypes.Charge:
-                              {
-                                _payChargeWithCard(widget.paymentInfo);
+                          if(await canLaunch(widget.paymentLink))
+                            await launch(widget.paymentLink);
+                          else
+                            setState(() {
+                              _errorText='امکان باز کردن لینک پرداخت وجود ندارد';
+                            });
 
-                              }
-                              break;
-                            default:
-                              break;
-                          }
+
 
                           },
 
 
-                      )] ,
+                      ) ,
+
+                          CButton(
+                            label: 'پرداخت با کیف پول',
+                          )
+                      ]:[
+                        CButton(
+                          label: 'پرداخت با درگاه بانکی',
+                          onClick: () async{
+                            if(await canLaunch(widget.paymentLink))
+                              await launch(widget.paymentLink);
+                            else
+                              setState(() {
+                                _errorText='امکان باز کردن لینک پرداخت وجود ندارد';
+                              });
+
+
+
+                          },
+
+
+                        ) ,
+
+                      ]
                     )
                 )
 
