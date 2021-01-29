@@ -58,88 +58,97 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   }
+  ProfileInfo _info=new ProfileInfo();
+  bool _getingData=true;
+  bool _hasError=true;
+  @override
+  void initState() {
+    getProfile().then((value) {
+      if(value!=null)
+      {
+        setState(() {
+          _info=value;
+          _hasError=false;
+
+        });
+
+
+      }
+      setState(() {
+        _getingData=false;
+      });
+
+
+
+    });
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return MasterTemplate(
       wchild:
-      FutureBuilder<ProfileInfo>(
-        future: getProfile(),
-        builder: (context, snapshot) {
-          switch(snapshot.connectionState){
-            case ConnectionState.active:
-            case ConnectionState.waiting:
-              return Center(
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  child: CircularProgressIndicator(),
+        _getingData?
+            Center(
+              child: Container(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(),
+              ),
+
+            ):
+            _hasError?
+                Center(
+                  child: Container(
+                    height: 30,
+                    child: Text('خطا در دریافت اطلاعات از سرور'),
+                  ),
+                ):
+            Column(
+
+              children: [
+                Padding(padding: EdgeInsets.only(top: 15)),
+                CircleAvatar(
+                  minRadius: 30,
+                  maxRadius: 40,
+                  backgroundColor: PColor.orangeparto,
+                  child: Icon(Icons.person_outline_rounded,color: Colors.white,size: 45,),
                 ),
-              );
-              break;
-            case ConnectionState.none:
-              return
-                Center(child:Text('خطا1 '));
-              break;
-            case ConnectionState.done:
-              {
+                Text(
+                  '${_info.deviceInfo.name} ${_info.deviceInfo.family}',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headline1,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  'اطلاعات پروفایل کاربری',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .subtitle1,
+                  textAlign: TextAlign.center,
+                ),
+                Divider(
+                  color: PColor.orangeparto,
+                  thickness: 2,
+                ),
+                Expanded(child: ListView(
+                  children: [
+                    Row(
+                      children: [
+                        Text('شماره تلفن همراه',style: TextStyle(color: PColor.blueparto),),
+                        Text('${_info.deviceInfo.cellNumber}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),)
+                      ],
+                    )
+                  ],
+                ))
+              ],
+            )
 
-                  var _data=snapshot.data;
-                  return Column(
-
-                    children: [
-                      Padding(padding: EdgeInsets.only(top: 15)),
-                      CircleAvatar(
-                        minRadius: 30,
-                        maxRadius: 40,
-                        backgroundColor: PColor.orangeparto,
-                        child: Icon(Icons.person_outline_rounded,color: Colors.white,size: 45,),
-                      ),
-                      Text(
-                        '${_data.deviceInfo.name} ${_data.deviceInfo.family}',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headline1,
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        'اطلاعات پروفایل کاربری',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .subtitle1,
-                        textAlign: TextAlign.center,
-                      ),
-                      Divider(
-                        color: PColor.orangeparto,
-                        thickness: 2,
-                      ),
-                      Expanded(child: ListView(
-                        children: [
-                          Row(
-                            children: [
-                              Text('شماره تلفن همراه',style: TextStyle(color: PColor.blueparto),),
-                              Text('${_data.deviceInfo.cellNumber}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),)
-                            ],
-                          )
-                        ],
-                      ))
-                    ],
-                  );
-
-
-
-
-        }
-              break;
-
-
-          }
-          return
-          Center(child:Text('خطا '));
-        },
-      )
 
 
 

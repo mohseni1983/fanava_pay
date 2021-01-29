@@ -38,10 +38,10 @@ class PColor{
   static const int _bluepartoPrimaryValue = 0xFF26445D;
 
   static const MaterialColor bluepartoAccent = MaterialColor(_bluepartoAccentValue, <int, Color>{
-    100: Color(0xFF6DB1FF),
+    100: Color(0xFFBEC7CE),
     200: Color(_bluepartoAccentValue),
-    400: Color(0xFF077AFF),
-    700: Color(0xFF006EEC),
+    400: Color(0xFF476075),
+    700: Color(0xFF1C354B),
   });
-  static const int _bluepartoAccentValue = 0xFF3A95FF;
+  static const int _bluepartoAccentValue = 0xFF93A2AE;
 }
