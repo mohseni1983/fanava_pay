@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/components/maintemplate.dart';
+import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
@@ -623,7 +624,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(inAsyncCall: _inprogress,
-        child: MasterTemplate(
+        child: MasterTemplateWithoutFooter(
+
            // inProgress: _inprogress,
             wchild: Column(
               children: [
@@ -642,7 +644,9 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                   color: PColor.orangeparto,
                   thickness: 2,
                 ),
-                Expanded(child: _stepperWidget())
+                Expanded(child: _stepperWidget()),
+                Container(height: 90,color: Colors.red,)
+
               ],
             )
 

@@ -37,6 +37,8 @@ dependencies:
   smart_select:
   url_launcher:
   fa_stepper:
+  flutter_money_formatter:
+  contact_picker:
 
 dev_dependencies:
   flutter_test:

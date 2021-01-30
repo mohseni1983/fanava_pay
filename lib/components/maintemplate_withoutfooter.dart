@@ -5,19 +5,19 @@ import 'package:parto_v/pages/main_page.dart';
 import 'package:parto_v/pages/profile.dart';
 
 import 'TopWallet.dart';
-class MasterTemplate extends StatefulWidget {
+class MasterTemplateWithoutFooter extends StatefulWidget {
   final Widget wchild;
 
   final bool isHome;
 
 
 
-  const MasterTemplate({Key key, this.wchild,this.isHome=false}) : super(key: key);
+  const MasterTemplateWithoutFooter({Key key, this.wchild,this.isHome=false}) : super(key: key);
   @override
   _MasterTemplateState createState() => _MasterTemplateState();
 }
 
-class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStateMixin{
+class _MasterTemplateState extends State<MasterTemplateWithoutFooter> with TickerProviderStateMixin{
   AnimationController _animationController;
 
   @override
@@ -39,6 +39,7 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
 
 
 
+/*
                 Transform.translate(
 
                   offset: Offset(0.0, MediaQuery.of(context).size.height-62.0*MediaQuery.of(context).size.width/375),
@@ -200,6 +201,7 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
 
                     )
                 ),
+*/
 
 
 
