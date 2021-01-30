@@ -10,7 +10,9 @@ import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
+import 'package:parto_v/custom_widgets/cust_pre_invoice_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
+import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -27,6 +29,13 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   TextEditingController _mobile = new TextEditingController();
   int _topUpOperator = -1;
   bool _progressing=false;
+  String _paymentLink='';
+  bool _canUseWallet=false;
+  double _walletAmount=0;
+  bool _readyToPay=false;
+  String _invoiceTitle='';
+  String _invoiceSubTitle='';
+  double _invoiceAmount=0;
 
   Widget Progress()=>
   Scaffold(
@@ -148,7 +157,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
         _progressing = true;
       });
 
-      _payChargeWithCard(_current).then((value) {
+      _payChargeWithCardAndSend(_current).then((value) {
 
       });
     });
@@ -234,6 +243,91 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
         );
     });
   }
+  Future<void> _payChargeWithCardAndSend(TopUp topUp) async {
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _p = await SharedPreferences.getInstance();
+        String _token = _p.getString('token');
+        var jsonTopUp = topUpToJson(topUp);
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: jsonTopUp);
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            _payChargeWithCard(topUp);
+          });
+        }
+        if (result.statusCode == 200) {
+          debugPrint(result.body);
+          var jres = json.decode(result.body);
+          setState(() {
+            _progressing=false;
+          });
+
+          if (jres['ResponseCode'] == 0)
+            {
+              setState(() {
+                _invoiceTitle= '${_chargeTypes[_selectedChargeType] }  ${_operatorsWithLogo[_topUpOperator].name}';
+                _invoiceSubTitle='${_operatorsWithLogo[_topUpOperator].chargeTypes[_selectedTopUpType].name}';
+                _invoiceAmount=_selectedAmount.toDouble();
+                _canUseWallet= jres['CanUseWallet'];
+                _paymentLink=jres['Url'];
+                _walletAmount=jres['Cash'];
+                _readyToPay=true;
+
+              });
+            }
+/*            showDialog(context: context,
+              builder: (context) {
+                return PreInvoice(
+                  title: '${_chargeTypes[_selectedChargeType] }  ${_operatorsWithLogo[_topUpOperator]
+                      .name}',
+                  subTitle: '${_operatorsWithLogo[_topUpOperator]
+                      .chargeTypes[_selectedTopUpType].name}',
+                  amount: _selectedAmount.toDouble(),
+                  canUseWallet: jres['CanUseWallet'],
+                  paymentLink: jres['Url'],
+                  walletAmount: 0,
+
+                );
+              },
+
+            );*/
+          else if (jres['ResponseCode'] == 5) {
+            auth.retryAuth().then((value) {
+              _payChargeWithCard(topUp);
+            });
+          }
+          else
+            showDialog(context: context,
+              builder: (context) =>
+                  CAlertDialog(
+                    content: jres['ResponseMessage'],
+                    buttons: [
+                      CButton(label: 'بستن',
+                        onClick: () => Navigator.of(context).pop(),)
+                    ],
+                  ),
+            );
+        }
+      } else
+        showDialog(context: context,
+          builder: (context) =>
+              CAlertDialog(
+                content: 'خطا در احراز هویت',
+                buttons: [
+                  CButton(
+                    label: 'بستن', onClick: () => Navigator.of(context).pop(),)
+                ],
+              ),
+        );
+    });
+  }
+
 
   Widget SinglePrices = Container(height: 0,);
 
@@ -243,7 +337,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
       var _list = _operatorsWithLogo[OperatorId].chargeTypes[TopUpId].prices;
       var _x = _list.asMap();
       _x.forEach((key, value) {
-        _widgets.add(CSelectedButton(
+        _widgets.add(
+/*            CSelectedButton(
           height: 40,
           label: getMoneyByRial(value),
           selectedValue: _selectedAmount,
@@ -254,7 +349,19 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
           },
           value: value,
 
-        ));
+        )*/
+        CSelectedGridItem(
+          height: 40,
+          label: getMoneyByRial(value),
+          selectedValue: _selectedAmount,
+          onPress: (v) {
+            setState(() {
+              _selectedAmount = value;
+            });
+          },
+          value: value,
+        )
+        );
       });
     }
     return GridView.count(
@@ -455,6 +562,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                       getContact().then((value) {
                                         setState(() {
                                           _mobile.text = value;
+                                          _onPhoneChange(value);
                                         });
                                       });
                                     },
@@ -725,6 +833,17 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                   ),
                 ),
               ),
+            ),
+            PreInvoiceContainer(
+              amount: _invoiceAmount,
+              paymentLink: _paymentLink ,
+              canUseWallet: _canUseWallet,
+              walletAmount: _walletAmount,
+              readyToPayment: _readyToPay,
+              title: _invoiceTitle,
+              subTitle: _invoiceSubTitle,
+
+
             )
 
           ],
