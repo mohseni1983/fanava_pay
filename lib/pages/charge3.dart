@@ -38,11 +38,12 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   double _invoiceAmount=0;
 
   Widget Progress()=>
-  Scaffold(
-    body:       Container(
+  Material(
+    color: Colors.transparent,
+    child:    Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      color: PColor.orangeparto.shade300.withOpacity(0.5),
+      color: PColor.orangeparto.withOpacity(0.8),
       child: Center(
         child:
         Column(
@@ -52,11 +53,12 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
           children: [
 
             Container(height: 30,width: 30,child: CircularProgressIndicator(),),
-            Text('در حال دریافت اطلاعات')
+            Text('در حال دریافت اطلاعات',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),textScaleFactor: 1.4,)
           ],
         ),
       ),
     ),
+
   );
 
 
@@ -171,6 +173,295 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   int _selectedTopUpType = 0;
 
 
+  //ویجت پرداخت
+  int _selectedPaymentType=-1;
+  Future<void> _payWithWallet() async{
+    int _refIdIndex=_paymentLink.indexOf('?RefId=')+7;
+    String _refId=_paymentLink.substring(_refIdIndex);
+    setState(() {
+      _readyToPay=false;
+      _progressing=true;
+    });
+
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _token = _prefs.getString('token');
+        var _body = {
+          "ReferenceNumber": int.parse(_refId),
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _prefs.getString('sign'),
+          "UseWallet": true
+        };
+        var jBody = json.encode(_body);
+
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: jBody);
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            _payWithWallet();
+          });
+        }
+        if (result.statusCode == 200) {
+          setState(() {
+            _progressing=false;
+          });
+          debugPrint(result.body);
+          var jres = json.decode(result.body);
+          if(jres["ResponseCode"]==0)
+            showDialog(context: context,
+            builder: (context) => CAlertDialog(
+              content: 'عملیات موفق',
+              subContent: 'شارژ و پرداخت از کیف پول با موفقیت انجام شد',
+              buttons: [CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)],
+            ),
+            );
+          else
+            showDialog(context: context,
+              builder: (context) => CAlertDialog(
+                content: 'عملیات ناموفق',
+                subContent: jres['ResponseMessage'],
+                buttons: [CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)],
+              ),
+            );
+        }
+      }
+    });
+
+
+
+
+
+  }
+
+  Widget _paymentDialog(){
+    return     Directionality(textDirection: TextDirection.rtl,
+        child:       AnimatedPositioned(
+          duration: Duration(seconds: 2),
+          child:
+          Material(
+            color: Colors.transparent,
+            child:
+            Container(
+              height: MediaQuery.of(context).size.height*0.7+30,
+              color: Colors.transparent,
+              child:           Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+
+                  Container(
+                    height: MediaQuery.of(context).size.height*0.7,
+                    width: MediaQuery.of(context).size.width-30,
+                    padding: EdgeInsets.only(top: 5,left: 15,right: 15),
+                    decoration: BoxDecoration(
+                        color: PColor.blueparto,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                        boxShadow: [
+/*
+                        BoxShadow(
+                            color: PColor.orangeparto,
+                            blurRadius: 3,
+                            spreadRadius: 3,
+                            offset: Offset(0,-1)
+                        ),
+*/
+                        ]
+                    ),
+                    child:
+                    Column(
+                      crossAxisAlignment:CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Text('تایید اطلاعات تراکنش',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),textScaleFactor: 1.3,textAlign: TextAlign.center,),
+                              Text('اطلاعات را مطالعه و پس از اطمینان پرداخت نمایید',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 0.8,textAlign: TextAlign.center,),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                margin: EdgeInsets.only(top: 5,left: 0,right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('نام محصول:',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 1,),
+                                        Text('${_invoiceTitle}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),textScaleFactor: 1,),
+
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('نوع محصول:',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 1,),
+                                        Text('${_invoiceSubTitle}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),textScaleFactor: 1,),
+
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('مبلغ پرداخت:',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 1.2,),
+                                        Text('${getMoneyByRial(_invoiceAmount.toInt())} ریال',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),textScaleFactor: 1.2,),
+
+                                      ],
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                              Text('روش پرداخت',style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),textScaleFactor: 1.3,textAlign: TextAlign.center,),
+                              Text('یکی از روش های پرداخت را انتخاب نمایید',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 0.8,textAlign: TextAlign.center,),
+                              Row(
+                                children: [
+                                  CSelectedButton(
+                                    label: 'کیف پول',
+                                    height: 40,
+                                    selectedColor: Colors.blue,
+                                    selectedValue: _selectedPaymentType,
+                                    value: 0,
+                                    onPress: (v){
+                                      setState(() {
+                                        _selectedPaymentType=v;
+                                      });
+                                    },
+                                  ),
+                                  CSelectedButton(
+                                    label: 'کارت بانکی',
+                                    selectedValue: _selectedPaymentType,
+                                    selectedColor: Colors.blue,
+                                    height: 40,
+
+                                    value: 1,
+                                    onPress: (v){
+                                      setState(() {
+                                        _selectedPaymentType=v;
+                                      });
+                                    },
+                                  )
+
+                                ],
+                              ),
+                              _selectedPaymentType==0?
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                margin: EdgeInsets.only(top: 5,left: 0,right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('مانده کیف پول:',style: TextStyle(color: Colors.white,fontWeight: FontWeight.normal),textScaleFactor: 1,),
+                                        Text('${getMoneyByRial(_walletAmount.toInt())} ریال',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),textScaleFactor: 1,),
+
+                                      ],
+                                    ),
+                                    _walletAmount<_invoiceAmount?
+                                    Text('مبلغ ${getMoneyByRial(_invoiceAmount.toInt())} ریال با کارت بانکی پرداخت شود',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.normal),textScaleFactor: 1,):
+                                    Container(height: 0,),
+
+
+                                  ],
+                                ),
+                              ):Container(height: 0,),
+
+
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 60,
+                          child:Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _selectedPaymentType==0 && _walletAmount>_invoiceAmount?
+                              CButton(label: 'پرداخت با کیف پول',onClick: (){
+                                _payWithWallet();
+                              },color: Colors.blue,textColor: Colors.white,):
+                              CButton(label: 'پرداخت با درگاه بانکی',onClick: () async{
+                                if(await canLaunch(_paymentLink))
+                                  launch(_paymentLink).then((value) {
+                                    setState(() {
+                                      _readyToPay=false;
+                                    });
+                                  });
+                              },color: Colors.redAccent,textColor: Colors.white,),
+
+                              Column(
+                                children: [
+                                  Text('مبلغ قابل پرداخت',style: TextStyle(color: Colors.white70),textScaleFactor: 0.9,),
+                                  Text(' ${getMoneyByRial(_invoiceAmount.toInt())} ریال',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),textScaleFactor: 1.2,)
+                                ],
+                              )
+                            ],
+                          ),
+                          //  color: Colors.red,
+                        )
+
+
+
+
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                      top: 10,
+                      child:
+                      GestureDetector(
+                        child:                     Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(150),
+                              color: PColor.orangeparto
+
+                          ),
+                          child: Icon(Icons.close,size: 35,color: Colors.white,),
+                        ),
+                        onTap: (){
+                          setState(() {
+                            _readyToPay=false;
+                          });
+                        }
+                        ,
+                      )
+                  )
+
+                ],
+              ),
+
+            ),
+
+          ),
+          bottom: _readyToPay? 0:(MediaQuery.of(context).size.height*0.7+30)*-1,
+          right: 5,
+          left: 5,
+          curve: Curves.fastLinearToSlowEaseIn,
+
+
+
+
+        )
+    );
+
+  }
+//پایان ویجت پرداخت
+
   Future<void> _payChargeWithCard(TopUp topUp) async {
     auth.checkAuth().then((value) async {
       if (value) {
@@ -222,7 +513,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
             showDialog(context: context,
               builder: (context) =>
                   CAlertDialog(
-                    content: jres['ResponseMessage'],
+                    subContent: jres['ResponseMessage'],
                     buttons: [
                       CButton(label: 'بستن',
                         onClick: () => Navigator.of(context).pop(),)
@@ -697,13 +988,14 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                           Column(
                             children: [
                               Text(
-                                'اپراتور کارت شارژ را وارد کنید',
+                                'این بخش بزودی فعال می گردد',
                                 style: TextStyle(
                                     color: PColor.blueparto,
                                     fontWeight: FontWeight.normal,
                                     fontSize: 12),
                                 textAlign: TextAlign.start,
                               ),
+/*
                               Container(
                                 alignment: Alignment.center,
                                 color: Colors.transparent,
@@ -762,6 +1054,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                   },
                                 ),
                               )
+*/
 
                             ],
                           ),
@@ -806,14 +1099,15 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      CButton(label: 'خرید', onClick: () {
+                      CButton(label: 'بعدی', onClick: () {
                         if (_selectedChargeType == 0)
                           if (_topUpOperator == -1 ||
                               _mobile.text.length < 11) {
                             showDialog(context: context,
                                 builder: (context) =>
                                     CAlertDialog(
-                                      content: 'شماره همراه وارد شده درست نیست، لطفا شماره را بررسی کنید.',
+                                      content: 'خطا در شماره',
+                                      subContent: 'شماره همراه وارد شده درست نیست، لطفا شماره را بررسی کنید.',
                                       buttons: [
                                         CButton(label: 'بستن',
                                           onClick: () =>
@@ -834,17 +1128,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                 ),
               ),
             ),
-            PreInvoiceContainer(
-              amount: _invoiceAmount,
-              paymentLink: _paymentLink ,
-              canUseWallet: _canUseWallet,
-              walletAmount: _walletAmount,
-              readyToPayment: _readyToPay,
-              title: _invoiceTitle,
-              subTitle: _invoiceSubTitle,
-
-
-            )
+            _paymentDialog()
 
           ],
         )

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:parto_v/pages/main_page.dart';
 import 'package:parto_v/pages/profile.dart';
+import 'package:parto_v/pages/wallet.dart';
 
 import 'TopWallet.dart';
 class MasterTemplate extends StatefulWidget {
@@ -106,7 +107,9 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
 
                             ),
                             GestureDetector(
-                              onTap: (){},
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => WalletPage(),));
+                              },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,

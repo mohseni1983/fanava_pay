@@ -307,4 +307,10 @@ Future<void> _payWithWallet() async{
     ;
 
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    this.dispose();
+  }
 }
