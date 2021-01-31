@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:parto_v/classes/convert.dart';
 import 'package:parto_v/classes/topup.dart';
+import 'package:parto_v/classes/wallet_trans.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
@@ -16,6 +18,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:persian_datepicker/persian_datepicker.dart';
+import 'package:persian_datepicker/persian_datetime.dart';
+import 'package:intl/intl.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -25,6 +30,69 @@ class WalletPage extends StatefulWidget {
 class _WalletPageState extends State<WalletPage> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   bool _progressing=false;
+
+  TextEditingController _startDatePicker=new TextEditingController();
+  TextEditingController _endDatePicker=new TextEditingController();
+  PersianDatePickerWidget _startPickerWidget;
+  PersianDatePickerWidget _endPickerWidget;
+  List<FinancingInfoListElement> _transList=[];
+  int _transCount=0;
+
+
+  PersianDateTime getPersianDate(DateTime dateTime){
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    PersianDateTime todayPersianDate=PersianDateTime.fromGregorian(gregorianDateTime: formatter.format(dateTime));
+    return todayPersianDate;
+
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+
+    _startPickerWidget=PersianDatePicker(
+      controller: _startDatePicker,
+      //datePickerHeight: 80,
+      fontFamily: 'Dirooz',
+      datetime: getPersianDate(DateTime.now().add(Duration(days: -1))).toString(),
+      headerTodayBackgroundColor: PColor.orangeparto,
+      farsiDigits: false,
+      //daysBackgroundColor: PColor.blueparto,
+      headerBackgroundColor: PColor.orangeparto,
+      headerTodayIcon: Icon(Icons.today_rounded,color: PColor.blueparto,),
+      selectedDayBackgroundColor: PColor.orangepartoAccent,
+      weekCaptionsBackgroundColor: PColor.blueparto,
+      //datetime: todayPersianDate.toString(),
+      //maxDatetime: todayPersianDate.toString(),
+      rangeDatePicker: false,
+      //rangeSeparator: '/',
+
+    ).init();
+    _endPickerWidget=PersianDatePicker(
+      controller: _endDatePicker,
+      //datePickerHeight: 80,
+      fontFamily: 'Dirooz',
+      farsiDigits: false,
+
+      datetime: getPersianDate(DateTime.now()).toString(),
+      headerTodayBackgroundColor: PColor.orangeparto,
+      //daysBackgroundColor: PColor.blueparto,
+      headerBackgroundColor: PColor.orangeparto,
+      headerTodayIcon: Icon(Icons.today_rounded,color: PColor.blueparto,),
+      selectedDayBackgroundColor: PColor.orangepartoAccent,
+      weekCaptionsBackgroundColor: PColor.blueparto,
+      //datetime: todayPersianDate.toString(),
+      //maxDatetime: todayPersianDate.toString(),
+      rangeDatePicker: false,
+      //rangeSeparator: '/',
+
+    ).init();
+
+    super.initState();
+  }
+
 
 
   //پروگرس ارتباط با سرور جهت دریافت اطلاعات
@@ -141,12 +209,22 @@ class _WalletPageState extends State<WalletPage> {
       _list.add(CSelectedButton(
         value: key,
         label: v,
-        height: 40,
+        height: 35,
         selectedValue: _selectedWalletOperation,
         onPress: (x) {
           setState(() {
             _selectedWalletOperation = x;
           });
+          if(x==1)
+            setState(() {
+            getWalletTransactions(pageNumber: 1,startDate: DateTime.now().add(Duration(days: -1)),endDate: DateTime.now(),pageSize: 3).then((value) {
+              setState(() {
+                _transList=value.financingInfoLists;
+                _transCount=value.totalCounts;
+              });
+            });
+
+            });
         },
       ));
     });
@@ -162,7 +240,7 @@ class _WalletPageState extends State<WalletPage> {
 
   //ویجت عدد اعتبار
   int _selectAmountForCharge=500000;
-  List<int> _predefinedAmountList=[100000,500000,750000,1000000];
+  List<int> _predefinedAmountList=[500000,750000,1000000];
   Widget ChargeAmountSelector(){
     return
         Container(
@@ -252,6 +330,86 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+  //بخش دریافت لیست تراکنش های کیف پول
+  Future<WalletTransFinancingInfoList> getWalletTransactions({int pageNumber,DateTime startDate,DateTime endDate,int pageSize}) async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async{
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+
+
+        String _sign = _prefs.getString('sign');
+        String _token = _prefs.get('token');
+        var _body={
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _sign,
+          "UseWallet": true,
+          "CurrentPage": pageNumber,
+          "DateFrom": startDate.toString(),
+          "DateTo": endDate.toString(),
+          "PageSize": pageSize,
+          "UseWallet": true
+
+        };
+        var _jBody=json.encode(_body);
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/GetFinancingInfo',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: _jBody
+        );
+        if (result.statusCode==401)
+        {
+          auth.retryAuth().then((value) {
+            getWalletTransactions(pageNumber: pageNumber,startDate: startDate,endDate: endDate,pageSize: pageSize);
+          });
+        }
+        if(result.statusCode==200){
+          setState(() {
+            _progressing=false;
+          });
+          debugPrint(result.body);
+          var jres=json.decode(result.body);
+
+          if(jres['ResponseCode']==0){
+            var _financeList=jres['FinancingInfoList'];
+            debugPrint(jres);
+            WalletTransFinancingInfoList _list= WalletTransFinancingInfoList.fromJson(_financeList);
+            return _list;
+          }
+
+        }
+      }
+    });
+
+
+
+
+
+  }
+
+
+  Widget MakeListOfTrans(){
+      return
+        ListView.builder(
+          itemCount: _transList.length,
+          padding: EdgeInsets.zero,
+          itemBuilder: (context, index) {
+            var _item=_transList[index];
+            return Container(
+              color: Colors.green,
+              margin: EdgeInsets.all(5),
+              child: Text('${ _item.transactDate }'),
+            );
+          },
+        );
+  }
+
+
 
 
 
@@ -292,7 +450,7 @@ class _WalletPageState extends State<WalletPage> {
                     padding: EdgeInsets.zero,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(5),
+                        padding: EdgeInsets.all(1),
                         decoration: BoxDecoration(
                           border: Border.all(color: PColor.orangeparto,
                               width: 2,
@@ -302,18 +460,20 @@ class _WalletPageState extends State<WalletPage> {
                         ),
                         child: Column(
                           children: [
-                            Text('عملیات مورد نظر را انخاب کنید',
+                            Text('عملیات مورد نظر را انتخاب کنید',
                               style: TextStyle(fontWeight: FontWeight.bold),),
                             Divider(color: PColor.orangeparto,
                               indent: 5,
                               endIndent: 5,
+                              height: 0,
                               thickness: 2,),
                             WalletOperationTypes(),
                           ],
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.all(5),
+                        //height: 50,
+                        padding: EdgeInsets.all(1),
                         margin: EdgeInsets.only(top: 5),
                         decoration: BoxDecoration(
                           border: Border.all(color: PColor.orangeparto,
@@ -325,7 +485,7 @@ class _WalletPageState extends State<WalletPage> {
 
                         child:
                         _selectedWalletOperation == 0 ?
-                        //بخش مربوط به تاپ آپ
+                        //بخش مربوط به شارژ کیف
                         Column(
                           children: [
                             Text(
@@ -339,17 +499,110 @@ class _WalletPageState extends State<WalletPage> {
 
                           ],
                         ) :
-                        //بخش مربوط به کارت شارژ
+                        //بخش مربوط به گزارش
                         Column(
                           children: [
-                            Text(
-                              'این بخش بزودی فعال می گردد',
-                              style: TextStyle(
-                                  color: PColor.blueparto,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 12),
-                              textAlign: TextAlign.start,
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(child:
+                                    Column(
+                                      children: [
+                                        Text('تاریخ شروع',textScaleFactor: 0.9,style: TextStyle(color: PColor.blueparto),),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              gapPadding: 2,
+                                            ),
+                                            hintText: 'تاریخ شروع',
+                                            suffixIcon: Icon(
+                                              Icons.calendar_today_rounded,
+                                              color: PColor.orangeparto,
+                                            ),
+                                            fillColor: Colors.white,
+                                            counterText: '',
+                                          ),
+                                          controller: _startDatePicker,
+                                          enableInteractiveSelection: false, // *** this is important to prevent user interactive selection ***
+                                          onTap: () {
+                                            FocusScope.of(context).requestFocus(new FocusNode()); // to prevent opening default keyboard
+                                            showModalBottomSheet(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Container(
+                                                    child: Column(
+                                                      children: [
+                                                        _startPickerWidget,
+                                                        CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)
+                                                      ],
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                      ],
+                                    )
+                                ),
+                               Padding(padding: EdgeInsets.only(left: 3)),
+                               Expanded( child:
+                                   Column(
+                                     children: [
+                                       Text('تاریخ پایان',textScaleFactor: 0.9,style: TextStyle(color: PColor.blueparto),),
+                                       TextField(
+                                         decoration: InputDecoration(
+                                           border: OutlineInputBorder(
+                                             borderRadius:
+                                             BorderRadius.circular(10),
+                                             gapPadding: 2,
+                                           ),
+                                           hintText: 'تاریخ پایان',
+                                           suffixIcon: Icon(
+                                             Icons.calendar_today_rounded,
+                                             color: PColor.orangeparto,
+                                           ),
+                                           fillColor: Colors.white,
+                                           counterText: '',
+                                         ),
+                                         controller: _endDatePicker,
+                                         enableInteractiveSelection: false, // *** this is important to prevent user interactive selection ***
+                                         onTap: () {
+                                           FocusScope.of(context).requestFocus(new FocusNode()); // to prevent opening default keyboard
+                                           showModalBottomSheet(
+                                               context: context,
+                                               builder: (BuildContext context) {
+                                                 return Container(
+                                                   child: Column(
+                                                     children: [
+                                                       _endPickerWidget,
+                                                       CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)
+                                                     ],
+                                                   ),
+                                                 );
+                                               });
+                                         },
+                                         textAlign: TextAlign.center,
+                                       )
+
+                                     ],
+                                   )
+                               ),
+
+
+                              ],
                             ),
+                            Container(
+                              height: 300,
+                              child: MakeListOfTrans(),
+                            )
+
+
+
+
+
 
                           ],
                         ),
@@ -414,10 +667,12 @@ class _WalletPageState extends State<WalletPage> {
 
 
 
+
   @override
   void dispose() {
     this.dispose();
   }
+
 
 
   Future<String> getContact() async{

@@ -41,7 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
           });
         }
         if(result.statusCode==200){
-          //debugPrint(result.body);
+          debugPrint(result.body);
           var jres=json.decode(result.body);
           if(jres['ResponseCode']==0){
             var x=profileInfoFromJson(result.body);

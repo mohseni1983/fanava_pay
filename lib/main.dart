@@ -217,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       RegPageTemplate(
         children: [
-          Text('برای ورود یا ثبت نام شماره همراه خود را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,),
+          Text('برای ورود یا ثبت نام شماره همراه خود را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,textScaleFactor: 0.9,),
           CTextField(textAlign: TextAlign.center,controller: _mobile,maxLenght: 11,keyboardType: TextInputType.phone,),
           Padding(padding: EdgeInsets.only(top: 3)),
           CButton(onClick: (){
@@ -246,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
            );
             else
               showDialog(context: context,
-                builder: (context) => CAlertDialog(content: 'شماره موبایل وارد شده صحیح نیست',buttons: [CButton(label: 'اصلاح',onClick: ()=>Navigator.of(context).pop(),)],),
+                builder: (context) => CAlertDialog(content:'خطا',subContent: 'شماره موبایل وارد شده صحیح نیست',buttons: [CButton(label: 'اصلاح',onClick: ()=>Navigator.of(context).pop(),)],),
               );
           },label: 'ورود',minWidth: MediaQuery.of(context).size.width,)
 

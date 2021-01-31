@@ -39,6 +39,8 @@ dependencies:
   fa_stepper:
   flutter_money_formatter:
   contact_picker:
+  persian_datepicker:
+  intl:
 
 dev_dependencies:
   flutter_test:
@@ -108,6 +110,9 @@ flutter:
           weight: 500
         - asset: assets/fonts/IRANSans(FaNum)_Bold.ttf
           weight: 700
+    - family: Dirooz
+      fonts:
+        - asset: assets/fonts/Dirooz.ttf
 
 
 
