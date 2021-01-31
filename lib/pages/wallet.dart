@@ -211,20 +211,21 @@ class _WalletPageState extends State<WalletPage> {
         label: v,
         height: 35,
         selectedValue: _selectedWalletOperation,
-        onPress: (x) {
+        onPress: (x)
+      {
+        setState(() {
+          _selectedWalletOperation = x;
+        });
+        if (x == 1){
           setState(() {
-            _selectedWalletOperation = x;
-          });
-          if(x==1)
-            setState(() {
-            getWalletTransactions(pageNumber: 1,startDate: DateTime.now().add(Duration(days: -1)),endDate: DateTime.now(),pageSize: 3).then((value) {
-              setState(() {
-                _transList=value.financingInfoLists;
-                _transCount=value.totalCounts;
-              });
-            });
+            _transList=[];
 
-            });
+          });
+          getWalletTransactions(pageNumber: 1,
+              startDate: DateTime.now().add(Duration(days: -1)),
+              endDate: DateTime.now(),
+              pageSize: 30);
+      }
         },
       ));
     });
@@ -330,8 +331,10 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+
+
   //بخش دریافت لیست تراکنش های کیف پول
-  Future<WalletTransFinancingInfoList> getWalletTransactions({int pageNumber,DateTime startDate,DateTime endDate,int pageSize}) async{
+  Future<void> getWalletTransactions({int pageNumber,DateTime startDate,DateTime endDate,int pageSize}) async{
     setState(() {
       _progressing=true;
     });
@@ -377,9 +380,12 @@ class _WalletPageState extends State<WalletPage> {
 
           if(jres['ResponseCode']==0){
             var _financeList=jres['FinancingInfoList'];
-            debugPrint(jres);
+            debugPrint(jres.toString());
             WalletTransFinancingInfoList _list= WalletTransFinancingInfoList.fromJson(_financeList);
-            return _list;
+            setState(() {
+              _transCount=_list.totalCounts;
+              _transList.addAll(_list.financingInfoLists);
+            });
           }
 
         }
@@ -393,20 +399,115 @@ class _WalletPageState extends State<WalletPage> {
   }
 
 
+  Widget MakeListOfTrans2(){
+    List<Widget> _widgets=[];
+  }
+
   Widget MakeListOfTrans(){
+    
       return
         ListView.builder(
+          //shrinkWrap: true,
           itemCount: _transList.length,
           padding: EdgeInsets.zero,
           itemBuilder: (context, index) {
             var _item=_transList[index];
             return Container(
-              color: Colors.green,
-              margin: EdgeInsets.all(5),
-              child: Text('${ _item.transactDate }'),
+              padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
+              height: 70,
+              //color: Colors.green,
+              margin: EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                color: PColor.orangepartoAccent,
+                borderRadius: BorderRadius.circular(12)
+
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 46,
+                    decoration: BoxDecoration(
+                        color: getTransactionType(_item.transactionType).color,
+                        borderRadius: BorderRadius.horizontal(left:Radius.circular(12) )
+
+                    ),
+
+                  ),
+                  Container(
+                    width: 20,
+                  ),
+                  Expanded(child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                     Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                       children: [
+                         Text('${getTransactionType(_item.transactionType).name}',textAlign: TextAlign.right,textScaleFactor: 1.1,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
+                         Container(
+
+                           padding: EdgeInsets.all(3),
+                           decoration: BoxDecoration(
+                             color: PColor.orangeparto,
+                             borderRadius: BorderRadius.circular(10),
+                           ),
+                           child: Text('مانده کیف: ${getMoneyByRial(_item.creditRemain.toInt())} ریال ',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.9,),
+                         )
+                       ],
+                     ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${getPersianDate(_item.transactDate)}-${_item.transactDate.hour}:${_item.transactDate.minute}:${_item.transactDate.second}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
+                          _item.creditAmount>0?
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('${getMoneyByRial(_item.creditAmount.toInt())} ریال',style: TextStyle(color: Colors.green.shade700),),
+                                  Icon(Icons.arrow_circle_up,color: Colors.green.shade600,)
+                                ],
+                              ):
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('${getMoneyByRial(_item.creditAmount.toInt())} ریال',style: TextStyle(color: Colors.red.shade700),),
+                              Icon(Icons.arrow_circle_down,color: Colors.red.shade600,)
+                            ],
+                          ),
+
+
+
+                        ],
+                      ),
+                      Container(
+                        width: 20,
+                      ),
+                    ],
+                  ))
+                ],
+              )
             );
           },
         );
+  }
+
+
+  TransactionType getTransactionType(int id){
+    switch(id){
+      case 6:
+        return TransactionType(color: Colors.blue,name: 'شارژ کیف پول');
+        break;
+      case 0:
+        return TransactionType(color: Colors.green,name: 'شارژ موبایل');
+        break;
+      default:
+        return TransactionType(color: PColor.blueparto,name: 'تراکنش مدل $id');
+        break;
+    }
   }
 
 
@@ -471,6 +572,7 @@ class _WalletPageState extends State<WalletPage> {
                           ],
                         ),
                       ),
+    _selectedWalletOperation == 0 ?
                       Container(
                         //height: 50,
                         padding: EdgeInsets.all(1),
@@ -484,7 +586,6 @@ class _WalletPageState extends State<WalletPage> {
                         ),
 
                         child:
-                        _selectedWalletOperation == 0 ?
                         //بخش مربوط به شارژ کیف
                         Column(
                           children: [
@@ -498,118 +599,24 @@ class _WalletPageState extends State<WalletPage> {
 
 
                           ],
-                        ) :
+                        ) ):
                         //بخش مربوط به گزارش
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Expanded(child:
-                                    Column(
-                                      children: [
-                                        Text('تاریخ شروع',textScaleFactor: 0.9,style: TextStyle(color: PColor.blueparto),),
-                                        TextField(
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(10),
-                                              gapPadding: 2,
-                                            ),
-                                            hintText: 'تاریخ شروع',
-                                            suffixIcon: Icon(
-                                              Icons.calendar_today_rounded,
-                                              color: PColor.orangeparto,
-                                            ),
-                                            fillColor: Colors.white,
-                                            counterText: '',
-                                          ),
-                                          controller: _startDatePicker,
-                                          enableInteractiveSelection: false, // *** this is important to prevent user interactive selection ***
-                                          onTap: () {
-                                            FocusScope.of(context).requestFocus(new FocusNode()); // to prevent opening default keyboard
-                                            showModalBottomSheet(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return Container(
-                                                    child: Column(
-                                                      children: [
-                                                        _startPickerWidget,
-                                                        CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)
-                                                      ],
-                                                    ),
-                                                  );
-                                                });
-                                          },
-                                          textAlign: TextAlign.center,
-                                        ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(2, 2, 2, 2),
+                        height: MediaQuery.of(context).size.height/2,
+                        child:                           Expanded(
+                            child:                                   MakeListOfTrans()
 
-                                      ],
-                                    )
-                                ),
-                               Padding(padding: EdgeInsets.only(left: 3)),
-                               Expanded( child:
-                                   Column(
-                                     children: [
-                                       Text('تاریخ پایان',textScaleFactor: 0.9,style: TextStyle(color: PColor.blueparto),),
-                                       TextField(
-                                         decoration: InputDecoration(
-                                           border: OutlineInputBorder(
-                                             borderRadius:
-                                             BorderRadius.circular(10),
-                                             gapPadding: 2,
-                                           ),
-                                           hintText: 'تاریخ پایان',
-                                           suffixIcon: Icon(
-                                             Icons.calendar_today_rounded,
-                                             color: PColor.orangeparto,
-                                           ),
-                                           fillColor: Colors.white,
-                                           counterText: '',
-                                         ),
-                                         controller: _endDatePicker,
-                                         enableInteractiveSelection: false, // *** this is important to prevent user interactive selection ***
-                                         onTap: () {
-                                           FocusScope.of(context).requestFocus(new FocusNode()); // to prevent opening default keyboard
-                                           showModalBottomSheet(
-                                               context: context,
-                                               builder: (BuildContext context) {
-                                                 return Container(
-                                                   child: Column(
-                                                     children: [
-                                                       _endPickerWidget,
-                                                       CButton(label: 'بستن',onClick: ()=>Navigator.of(context).pop(),)
-                                                     ],
-                                                   ),
-                                                 );
-                                               });
-                                         },
-                                         textAlign: TextAlign.center,
-                                       )
-
-                                     ],
-                                   )
-                               ),
-
-
-                              ],
-                            ),
-                            Container(
-                              height: 300,
-                              child: MakeListOfTrans(),
-                            )
-
-
-
-
-
-
-                          ],
                         ),
 
+                      )
 
-                      ),
-                      Container(height: 90,
+
+
+
+
+
+                     , Container(height: 90,
                       ),
 
                     ],
@@ -690,5 +697,13 @@ class _WalletPageState extends State<WalletPage> {
     return _phoneNumber;
   }
 
+}
+
+class TransactionType{
+
+  String name;
+  Color color;
+
+  TransactionType({ this.name, this.color});
 }
 

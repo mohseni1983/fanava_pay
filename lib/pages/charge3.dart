@@ -1210,7 +1210,25 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                               )
                                             ],
                                           ));
-                                } else {
+                                }else if(_selectedAmount<500){
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => CAlertDialog(
+                                        content: 'خطا در مبلغ',
+                                        subContent:
+                                        'مبلغ برای شارژ را انتخاب کنید',
+                                        buttons: [
+                                          CButton(
+                                            label: 'بستن',
+                                            onClick: () =>
+                                                Navigator.of(context).pop(),
+                                          )
+                                        ],
+                                      ));
+
+                                }
+
+                                else {
                                   _sendToPayment();
                                 }
                               },
