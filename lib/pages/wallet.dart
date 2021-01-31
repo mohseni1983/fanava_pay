@@ -545,34 +545,36 @@ class _WalletPageState extends State<WalletPage> {
                     color: PColor.orangeparto,
                     thickness: 2,
                   ),
+                  Container(
+                    padding: EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: PColor.orangeparto,
+                          width: 2,
+                          style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.transparent,
+                    ),
+                    child: Column(
+                      children: [
+                        Text('عملیات مورد نظر را انتخاب کنید',
+                          style: TextStyle(fontWeight: FontWeight.bold),),
+                        Divider(color: PColor.orangeparto,
+                          indent: 5,
+                          endIndent: 5,
+                          height: 0,
+                          thickness: 2,),
+                        WalletOperationTypes(),
+                      ],
+                    ),
+                  ),
+
                   // بخش مربوط به اطلاعات اصلی
                   Expanded(child:
+                  _selectedWalletOperation == 0 ?
                   ListView(
                     padding: EdgeInsets.zero,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: PColor.orangeparto,
-                              width: 2,
-                              style: BorderStyle.solid),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.transparent,
-                        ),
-                        child: Column(
-                          children: [
-                            Text('عملیات مورد نظر را انتخاب کنید',
-                              style: TextStyle(fontWeight: FontWeight.bold),),
-                            Divider(color: PColor.orangeparto,
-                              indent: 5,
-                              endIndent: 5,
-                              height: 0,
-                              thickness: 2,),
-                            WalletOperationTypes(),
-                          ],
-                        ),
-                      ),
-    _selectedWalletOperation == 0 ?
+
                       Container(
                         //height: 50,
                         padding: EdgeInsets.all(1),
@@ -599,28 +601,22 @@ class _WalletPageState extends State<WalletPage> {
 
 
                           ],
-                        ) ):
+                        ) ),
                         //بخش مربوط به گزارش
-                      Container(
-                        margin: EdgeInsets.fromLTRB(2, 2, 2, 2),
-                        height: MediaQuery.of(context).size.height/2,
-                        child:                           Expanded(
-                            child:                                   MakeListOfTrans()
-
-                        ),
-
-                      )
 
 
 
 
 
 
-                     , Container(height: 90,
+                     Container(height: 90,
                       ),
 
                     ],
-                  )),
+                  ):
+    MakeListOfTrans()
+    )
+
 
 
                 ],
