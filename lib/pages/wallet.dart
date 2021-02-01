@@ -1,18 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:contact_picker/contact_picker.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:parto_v/classes/convert.dart';
-import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/classes/wallet_trans.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
-import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -168,12 +165,10 @@ class _WalletPageState extends State<WalletPage> {
           });
           debugPrint(result.body);
           var jres = json.decode(result.body);
-
           if (jres['ResponseCode'] == 0)
           {
             if(await canLaunch(jres['Url']))
               await launch(jres['Url']);
-
           }else{
             showDialog(context: context,
             builder: (context) => CAlertDialog(
@@ -186,13 +181,8 @@ class _WalletPageState extends State<WalletPage> {
             ),
             );
           }
-
-
-
-
         }
       }
-
     });
   }
 
@@ -219,12 +209,13 @@ class _WalletPageState extends State<WalletPage> {
         if (x == 1){
           setState(() {
             _transList=[];
+            _currentPage=1;
 
           });
-          getWalletTransactions(pageNumber: 1,
+          getWalletTransactions(pageNumber: _currentPage,
               startDate: DateTime.now().add(Duration(days: -1)),
               endDate: DateTime.now(),
-              pageSize: 30);
+              pageSize: pageSize);
       }
         },
       ));
@@ -336,13 +327,13 @@ class _WalletPageState extends State<WalletPage> {
   //بخش دریافت لیست تراکنش های کیف پول
   Future<void> getWalletTransactions({int pageNumber,DateTime startDate,DateTime endDate,int pageSize}) async{
     setState(() {
-      _progressing=true;
+      isLoading=true;
     });
     auth.checkAuth().then((value) async{
-      if (value) {
+      if (value) 
+      try
+      {
         SharedPreferences _prefs = await SharedPreferences.getInstance();
-
-
         String _sign = _prefs.getString('sign');
         String _token = _prefs.get('token');
         var _body={
@@ -364,7 +355,7 @@ class _WalletPageState extends State<WalletPage> {
               'Content-Type': 'application/json'
             },
             body: _jBody
-        );
+        ).timeout(Duration(seconds: 20));
         if (result.statusCode==401)
         {
           auth.retryAuth().then((value) {
@@ -374,9 +365,11 @@ class _WalletPageState extends State<WalletPage> {
         if(result.statusCode==200){
           setState(() {
             _progressing=false;
+            isLoading=false;
           });
           debugPrint(result.body);
           var jres=json.decode(result.body);
+          debugPrint(jres.toString());
 
           if(jres['ResponseCode']==0){
             var _financeList=jres['FinancingInfoList'];
@@ -389,6 +382,22 @@ class _WalletPageState extends State<WalletPage> {
           }
 
         }
+      }
+      on TimeoutException catch(e){
+        showDialog(
+          context: context,
+          builder: (context) =>
+              CAlertDialog(
+                content: 'خطای ارتباط',
+                subContent: 'ارتباط با سرور بر قرار نشد',
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+        );
       }
     });
 
@@ -403,96 +412,131 @@ class _WalletPageState extends State<WalletPage> {
     List<Widget> _widgets=[];
   }
 
+  bool isLoading=false;
+  int pageSize=10;
+  int _currentPage=1;
   Widget MakeListOfTrans(){
     
       return
-        ListView.builder(
-          //shrinkWrap: true,
-          itemCount: _transList.length,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, index) {
-            var _item=_transList[index];
-            return Container(
-              padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
-              height: 70,
-              //color: Colors.green,
-              margin: EdgeInsets.only(top: 2),
-              decoration: BoxDecoration(
-                color: PColor.orangepartoAccent,
-                borderRadius: BorderRadius.circular(12)
+          NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!isLoading && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                  // start loading data
+                  if(_currentPage<=(_transCount/pageSize).ceil())
+                    {
+                      setState(() {
+                        _currentPage++;
+                        isLoading = true;
+                      });
+                      getWalletTransactions(pageNumber: _currentPage,
+                          startDate: DateTime.now().add(Duration(days: -1)),
+                          endDate: DateTime.now(),
+                          pageSize: pageSize);
 
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 46,
-                    decoration: BoxDecoration(
-                        color: getTransactionType(_item.transactionType).color,
-                        borderRadius: BorderRadius.horizontal(left:Radius.circular(12) )
+                    }
+                    }
+                return true;
+                },
 
-                    ),
 
-                  ),
-                  Container(
-                    width: 20,
-                  ),
-                  Expanded(child:
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                    children: [
-                     Row(
-                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                       children: [
-                         Text('${getTransactionType(_item.transactionType).name}',textAlign: TextAlign.right,textScaleFactor: 1.1,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
-                         Container(
+              child:         ListView.builder(
+                //shrinkWrap: true,
 
-                           padding: EdgeInsets.all(3),
-                           decoration: BoxDecoration(
-                             color: PColor.orangeparto,
-                             borderRadius: BorderRadius.circular(10),
-                           ),
-                           child: Text('مانده کیف: ${getMoneyByRial(_item.creditRemain.toInt())} ریال ',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.9,),
-                         )
-                       ],
-                     ),
-                      Row(
+                itemCount: _transList.length,
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) {
+                  var _item=_transList[index];
+                  return Container(
+                      padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
+                      height: 80,
+                      //color: Colors.green,
+                      margin: EdgeInsets.only(top: 2),
+                      decoration: BoxDecoration(
+                          color: PColor.orangepartoAccent,
+                          borderRadius: BorderRadius.circular(12)
+
+                      ),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('${getPersianDate(_item.transactDate)}-${_item.transactDate.hour}:${_item.transactDate.minute}:${_item.transactDate.second}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
-                          _item.creditAmount>0?
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('${getMoneyByRial(_item.creditAmount.toInt())} ریال',style: TextStyle(color: Colors.green.shade700),),
-                                  Icon(Icons.arrow_circle_up,color: Colors.green.shade600,)
-                                ],
-                              ):
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('${getMoneyByRial(_item.creditAmount.toInt())} ریال',style: TextStyle(color: Colors.red.shade700),),
-                              Icon(Icons.arrow_circle_down,color: Colors.red.shade600,)
-                            ],
+                          Container(
+                            width: 8,
+                            height: 67,
+                            decoration: BoxDecoration(
+                                color: _item.creditAmount>0?Colors.green:Colors.red,
+                                borderRadius: BorderRadius.horizontal(left:Radius.circular(12) )
+
+                            ),
+
                           ),
+                          Container(
+                            width: 20,
+                          ),
+                          Expanded(child:
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('${_item.transactionTypeDetails}',textAlign: TextAlign.right,textScaleFactor: 1.1,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
+                                  Container(
+
+                                    padding: EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      color: PColor.orangeparto,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text('مانده کیف: ${getMoneyByRial(_item.creditRemain.toInt())} ریال ',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.9,),
+                                  )
+                                ],
+                              ),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text('${_item.description}',style: TextStyle(color: PColor.blueparto.shade300,fontWeight: FontWeight.bold,fontSize: 10),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('${getPersianDate(_item.transactDate)}-${_item.transactDate.hour}:${_item.transactDate.minute}:${_item.transactDate.second}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
+                                  _item.creditAmount>0?
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('${getMoneyByRial(_item.creditAmount.toInt())} ریال',style: TextStyle(color: Colors.green.shade700),),
+                                      Icon(Icons.arrow_circle_up,color: Colors.green.shade600,)
+                                    ],
+                                  ):
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('${getMoneyByRial((_item.creditAmount*-1).toInt())} ریال',style: TextStyle(color: Colors.red.shade700),),
+                                      Icon(Icons.arrow_circle_down,color: Colors.red.shade600,)
+                                    ],
+                                  ),
 
 
 
+                                ],
+                              ),
+                              Container(
+                                width: 20,
+                              ),
+                            ],
+                          ))
                         ],
-                      ),
-                      Container(
-                        width: 20,
-                      ),
-                    ],
-                  ))
-                ],
+                      )
+                  );
+                },
               )
-            );
-          },
-        );
+          );
   }
 
 
@@ -615,7 +659,13 @@ class _WalletPageState extends State<WalletPage> {
                     ],
                   ):
     MakeListOfTrans()
-    )
+    ),
+                  isLoading?
+                      Container(
+                        height: 10,
+                        child: LinearProgressIndicator(),
+                      ):
+                      Container(height: 0,)
 
 
 

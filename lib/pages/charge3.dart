@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:parto_v/classes/convert.dart';
+import 'package:parto_v/classes/global_variables.dart';
 import 'package:parto_v/classes/topup.dart';
+import 'package:parto_v/classes/wallet.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
@@ -212,7 +215,11 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
           setState(() {
             _progressing = false;
           });
-          debugPrint(result.body);
+
+          await setWalletAmount();
+          setState(() {
+
+          });
           var jres = json.decode(result.body);
           if (jres["ResponseCode"] == 0)
             showDialog(
@@ -637,72 +644,82 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   Future<void> _payChargeWithCardAndSend(TopUp topUp) async {
     auth.checkAuth().then((value) async {
       if (value) {
-        SharedPreferences _p = await SharedPreferences.getInstance();
-        String _token = _p.getString('token');
-        var jsonTopUp = topUpToJson(topUp);
-        var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
-            headers: {
-              'Authorization': 'Bearer $_token',
-              'Content-Type': 'application/json'
-            },
-            body: jsonTopUp);
-        if (result.statusCode == 401) {
-          auth.retryAuth().then((value) {
-            _payChargeWithCard(topUp);
-          });
-        }
-        if (result.statusCode == 200) {
-          debugPrint(result.body);
-          var jres = json.decode(result.body);
-          setState(() {
-            _progressing = false;
-          });
-
-          if (jres['ResponseCode'] == 0) {
-            setState(() {
-              _invoiceTitle =
-                  '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator].name}';
-              _invoiceSubTitle =
-                  '${_operatorsWithLogo[_topUpOperator].chargeTypes[_selectedTopUpType].name}';
-              _invoiceAmount = _selectedAmount.toDouble();
-              _canUseWallet = jres['CanUseWallet'];
-              _paymentLink = jres['Url'];
-              _walletAmount = jres['Cash'];
-              _readyToPay = true;
-            });
-          }
-          else if (jres['ResponseCode'] == 5) {
+        try {
+          SharedPreferences _p = await SharedPreferences.getInstance();
+          String _token = _p.getString('token');
+          var jsonTopUp = topUpToJson(topUp);
+          var result = await http.post(
+              'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+              headers: {
+                'Authorization': 'Bearer $_token',
+                'Content-Type': 'application/json'
+              },
+              body: jsonTopUp).timeout(Duration(seconds: 20));
+          if (result.statusCode == 401) {
             auth.retryAuth().then((value) {
               _payChargeWithCard(topUp);
             });
-          } else
-            showDialog(
-              context: context,
-              builder: (context) => CAlertDialog(
-                content: jres['ResponseMessage'],
-                buttons: [
-                  CButton(
-                    label: 'بستن',
-                    onClick: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            );
+          }
+          if (result.statusCode == 200) {
+            debugPrint(result.body);
+            var jres = json.decode(result.body);
+            setState(() {
+              _progressing = false;
+            });
+
+            if (jres['ResponseCode'] == 0) {
+              setState(() {
+                _invoiceTitle =
+                '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator]
+                    .name}';
+                _invoiceSubTitle =
+                '${_operatorsWithLogo[_topUpOperator]
+                    .chargeTypes[_selectedTopUpType].name}';
+                _invoiceAmount = _selectedAmount.toDouble();
+                _canUseWallet = jres['CanUseWallet'];
+                _paymentLink = jres['Url'];
+                _walletAmount = jres['Cash'];
+                _readyToPay = true;
+              });
+            }
+
+            else
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    CAlertDialog(
+                      content: 'خطای تراکنش',
+                      subContent: jres['ResponseMessage'],
+                      buttons: [
+                        CButton(
+                          label: 'بستن',
+                          onClick: () => Navigator.of(context).pop(),
+                        )
+                      ],
+                    ),
+              );
+          }
+        } on TimeoutException catch(e){
+          setState(() {
+            _progressing=false;
+          });
+          showDialog(
+            context: context,
+            builder: (context) =>
+                CAlertDialog(
+                  content: 'خطای ارتباط',
+                  subContent: 'ارتباط با سرور برقرار نشد',
+                  buttons: [
+                    CButton(
+                      label: 'بستن',
+                      onClick: () => Navigator.of(context).pop(),
+                    )
+                  ],
+                ),
+          );
         }
-      } else
-        showDialog(
-          context: context,
-          builder: (context) => CAlertDialog(
-            content: 'خطا در احراز هویت',
-            buttons: [
-              CButton(
-                label: 'بستن',
-                onClick: () => Navigator.of(context).pop(),
-              )
-            ],
-          ),
-        );
+      }
+
     });
   }
 

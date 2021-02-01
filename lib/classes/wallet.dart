@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:parto_v/classes/convert.dart';
+import 'package:parto_v/classes/global_variables.dart';
 import 'package:parto_v/classes/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:http/http.dart' as http;
 Future<void> setWalletAmount() async{
+  debugPrint('Start updating wallet amount====================================================');
   auth.checkAuth().then((value) async{
     if (value) {
       SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -35,7 +39,13 @@ Future<void> setWalletAmount() async{
         var jres=json.decode(result.body);
         if(jres['ResponseCode']==0){
           var x=profileInfoFromJson(result.body);
-          _prefs.setDouble('wallet_amount', x.deviceInfo.credit);
+          debugPrint('Stop updating wallet amount ==========================================');
+
+          //_prefs.setDouble('wallet_amount', x.deviceInfo.credit);
+          globWalletAmount=x.deviceInfo.credit>0?getMoneyByRial((x.deviceInfo.credit/10).toInt()):"0" ;
+
+
+
 
 
 

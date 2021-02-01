@@ -22,7 +22,15 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  double _walletAmount = 150;
+
+
+  @override
+  void didUpdateWidget(MainPage oldWidget) {
+    setWalletAmount();
+    setState(() {
+
+    });
+  }
 
   @override
   void initState() {

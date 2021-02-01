@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:parto_v/classes/wallet.dart';
+import 'package:parto_v/classes/convert.dart';
+import 'package:parto_v/classes/global_variables.dart';
+import 'package:parto_v/classes/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:http/http.dart' as http;
 
 class WalletWidget extends StatefulWidget {
 
@@ -15,20 +21,61 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
   double _walletAmount=0;
   bool _flag = false;
 
+  Future<void> setWalletAmount() async{
+    debugPrint('Start updating wallet amount====================================================');
+
+    auth.checkAuth().then((value) async{
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _sign = _prefs.getString('sign');
+        String _token = _prefs.get('token');
+        var _body={
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _sign,
+          "UseWallet": true
+        };
+        var _jBody=json.encode(_body);
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: _jBody
+        );
+        if (result.statusCode==401)
+        {
+          auth.retryAuth().then((value) {
+            setWalletAmount();
+          });
+        }
+        if(result.statusCode==200){
+          //debugPrint(result.body);
+          var jres=json.decode(result.body);
+          if(jres['ResponseCode']==0){
+            var x=profileInfoFromJson(result.body);
 
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _prefs.then((value) {
-      if(value.containsKey('wallet_amount'))
-        setState(() {
-          _walletAmount=value.getDouble('wallet_amount');
-        });
+            //_prefs.setDouble('wallet_amount', x.deviceInfo.credit);
+            globWalletAmount=x.deviceInfo.credit>0?getMoneyByRial((x.deviceInfo.credit/10).toInt()):"0" ;
+
+
+
+
+
+
+          }
+
+        }
+      }
     });
 
+
   }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return
@@ -64,26 +111,21 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
                 ),
                 child: Row(
                   children: [
-                    Expanded(child: Center(child: Text('${_walletAmount.toInt()}'),)),
+                    Expanded(child: Center(child: Text('$globWalletAmount'),)),
                     CircleAvatar(
                       backgroundColor: Color.fromRGBO(224, 114, 67, 1),
                       radius: 13,
 
 
                       child: GestureDetector(
-                        child: _flag?CircularProgressIndicator():Icon(Icons.refresh,color: Colors.white,size: 18,),
-                        onTap: (){
-                          setState(() {
-                            _flag=true;
-                            setState(() {
+                        child: isWalletAmountUpdating?CircularProgressIndicator():Icon(Icons.refresh,color: Colors.white,size: 18,),
+                        onTap: () async{
 
-                            });
+                          await setWalletAmount();
+                          setState(() {
+                            isWalletAmountUpdating=false;
                           });
-                          setWalletAmount().then((value) {
-                            setState(() {
-                              _flag=false;
-                            });
-                          });
+
                         },
                       )
 

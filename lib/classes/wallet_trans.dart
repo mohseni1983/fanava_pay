@@ -28,6 +28,7 @@ class FinancingInfoListElement {
     this.ownerId,
     this.transactDate,
     this.transactionType,
+    this.transactionTypeDetails
   });
 
   double creditAmount;
@@ -38,6 +39,7 @@ class FinancingInfoListElement {
   int ownerId;
   DateTime transactDate;
   int transactionType;
+  String transactionTypeDetails;
 
   factory FinancingInfoListElement.fromJson(Map<String, dynamic> json) => FinancingInfoListElement(
     creditAmount: json["CreditAmount"],
@@ -48,6 +50,7 @@ class FinancingInfoListElement {
     ownerId: json["OwnerId"],
     transactDate: DateTime.parse(json["TransactDate"]),
     transactionType: json["TransactionType"],
+      transactionTypeDetails: json["TransactionTypeDetails"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -59,5 +62,6 @@ class FinancingInfoListElement {
     "OwnerId": ownerId,
     "TransactDate": transactDate.toIso8601String(),
     "TransactionType": transactionType,
+    "TransactionTypeDetails":transactionTypeDetails
   };
 }
