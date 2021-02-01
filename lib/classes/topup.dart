@@ -75,3 +75,5 @@ class ChargeTypesWithPrice{
   String coverImage;
   ChargeTypesWithPrice({this.id,this.name,this.prices,this.coverImage});
 }
+
+

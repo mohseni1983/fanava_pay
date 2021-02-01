@@ -40,7 +40,7 @@ class _CSelectedButtonState extends State<CSelectedButton> {
           child: Center(
             child:
             Text(widget.label,style: TextStyle(
-                color: widget.selectedValue==widget.value?widget.selectedTextColor:widget.textColor,fontSize: 14,fontWeight: widget.selectedValue==widget.value?FontWeight.bold:FontWeight.normal
+                color: widget.selectedValue==widget.value?widget.selectedTextColor:widget.textColor, fontSize:widget.label.length<10? 14:9.5,fontWeight: widget.selectedValue==widget.value?FontWeight.bold:FontWeight.normal
             ),),
           ),
 

@@ -8,6 +8,7 @@ import 'package:parto_v/components/maintemplate.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
 import 'package:parto_v/pages/charge.dart';
+import 'package:parto_v/pages/internet_package.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,7 +76,34 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                   ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => InternetPackagePage(),
+                  )),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: PColor.orangeparto,
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                              color: PColor.blueparto,
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                              offset: Offset(0, 0))
+                        ]),
+                    child: Center(
+                      child: Text(
+                        ' خرید بسته اینترنت',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                    ),
+                  ),
                 )
+
               ],
             )),
         onWillPop: () => _onWillPop());
