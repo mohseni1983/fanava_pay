@@ -41,6 +41,7 @@ dependencies:
   contact_picker:
   persian_datepicker:
   intl:
+  otp_count_down:
 
 dev_dependencies:
   flutter_test:

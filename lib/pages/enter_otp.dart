@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:otp_count_down/otp_count_down.dart';
 import 'package:parto_v/pages//main_page.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
@@ -21,35 +23,43 @@ class _EnterOTPState extends State<EnterOTP> {
   String _phoneNumber='';
   String _deviceId='';
   int _OS_id=0;
+
+
+
   TextEditingController _otp=new TextEditingController();
-   Timer _timer;
-  int _start = 60;
   bool _progress=false;
+  bool _countEnded=false;
 
-  void startTimer() {
+  String _countDown='';
+  OTPCountDown _otpCountDown;
+  final int _otpTimeInMS = 1000 * 60;
 
-    const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
-      oneSec,
-          (Timer timer) {
-        if (_start == 0) {
-          setState(() {
-            timer.cancel();
-          });
-        } else {
-          setState(() {
-            _start--;
-          });
-        }
+  void _startCountDown() {
+    setState(() {
+      _countEnded=false;
+    });
+    _otpCountDown = OTPCountDown.startOTPTimer(
+      timeInMS: _otpTimeInMS,
+
+      currentCountDown: (String countDown) {
+        _countDown = countDown;
+        setState(() {});
+      },
+      onFinish: () {
+       setState(() {
+         _countEnded=true;
+       });
       },
     );
   }
 
-@override
+
+
+  @override
   void dispose() {
     // TODO: implement dispose
+    _otpCountDown.cancelTimer();
     super.dispose();
-    _timer.cancel();
   }
 
   @override
@@ -63,7 +73,8 @@ class _EnterOTPState extends State<EnterOTP> {
         _deviceId=value.getString('device_id');
         _OS_id=value.getInt('os');
       });
-      startTimer();
+      _startCountDown();
+
     });
   }
 
@@ -105,10 +116,10 @@ class _EnterOTPState extends State<EnterOTP> {
             ),
             Padding(padding: EdgeInsets.only(top: 15)),
 
-            _timer.tick!=null?_timer.tick<60 ?
+            !_countEnded ?
             CircleAvatar(
               radius: 25,
-              child:             Text('${60-_timer.tick}',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.1,textAlign: TextAlign.center,)
+              child:             Text('$_countDown',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.1,textAlign: TextAlign.center,)
               ,
             ):
             GestureDetector(
@@ -116,9 +127,7 @@ class _EnterOTPState extends State<EnterOTP> {
                 child:
                 Text('ارسال مجدد کد',style: TextStyle(color: PColor.orangeparto),textScaleFactor: 1.1,textAlign: TextAlign.center,)
 
-            ):
-            Container(height: 0,)
-
+            )
 
           ],
         )
@@ -141,7 +150,7 @@ class _EnterOTPState extends State<EnterOTP> {
     });
     if(result.statusCode==200){
         //debugPrint('Sended');
-      startTimer();
+      _startCountDown();
       }
 
     }
