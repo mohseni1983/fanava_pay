@@ -32,13 +32,8 @@ class InternetPackageListPage extends StatefulWidget {
 
 class _InternetPackageListPageState extends State<InternetPackageListPage> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-
-
-  TextEditingController _mobile = new TextEditingController();
   bool _progressing = false;
   String _paymentLink = '';
-
   bool _inprogress = false;
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -71,13 +66,15 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
     ),
   );
 
+  int test=0;
 
   List<DataPlan> _listOfPlans;
   @override
   void initState() {
-    getDataPlans();
+    
     // TODO: implement initState
     super.initState();
+    getDataPlans();
 
 
   }
@@ -117,10 +114,24 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             var jResult=json.decode(result.body);
             //debugPrint(jResult.toString());
             if(jResult['ResponseCode']==0){
-              setState(() {
-                _listOfPlans= internetPackageFromJson(result.body).dataPlans;
 
-              });
+               var s= internetPackageFromJson(result.body).dataPlans;
+               s.retainWhere((element) => element.dataPlanOperator==widget.operatorId);
+               _packs.forEach((t) {
+                 s.forEach((k) {
+                   if(t.id==k.period)
+                    setState(() {
+                      t.dataPlans.add(k);
+                    });
+                 });
+               });
+
+               _packs.forEach((element) {
+                 debugPrint('${element.name} ---- ${element.dataPlans.length}');
+               });
+
+
+
 
             }else{
               showDialog(context: context,
@@ -144,32 +155,50 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   }
 
 
+  List<NetPackage> _packs=[
+    new NetPackage(id: 0,name: 'ساعتی',dataPlans: []),
+    new NetPackage(id:1,name: 'روزانه',dataPlans: []),
+    new NetPackage(id:2,name: 'هفتگی',dataPlans: []),
+    new NetPackage(id: 3,name: 'ماهانه',dataPlans: []),
+    new NetPackage(id:8,name: 'دو ماهه',dataPlans: []),
+    new NetPackage(id: 9,name: 'سه ماهه',dataPlans: []),
+    new NetPackage(id: 10,name: 'چهارماهه',dataPlans: []),
+    new NetPackage(id: 4,name: 'شش ماهه',dataPlans: []),
+    new NetPackage(id: 5,name: 'سالانه',dataPlans: [])
+  ];
 
   //List of Internet Packages by duration
   Map<int,String>_packages= {0:'ساعتی',1:'روزانه',2: 'هفتگی',3:'ماهانه', 8:'دوماهه', 9:'سه ماهه',10:'چهارماهه',4:'شش ماهه', 5:'یکساله'};
 
-  int _selectedPackage=-1;
+
+
+
+
+  int _selectedPackage=2;
   Widget Packages(){
     List<Widget> _list=[];
-    _packages.forEach((key, value) {
-      _list.add(CSelectedButton(
-        value:key ,
-        label: value,
-        height: 35,
-        selectedValue: _selectedPackage,
-        onPress: (x){
-          setState(() {
-            _selectedPackage=x;
-          });
-        },
-
-      ));
+    _packs[_selectedPeriod].dataPlans.forEach((element) {
+      _list.add(
+        CSelectedPackage(
+          costWithoutTax: element.priceWithoutTax,
+          costWithTax: element.priceWithTax,
+          value: element.id,
+          label: element.title,
+          selectedValue: _selectedPackage,
+          onPress: (v){
+            setState(() {
+              _selectedPackage=v;
+            });
+          },
+        )
+      );
     });
     return ListView(
-      padding: EdgeInsets.zero,
       children: _list,
     );
   }
+
+  ///////////////////////////////////////////////
 
 
 
@@ -238,28 +267,24 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   //create list of periods
   Widget ListOfPeriods(){
     List<Widget> _list=[];
-    _packages.forEach((key, value) {
+    _packs.forEach((element) {
+      if(element.dataPlans.length>0)
       _list.add(
 
           CSelectedGridItem(
-
-        height: 40,
-       // width: 120,
+            height: 40,
             paddingHorizontal: 10,
-        paddingVertical: 5,
+            paddingVertical: 5,
+            label: element.name,
+            value: element.id,
+            selectedValue: _selectedPeriod,
+            onPress: (v){
+              setState(() {
+                _selectedPeriod=v;
 
-        label: value,
-        value: key,
-        selectedValue: _selectedPeriod,
-        onPress: (v){
-          setState(() {
-            _selectedPeriod=v;
-            setState(() {
-              filterList(selectedPeriod: _selectedPeriod,simCardTypeId: widget.simCardId,operatorId: widget.operatorId,masterList: _listOfPlans);
-            });
-          });
-        },
-      )
+              });
+            },
+          )
       );
     });
     return
@@ -273,7 +298,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             child: Wrap(
               children: _list,
               direction: Axis.horizontal,
-              spacing: 5,
+              spacing: 2,
             ),
           )
           ,
@@ -340,32 +365,11 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
 
                       ],
                     ),
+                    Expanded(
+                      child: Packages(),
+                    ),
 
                     // بخش مربوط به اطلاعات اصلی
-                    Expanded(
-                        child:
-                        ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: _plans.length,
-                          itemBuilder: (context, index) {
-                            var _item=_plans[index];
-                            return CSelectedPackage(
-                              value: _item.id,
-                              label: _item.title,
-                              selectedValue: _selectedPackage,
-                              costWithTax: _item.priceWithTax,
-                              costWithoutTax: _item.priceWithoutTax,
-                              onPress: (v){
-                                setState(() {
-                                  _selectedPackage=v;
-                                });
-                              },
-                            );
-                          },
-
-                        )
-
-                    ),
                     Container(height: 90,)
                   ],
                 )),
@@ -470,4 +474,12 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
 
 
 
+}
+
+class NetPackage{
+  int id;
+  String name;
+  List<DataPlan> dataPlans;
+
+  NetPackage({this.id, this.name, this.dataPlans});
 }
