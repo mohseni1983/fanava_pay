@@ -4,23 +4,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:parto_v/classes/convert.dart';
+import 'package:parto_v/Pages/internet_package_list.dart';
+import 'package:parto_v/Pages/main_page.dart';
 import 'package:parto_v/classes/global_variables.dart';
 import 'package:parto_v/classes/internet_package.dart';
-import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/classes/wallet.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
-import 'package:parto_v/custom_widgets/cust_pre_invoice_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
-import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
-import 'package:url_launcher/url_launcher.dart';
 
 class InternetPackagePage extends StatefulWidget {
   @override
@@ -30,15 +26,8 @@ class InternetPackagePage extends StatefulWidget {
 class _InternetPackagePageState extends State<InternetPackagePage> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   TextEditingController _mobile = new TextEditingController();
-  int _topUpOperator = -1;
   bool _progressing = false;
   String _paymentLink = '';
-  bool _canUseWallet = false;
-  double _walletAmount = 0;
-  bool _readyToPay = false;
-  String _invoiceTitle = '';
-  String _invoiceSubTitle = '';
-  double _invoiceAmount = 0;
 
   bool _inprogress = false;
   Widget Progress() => Material(
@@ -171,6 +160,72 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
   }
 
 
+
+  // get the list of packages;
+  List<DataPlan> _dataPlans=[];
+  Future<List<DataPlan>> getDataPlans() async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async{
+      if(value){
+        SharedPreferences _prefs=await SharedPreferences.getInstance();
+        String _token=_prefs.getString('token');
+        String _sign=_prefs.getString('sign');
+        var _body=json.encode({
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _sign,
+        });
+        try{
+          var result=await http.post(
+              'https://www.idehcharge.com/Middle/Api/Charge/GetDataPlanList',
+              headers: {
+                'Authorization': 'Bearer $_token',
+                'Content-Type': 'application/json'
+              },
+              body: _body
+          ).timeout(Duration(seconds: 20));
+          if(result.statusCode==401){
+            auth.retryAuth().then((value) {
+              getDataPlans();
+            });
+          }
+          if(result.statusCode==200){
+            setState(() {
+              _progressing=false;
+            });
+            var jResult=json.decode(result.body);
+            //debugPrint(jResult.toString());
+            if(jResult['ResponseCode']==0){
+              setState(() {
+                _dataPlans=internetPackageFromJson(result.body).dataPlans;
+
+              });
+            }else{
+              showDialog(context: context,
+              builder: (context) =>
+                  CAlertDialog(content: 'خطا در دریافت اطلاعات',subContent: jResult['ResponseMessage'],buttons: [CButton(label: 'بستن',onClick: ()=>
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MainPage(),))
+                ,)],) ,
+              );
+            }
+          }
+        }on TimeoutException catch(e){
+          showDialog(context: context,
+            builder: (context) => CAlertDialog(
+              content: 'خطای ارتباط با سرور',
+              subContent: 'سرور پاسخ نمی دهد، از اتصال اینترنت خود مطمئن شوید',
+            ),
+          );
+        }
+      }
+    });
+  }
+
+
+
+
+
   // sim card row for every operator
   int _selectedSimCard=0;
   Widget SimCards(int selectedOprator) {
@@ -198,594 +253,12 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
     );
   }
 
-
-  // for step of Stepper
-  int _currentStep = 0;
-
-
-
-//send to payment Api  *** most redefine
-/*
-  void _sendToPayment() {
-    TopUp _current = new TopUp();
-    _prefs.then((value) {
-      _current.sign = value.getString('sign');
-      _current.amount = _selectedAmount;
-      _current.chargeType = _selectedTopUpType;
-      _current.cellNumber = _mobile.text.substring(1, 11);
-      _current.deviceId = 0;
-      _current.useWallet = false;
-      _current.localDate = DateTime.now();
-      _current.topUpOperator = _topUpOperator;
-      _current.uniqCode = "";
-    }).then((value) {
-      setState(() {
-        _progressing = true;
-      });
-
-      _payChargeWithCardAndSend(_current).then((value) {});
-    });
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+   // getDataPlans();
   }
-*/
-
-
-
-
-  Future<void> _payWithWallet() async {
-    int _refIdIndex = _paymentLink.indexOf('?RefId=') + 7;
-    String _refId = _paymentLink.substring(_refIdIndex);
-    setState(() {
-      _readyToPay = false;
-      _progressing = true;
-    });
-
-    auth.checkAuth().then((value) async {
-      if (value) {
-        SharedPreferences _prefs = await SharedPreferences.getInstance();
-        String _token = _prefs.getString('token');
-        var _body = {
-          "ReferenceNumber": int.parse(_refId),
-          "LocalDate": DateTime.now().toString(),
-          "Sign": _prefs.getString('sign'),
-          "UseWallet": true
-        };
-        var jBody = json.encode(_body);
-
-        var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove',
-            headers: {
-              'Authorization': 'Bearer $_token',
-              'Content-Type': 'application/json'
-            },
-            body: jBody);
-        if (result.statusCode == 401) {
-          auth.retryAuth().then((value) {
-            _payWithWallet();
-          });
-        }
-        if (result.statusCode == 200) {
-          setState(() {
-            _progressing = false;
-          });
-
-          await setWalletAmount();
-          setState(() {
-
-          });
-          var jres = json.decode(result.body);
-          if (jres["ResponseCode"] == 0)
-            showDialog(
-              context: context,
-              builder: (context) => CAlertDialog(
-                content: 'عملیات موفق',
-                subContent: 'شارژ و پرداخت از کیف پول با موفقیت انجام شد',
-                buttons: [
-                  CButton(
-                    label: 'بستن',
-                    onClick: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            );
-          else
-            showDialog(
-              context: context,
-              builder: (context) => CAlertDialog(
-                content: 'عملیات ناموفق',
-                subContent: jres['ResponseMessage'],
-                buttons: [
-                  CButton(
-                    label: 'بستن',
-                    onClick: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            );
-        }
-      }
-    });
-  }
-
-/*
-  Widget _paymentDialog() {
-    return Directionality(
-        textDirection: TextDirection.rtl,
-        child: AnimatedPositioned(
-          duration: Duration(seconds: 2),
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.7 + 30,
-              color: Colors.transparent,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    width: MediaQuery.of(context).size.width - 30,
-                    padding: EdgeInsets.only(top: 5, left: 15, right: 15),
-                    decoration: BoxDecoration(
-                        color: PColor.blueparto,
-                        borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(25)),
-                        boxShadow: [
-*/
-/*
-                        BoxShadow(
-                            color: PColor.orangeparto,
-                            blurRadius: 3,
-                            spreadRadius: 3,
-                            offset: Offset(0,-1)
-                        ),
-*//*
-
-                        ]),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              Text(
-                                'تایید اطلاعات تراکنش',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                                textScaleFactor: 1.3,
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'اطلاعات را مطالعه و پس از اطمینان پرداخت نمایید',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal),
-                                textScaleFactor: 0.8,
-                                textAlign: TextAlign.center,
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(12),
-                                margin:
-                                EdgeInsets.only(top: 5, left: 0, right: 0),
-                                decoration: BoxDecoration(
-                                  color: PColor.blueparto.shade900,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'نام محصول:',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                          textScaleFactor: 1,
-                                        ),
-                                        Text(
-                                          '${_invoiceTitle}',
-                                          style: TextStyle(
-                                              color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold),
-                                          textScaleFactor: 1,
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'نوع محصول:',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                          textScaleFactor: 1,
-                                        ),
-                                        Text(
-                                          '${_invoiceSubTitle}',
-                                          style: TextStyle(
-                                              color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold),
-                                          textScaleFactor: 1,
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'مبلغ پرداخت:',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.normal),
-                                          textScaleFactor: 1.2,
-                                        ),
-                                        Text(
-                                          '${getMoneyByRial(_invoiceAmount.toInt())} ریال',
-                                          style: TextStyle(
-                                              color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold),
-                                          textScaleFactor: 1.2,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                'روش پرداخت',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                                textScaleFactor: 1.3,
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'یکی از روش های پرداخت را انتخاب نمایید',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal),
-                                textScaleFactor: 0.8,
-                                textAlign: TextAlign.center,
-                              ),
-                              Row(
-                                children: [
-                                  CSelectedButton(
-                                    label: 'کیف پول',
-                                    height: 40,
-                                    selectedColor: Colors.blue,
-                                    selectedValue: _selectedPaymentType,
-                                    value: 0,
-                                    onPress: (v) {
-                                      setState(() {
-                                        _selectedPaymentType = v;
-                                      });
-                                    },
-                                  ),
-                                  CSelectedButton(
-                                    label: 'کارت بانکی',
-                                    selectedValue: _selectedPaymentType,
-                                    selectedColor: Colors.blue,
-                                    height: 40,
-                                    value: 1,
-                                    onPress: (v) {
-                                      setState(() {
-                                        _selectedPaymentType = v;
-                                      });
-                                    },
-                                  )
-                                ],
-                              ),
-                              _selectedPaymentType == 0
-                                  ? Container(
-                                padding: EdgeInsets.all(12),
-                                margin: EdgeInsets.only(
-                                    top: 5, left: 0, right: 0),
-                                decoration: BoxDecoration(
-                                  color: PColor.blueparto.shade900,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'مانده کیف پول:',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight:
-                                              FontWeight.normal),
-                                          textScaleFactor: 1,
-                                        ),
-                                        Text(
-                                          '${getMoneyByRial(_walletAmount.toInt())} ریال',
-                                          style: TextStyle(
-                                              color: PColor.orangeparto,
-                                              fontWeight:
-                                              FontWeight.bold),
-                                          textScaleFactor: 1,
-                                        ),
-                                      ],
-                                    ),
-                                    _walletAmount < _invoiceAmount
-                                        ? Text(
-                                      'مبلغ ${getMoneyByRial(_invoiceAmount.toInt())} ریال با کارت بانکی پرداخت شود',
-                                      style: TextStyle(
-                                          color: PColor.orangeparto,
-                                          fontWeight:
-                                          FontWeight.normal),
-                                      textScaleFactor: 1,
-                                    )
-                                        : Container(
-                                      height: 0,
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : Container(
-                                height: 0,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 60,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _selectedPaymentType == 0 &&
-                                  _walletAmount > _invoiceAmount
-                                  ? CButton(
-                                label: 'پرداخت با کیف پول',
-                                onClick: () {
-                                  _payWithWallet();
-                                },
-                                color: Colors.blue,
-                                textColor: Colors.white,
-                              )
-                                  : CButton(
-                                label: 'پرداخت با درگاه بانکی',
-                                onClick: () async {
-                                  if (await canLaunch(_paymentLink))
-                                    launch(_paymentLink).then((value) {
-                                      setState(() {
-                                        _readyToPay = false;
-                                      });
-                                    });
-                                },
-                                color: Colors.redAccent,
-                                textColor: Colors.white,
-                              ),
-                              Column(
-                                children: [
-                                  Text(
-                                    'مبلغ قابل پرداخت',
-                                    style: TextStyle(color: Colors.white70),
-                                    textScaleFactor: 0.9,
-                                  ),
-                                  Text(
-                                    ' ${getMoneyByRial(_invoiceAmount.toInt())} ریال',
-                                    style: TextStyle(
-                                        color: PColor.orangeparto,
-                                        fontWeight: FontWeight.bold),
-                                    textScaleFactor: 1.2,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          //  color: Colors.red,
-                        )
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                      top: 10,
-                      child: GestureDetector(
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(150),
-                              color: PColor.orangeparto),
-                          child: Icon(
-                            Icons.close,
-                            size: 35,
-                            color: Colors.white,
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _readyToPay = false;
-                          });
-                        },
-                      ))
-                ],
-              ),
-            ),
-          ),
-          bottom: _readyToPay
-              ? 0
-              : (MediaQuery.of(context).size.height * 0.7 + 30) * -1,
-          right: 5,
-          left: 5,
-          curve: Curves.fastLinearToSlowEaseIn,
-        ));
-  }
-*/
-
-//پایان ویجت پرداخت
-
-/*
-  Future<void> _payChargeWithCard(TopUp topUp) async {
-    auth.checkAuth().then((value) async {
-      if (value) {
-        SharedPreferences _p = await SharedPreferences.getInstance();
-        String _token = _p.getString('token');
-        var jsonTopUp = topUpToJson(topUp);
-        var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
-            headers: {
-              'Authorization': 'Bearer $_token',
-              'Content-Type': 'application/json'
-            },
-            body: jsonTopUp);
-        if (result.statusCode == 401) {
-          auth.retryAuth().then((value) {
-            _payChargeWithCard(topUp);
-          });
-        }
-        if (result.statusCode == 200) {
-          debugPrint(result.body);
-          var jres = json.decode(result.body);
-          setState(() {
-            _progressing = false;
-          });
-
-          if (jres['ResponseCode'] == 0)
-            showDialog(
-              context: context,
-              builder: (context) {
-                return PreInvoice(
-                  title:
-                  '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator].name}',
-                  subTitle:
-                  '${_operatorsWithLogo[_topUpOperator].chargeTypes[_selectedTopUpType].name}',
-                  amount: _selectedAmount.toDouble(),
-                  canUseWallet: jres['CanUseWallet'],
-                  paymentLink: jres['Url'],
-                  walletAmount: 0,
-                );
-              },
-            );
-          else if (jres['ResponseCode'] == 5) {
-            auth.retryAuth().then((value) {
-              _payChargeWithCard(topUp);
-            });
-          } else
-            showDialog(
-              context: context,
-              builder: (context) => CAlertDialog(
-                subContent: jres['ResponseMessage'],
-                buttons: [
-                  CButton(
-                    label: 'بستن',
-                    onClick: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            );
-        }
-      } else
-        showDialog(
-          context: context,
-          builder: (context) => CAlertDialog(
-            content: 'خطا در احراز هویت',
-            buttons: [
-              CButton(
-                label: 'بستن',
-                onClick: () => Navigator.of(context).pop(),
-              )
-            ],
-          ),
-        );
-    });
-  }
-*/
-
-/*
-  Future<void> _payChargeWithCardAndSend(TopUp topUp) async {
-    auth.checkAuth().then((value) async {
-      if (value) {
-        try {
-          SharedPreferences _p = await SharedPreferences.getInstance();
-          String _token = _p.getString('token');
-          var jsonTopUp = topUpToJson(topUp);
-          var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
-              headers: {
-                'Authorization': 'Bearer $_token',
-                'Content-Type': 'application/json'
-              },
-              body: jsonTopUp).timeout(Duration(seconds: 20));
-          if (result.statusCode == 401) {
-            auth.retryAuth().then((value) {
-              _payChargeWithCard(topUp);
-            });
-          }
-          if (result.statusCode == 200) {
-            debugPrint(result.body);
-            var jres = json.decode(result.body);
-            setState(() {
-              _progressing = false;
-            });
-
-            if (jres['ResponseCode'] == 0) {
-              setState(() {
-                _invoiceTitle =
-                '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator]
-                    .name}';
-                _invoiceSubTitle =
-                '${_operatorsWithLogo[_topUpOperator]
-                    .chargeTypes[_selectedTopUpType].name}';
-                _invoiceAmount = _selectedAmount.toDouble();
-                _canUseWallet = jres['CanUseWallet'];
-                _paymentLink = jres['Url'];
-                _walletAmount = jres['Cash'];
-                _readyToPay = true;
-              });
-            }
-
-            else
-              showDialog(
-                context: context,
-                builder: (context) =>
-                    CAlertDialog(
-                      content: 'خطای تراکنش',
-                      subContent: jres['ResponseMessage'],
-                      buttons: [
-                        CButton(
-                          label: 'بستن',
-                          onClick: () => Navigator.of(context).pop(),
-                        )
-                      ],
-                    ),
-              );
-          }
-        } on TimeoutException catch(e){
-          setState(() {
-            _progressing=false;
-          });
-          showDialog(
-            context: context,
-            builder: (context) =>
-                CAlertDialog(
-                  content: 'خطای ارتباط',
-                  subContent: 'ارتباط با سرور برقرار نشد',
-                  buttons: [
-                    CButton(
-                      label: 'بستن',
-                      onClick: () => Navigator.of(context).pop(),
-                    )
-                  ],
-                ),
-          );
-        }
-      }
-
-    });
-  }
-*/
-
-
-
-
 
 
   @override
@@ -1082,6 +555,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
                           }
 
                           else {
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackageListPage(operatorId: _selectedOperator,simCardId: _selectedSimCard,),));
                            // _sendToPayment();
                           }
                         },
@@ -1102,6 +576,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
           ],
         ));
   }
+
 
   //Detect operator of mobile with 3 number of starting
   _onPhoneChange(String number) {
@@ -1156,6 +631,8 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
   void dispose() {
     this.dispose();
   }
+
+
 
   Future<String> getContact() async {
     final ContactPicker _contactPicker = new ContactPicker();

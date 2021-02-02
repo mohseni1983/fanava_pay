@@ -11,11 +11,18 @@ class CSelectedGridItem extends StatefulWidget {
   final int value;
   final Function(int tval) onPress;
   final int selectedValue;
+  final double paddingHorizontal;
+  final double paddingVertical;
+  final double width;
   const CSelectedGridItem({Key key, this.height=30,  this.selectedColor=PColor.blueparto,
     this.color=PColor.orangeparto,  this.label,this.value=-1,
     this.textColor=PColor.blueparto,this.selectedTextColor=Colors.white,
     this.onPress,
-    this.selectedValue
+    this.selectedValue,
+    this.paddingHorizontal=1,
+    this.paddingVertical=1,
+    this.width=80
+
   }) : super(key: key);
 
   @override
@@ -28,6 +35,8 @@ class _CSelectedGridItemState extends State<CSelectedGridItem> {
     return GestureDetector(
       child:
       Container(height: widget.height,
+          width: widget.width,
+          padding: EdgeInsets.only(top: widget.paddingVertical,bottom: widget.paddingVertical,left: widget.paddingHorizontal,right: widget.paddingHorizontal),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
 

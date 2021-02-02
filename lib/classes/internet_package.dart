@@ -29,27 +29,17 @@ class InternetPackage {
     this.canUseWallet,
     this.cash,
     this.dataPlans,
-    this.deviceInfo,
-    this.financingInfoList,
     this.responseCode,
     this.responseMessage,
-    this.signKey,
-    this.txnInfoList,
-    this.url,
   });
 
-  int amount;
+  double amount;
   int billGroup;
   bool canUseWallet;
-  int cash;
+  double cash;
   List<DataPlan> dataPlans;
-  dynamic deviceInfo;
-  dynamic financingInfoList;
   int responseCode;
   String responseMessage;
-  dynamic signKey;
-  dynamic txnInfoList;
-  dynamic url;
 
   factory InternetPackage.fromJson(Map<String, dynamic> json) => InternetPackage(
     amount: json["Amount"],
@@ -57,13 +47,8 @@ class InternetPackage {
     canUseWallet: json["CanUseWallet"],
     cash: json["Cash"],
     dataPlans: List<DataPlan>.from(json["DataPlans"].map((x) => DataPlan.fromJson(x))),
-    deviceInfo: json["DeviceInfo"],
-    financingInfoList: json["FinancingInfoList"],
     responseCode: json["ResponseCode"],
     responseMessage: json["ResponseMessage"],
-    signKey: json["SignKey"],
-    txnInfoList: json["TxnInfoList"],
-    url: json["Url"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -72,13 +57,8 @@ class InternetPackage {
     "CanUseWallet": canUseWallet,
     "Cash": cash,
     "DataPlans": List<dynamic>.from(dataPlans.map((x) => x.toJson())),
-    "DeviceInfo": deviceInfo,
-    "FinancingInfoList": financingInfoList,
     "ResponseCode": responseCode,
     "ResponseMessage": responseMessage,
-    "SignKey": signKey,
-    "TxnInfoList": txnInfoList,
-    "Url": url,
   };
 }
 
@@ -99,8 +79,8 @@ class DataPlan {
   int id;
   int dataPlanOperator;
   int period;
-  int priceWithTax;
-  int priceWithoutTax;
+  double priceWithTax;
+  double priceWithoutTax;
   int profileId;
   String title;
   String uniqCode;
