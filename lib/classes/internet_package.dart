@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 class InternetPackageOperators{
   int id;
   String name;
   String grayImage;
   String colorImage;
   List<SimCardTypes> simTypes;
+  Color color;
 
-  InternetPackageOperators({this.id, this.name, this.grayImage, this.colorImage,this.simTypes});
+  InternetPackageOperators({this.id, this.name, this.grayImage, this.colorImage,this.simTypes,this.color});
 }
 
 class SimCardTypes{

@@ -35,36 +35,61 @@ class _CSelectedPackageState extends State<CSelectedPackage> {
     return    GestureDetector(
       child:
       Container(
+        //height: 60,
         margin: EdgeInsets.all(2),
-        padding: EdgeInsets.all(3),
+        //padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
         decoration: BoxDecoration(
           borderRadius:BorderRadius.circular(8) ,
+            border: Border.all(color: widget.color,width: 2,style: BorderStyle.solid),
             color: widget.selectedValue==widget.value?PColor.orangeparto:PColor.orangepartoAccent
         ),
         child:
-        Row(
-          mainAxisSize: MainAxisSize.max,
+        Column(
           children: [
-            Column(
-             // mainAxisAlignment: MainAxisAlignment.start,
-              //mainAxisSize: MainAxisSize.max,
-              children: [
-                Text(widget.label,style: TextStyle(color: PColor.blueparto,fontSize: widget.label.length>70?10:12,fontWeight: FontWeight.bold),textAlign: TextAlign.start,softWrap: true,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Text('قیمت بدون مالیات: ${getMoneyByRial(widget.costWithoutTax.toInt())}ریال',style: TextStyle(fontSize: 10),),
-                    Padding(padding: EdgeInsets.only(left: 8)),
-                    Text('قیمت با مالیات: ${getMoneyByRial(widget.costWithTax.toInt())}ریال',style: TextStyle(fontSize: 10),)
+            Container(
 
-                  ],
+              //margin: EdgeInsets.only(left: 5,right: 5),
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                //borderRadius: BorderRadius.vertical(bottom: Radius.circular(50)),
+                color: widget.color,
+
+              ),
+              child:                 Text(widget.label.trim(),style: TextStyle(color: Colors.white,fontSize: widget.label.length>70?10:12,fontWeight: FontWeight.bold),textAlign: TextAlign.start,softWrap: true,),
+
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  margin: EdgeInsets.all(2),
+                  width: 120,
+                  child: Column(
+                    children: [
+                      Text('قیمت بدون مالیات',textScaleFactor: 0.7,style: TextStyle(color: widget.textColor),),
+                      Text('${getMoneyByRial(widget.costWithoutTax.toInt())}ریال',textScaleFactor: 0.7,style: TextStyle(color: widget.textColor),)
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 120,
+                  //color: Colors.white,
+                  child: Column(
+                    children: [
+                      Text('قیمت با مالیات',textScaleFactor: 0.7,style: TextStyle(color: widget.textColor),),
+                      Text('${getMoneyByRial(widget.costWithTax.toInt())}ریال',textScaleFactor: 0.7,style: TextStyle(color: widget.textColor),)
+                    ],
+                  ),
                 )
 
               ],
             )
           ],
         )
+
+
+
         ,
       ),
       onTap: (){

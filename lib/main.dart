@@ -5,7 +5,6 @@ import 'package:parto_v/UI/cust_colors.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:parto_v/Pages/registeration.dart';
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
   WidgetsFlutterBinding.ensureInitialized();
   auth.checkAuth().then((value) {
@@ -19,6 +18,8 @@ final bool isAuth;
   const MyApp({Key key, this.isAuth}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
