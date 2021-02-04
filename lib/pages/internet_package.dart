@@ -555,7 +555,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
                           }
 
                           else {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackageListPage(operatorId: _selectedOperator,simCardId: _selectedSimCard,),));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackageListPage(operatorId: _selectedOperator,simCardId: _selectedSimCard,mobile: _mobile.text,),));
                            // _sendToPayment();
                           }
                         },

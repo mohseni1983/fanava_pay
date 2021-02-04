@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:parto_v/Pages/main_page.dart';
+import 'package:parto_v/classes/convert.dart';
 import 'package:parto_v/classes/global_variables.dart';
 import 'package:parto_v/classes/internet_package.dart';
 import 'package:parto_v/classes/wallet.dart';
@@ -18,12 +19,14 @@ import 'package:parto_v/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:url_launcher/url_launcher.dart';
 
 class InternetPackageListPage extends StatefulWidget {
   final int operatorId;
   final int simCardId;
+  final String mobile;
 
-  const InternetPackageListPage({Key key,  this.operatorId, this.simCardId}) : super(key: key);
+  const InternetPackageListPage({Key key,  this.operatorId, this.simCardId,this.mobile}) : super(key: key);
   @override
   _InternetPackageListPageState createState() => _InternetPackageListPageState();
 }
@@ -35,6 +38,499 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   bool _progressing = false;
   String _paymentLink = '';
   bool _inprogress = false;
+  bool  _readyToPay=false;
+
+  String _invoiceTitle='';
+  String _invoiceSubTitle='';
+  double _invoiceAmount=0;
+  int _selectedPaymentType = 1;
+  double _walletAmount = 0;
+  String  _uniqCode='';
+  bool _canUseWallet=false;
+
+
+
+
+//send to payment Api  *** most redefine
+
+//payment with wallet
+  Future<void> _payWithWallet() async {
+    int _refIdIndex = _paymentLink.indexOf('?RefId=') + 7;
+    String _refId = _paymentLink.substring(_refIdIndex);
+    setState(() {
+      _readyToPay = false;
+      _progressing = true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _token = _prefs.getString('token');
+        var _body = {
+          "ReferenceNumber": int.parse(_refId),
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _prefs.getString('sign'),
+          "UseWallet": true
+        };
+        var jBody = json.encode(_body);
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: jBody);
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            _payWithWallet();
+          });
+        }
+        if (result.statusCode == 200) {
+          setState(() {
+            _progressing = false;
+          });
+
+          await setWalletAmount();
+          setState(() {
+          });
+          var jres = json.decode(result.body);
+          if (jres["ResponseCode"] == 0)
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                content: 'عملیات موفق',
+                subContent: 'شارژ و پرداخت از کیف پول با موفقیت انجام شد',
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+          else
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                content: 'عملیات ناموفق',
+                subContent: jres['ResponseMessage'],
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+        }
+      }
+    });
+  }
+
+//get payment info for payment
+  Future<void> _payChargeWithCardAndSend() async {
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        try {
+          var _dp=_dataPlans.firstWhere((element) => element.id==_selectedPackage,orElse: ()=>null);
+
+          SharedPreferences _p = await SharedPreferences.getInstance();
+          debugPrint('PACKAGE: ${_selectedPackage}');
+          var body={
+            "CellNumber": widget.mobile.substring(1,11),
+            "ChargeType": _selectedPackage,
+            "UniqCode": _dp.uniqCode,
+            "LocalDate": DateTime.now().toString(),
+            "Sign": _p.getString('sign')
+          };
+          //            "Operator": widget.simCardId,
+          String _token = _p.getString('token');
+          var jsonTopUp = json.encode(body);
+          var result = await http.post(
+              'https://www.idehcharge.com/Middle/Api/Charge/DataPlan',
+              headers: {
+                'Authorization': 'Bearer $_token',
+                'Content-Type': 'application/json'
+              },
+              body: jsonTopUp).timeout(Duration(seconds: 20));
+          if (result.statusCode == 401) {
+            auth.retryAuth().then((value) {
+              _payChargeWithCardAndSend();
+            });
+          }
+          if (result.statusCode == 200) {
+            debugPrint(result.body);
+            var jres = json.decode(result.body);
+            setState(() {
+              _progressing = false;
+            });
+
+            if (jres['ResponseCode'] == 0) {
+              setState(() {
+                _invoiceTitle =
+                'خرید بسته ${_operatorsWithLogo[widget.operatorId].name} برای شماره ${widget.mobile}';
+                _invoiceSubTitle =
+                '${_dp.title}';
+                _invoiceAmount = _dp.priceWithTax;
+                _canUseWallet = jres['CanUseWallet'];
+                _paymentLink = jres['Url'];
+                _walletAmount = jres['Cash'];
+                _readyToPay = true;
+              });
+            }
+
+            else
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    CAlertDialog(
+                      content: 'خطای تراکنش',
+                      subContent: jres['ResponseMessage'],
+                      buttons: [
+                        CButton(
+                          label: 'بستن',
+                          onClick: () => Navigator.of(context).pop(),
+                        )
+                      ],
+                    ),
+              );
+          }
+        } on TimeoutException catch(e){
+          setState(() {
+            _progressing=false;
+          });
+          showDialog(
+            context: context,
+            builder: (context) =>
+                CAlertDialog(
+                  content: 'خطای ارتباط',
+                  subContent: 'ارتباط با سرور برقرار نشد',
+                  buttons: [
+                    CButton(
+                      label: 'بستن',
+                      onClick: () => Navigator.of(context).pop(),
+                    )
+                  ],
+                ),
+          );
+        }
+      }
+
+    });
+  }
+
+
+//
+
+  //widget for payment
+  Widget _paymentDialog() {
+    return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AnimatedPositioned(
+          duration: Duration(seconds: 2),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.7 + 30,
+              color: Colors.transparent,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    width: MediaQuery.of(context).size.width - 30,
+                    padding: EdgeInsets.only(top: 5, left: 15, right: 15),
+                    decoration: BoxDecoration(
+                        color: PColor.blueparto,
+                        borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(25)),
+                        boxShadow: [
+                        ]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Text(
+                                'تایید اطلاعات تراکنش',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                                textScaleFactor: 1.3,
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'اطلاعات را مطالعه و پس از اطمینان پرداخت نمایید',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textScaleFactor: 0.8,
+                                textAlign: TextAlign.center,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                margin:
+                                EdgeInsets.only(top: 5, left: 0, right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نام محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          '${_invoiceTitle}',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>40?9:12),
+                                          textScaleFactor: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نوع محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          '${_invoiceSubTitle}',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold,fontSize: _invoiceSubTitle.length>40?9:12),
+                                          textScaleFactor: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'مبلغ پرداخت:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                        Text(
+                                          '${getMoneyByRial(_invoiceAmount.toInt())} ریال',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'روش پرداخت',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                                textScaleFactor: 1.3,
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'یکی از روش های پرداخت را انتخاب نمایید',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textScaleFactor: 0.8,
+                                textAlign: TextAlign.center,
+                              ),
+                              Row(
+                                children: [
+                                  CSelectedButton(
+                                    label: 'کیف پول',
+                                    height: 40,
+                                    selectedColor: Colors.blue,
+                                    selectedValue: _selectedPaymentType,
+                                    value: 0,
+                                    onPress: (v) {
+                                      setState(() {
+                                        _selectedPaymentType = v;
+                                      });
+                                    },
+                                  ),
+                                  CSelectedButton(
+                                    label: 'کارت بانکی',
+                                    selectedValue: _selectedPaymentType,
+                                    selectedColor: Colors.blue,
+                                    height: 40,
+                                    value: 1,
+                                    onPress: (v) {
+                                      setState(() {
+                                        _selectedPaymentType = v;
+                                      });
+                                    },
+                                  )
+                                ],
+                              ),
+                              _selectedPaymentType == 0
+                                  ? Container(
+                                padding: EdgeInsets.all(12),
+                                margin: EdgeInsets.only(
+                                    top: 5, left: 0, right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'مانده کیف پول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight:
+                                              FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          '${getMoneyByRial(_walletAmount.toInt())} ریال',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight:
+                                              FontWeight.bold),
+                                          textScaleFactor: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    _walletAmount < _invoiceAmount
+                                        ? Text(
+                                      'مبلغ ${getMoneyByRial(_invoiceAmount.toInt())} ریال با کارت بانکی پرداخت شود',
+                                      style: TextStyle(
+                                          color: PColor.orangeparto,
+                                          fontWeight:
+                                          FontWeight.normal),
+                                      textScaleFactor: 1,
+                                    )
+                                        : Container(
+                                      height: 0,
+                                    ),
+                                  ],
+                                ),
+                              )
+                                  : Container(
+                                height: 0,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _selectedPaymentType == 0 &&
+                                  _walletAmount > _invoiceAmount
+                                  ? CButton(
+                                label: 'پرداخت با کیف پول',
+                                onClick: () {
+                                  _payWithWallet();
+                                },
+                                color: Colors.blue,
+                                textColor: Colors.white,
+                              )
+                                  : CButton(
+                                label: 'پرداخت با درگاه بانکی',
+                                onClick: () async {
+                                  launch(_paymentLink).then((value) {
+                                    setState(() {
+                                      _readyToPay = false;
+                                    });
+                                  });
+
+                                },
+                                color: Colors.redAccent,
+                                textColor: Colors.white,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    'مبلغ قابل پرداخت',
+                                    style: TextStyle(color: Colors.white70),
+                                    textScaleFactor: 0.9,
+                                  ),
+                                  Text(
+                                    ' ${getMoneyByRial(_invoiceAmount.toInt())} ریال',
+                                    style: TextStyle(
+                                        color: PColor.orangeparto,
+                                        fontWeight: FontWeight.bold),
+                                    textScaleFactor: 1.2,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          //  color: Colors.red,
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                      top: 10,
+                      child: GestureDetector(
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(150),
+                              color: PColor.orangeparto),
+                          child: Icon(
+                            Icons.close,
+                            size: 35,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _readyToPay = false;
+                          });
+                        },
+                      ))
+                ],
+              ),
+            ),
+          ),
+          bottom: _readyToPay
+              ? 0
+              : (MediaQuery.of(context).size.height * 0.7 + 30) * -1,
+          right: 5,
+          left: 5,
+          curve: Curves.fastLinearToSlowEaseIn,
+        ));
+  }
+
+
+
+
+
   Widget Progress() => Material(
     color: Colors.transparent,
     child: Container(
@@ -80,6 +576,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   }
 
   // get the list of packages;
+  List<DataPlan> _dataPlans=[];
   Future<void> getDataPlans() async{
     setState(() {
       _progressing=true;
@@ -116,18 +613,24 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             if(jResult['ResponseCode']==0){
 
                var s= internetPackageFromJson(result.body).dataPlans;
-               s.retainWhere((element) => element.dataPlanOperator==widget.operatorId);
-               _packs.forEach((t) {
-                 s.forEach((k) {
-                   if(t.id==k.period)
-                    setState(() {
-                      t.dataPlans.add(k);
-                    });
-                 });
+               setState(() {
+                 _dataPlans= internetPackageFromJson(result.body).dataPlans;
                });
+               //s.retainWhere((element) => element.dataPlanOperator==widget.operatorId && element.dataPlanType==widget.simCardId );
+               debugPrint('SIMCARD: ${widget.simCardId}');
+               debugPrint('OPERATOR: ${widget.operatorId}');
+
+              s.forEach((dp) {
+                _packs.forEach((pr) {
+                  if (dp.period==pr.id && dp.dataPlanOperator==widget.operatorId && dp.dataPlanType==widget.simCardId)
+                    setState(() {
+                      pr.dataPlans.add(dp);
+                    });
+                });
+              });
 
                _packs.forEach((element) {
-                 debugPrint('${element.name} ---- ${element.dataPlans.length}');
+                 //debugPrint('${element.name} ---- ${element.dataPlans.length}');
                });
 
 
@@ -167,8 +670,6 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
     new NetPackage(id: 5,name: 'سالانه',dataPlans: [])
   ];
 
-  //List of Internet Packages by duration
-  Map<int,String>_packages= {0:'ساعتی',1:'روزانه',2: 'هفتگی',3:'ماهانه', 8:'دوماهه', 9:'سه ماهه',10:'چهارماهه',4:'شش ماهه', 5:'یکساله'};
 
 
 
@@ -177,23 +678,28 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   int _selectedPackage=2;
   Widget Packages(){
     List<Widget> _list=[];
-    _packs[_selectedPeriod].dataPlans.forEach((element) {
+    var _loc=_packs.firstWhere((element) => element.id==_selectedPeriod,orElse: ()=>null);
+    if(_loc!=null)
+    _loc.dataPlans.forEach((element) {
       _list.add(
         CSelectedPackage(
           costWithoutTax: element.priceWithoutTax,
           costWithTax: element.priceWithTax,
           value: element.id,
           label: element.title,
+          color: _operatorsWithLogo[widget.operatorId].color,
           selectedValue: _selectedPackage,
           onPress: (v){
             setState(() {
               _selectedPackage=v;
+              //_uniqCode=_packs[widget.]
             });
           },
         )
       );
     });
     return ListView(
+      padding: EdgeInsets.zero,
       children: _list,
     );
   }
@@ -209,6 +715,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         name: 'ایرانسل',
         colorImage: 'assets/images/mtn-color.jpg',
         grayImage: 'assets/images/mtn-gray.jpg',
+        color: Color(0xfffebe10),
         simTypes: [
           new SimCardTypes(id: 0,name: 'دائمی'),
           new SimCardTypes(id: 1,name: 'اعتباری'),
@@ -221,6 +728,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         name: 'همراه اول',
         colorImage: 'assets/images/mci-color.jpg',
         grayImage: 'assets/images/mci-gray.jpg',
+        color: Color(0xff54c5d0),
         simTypes: [
           new SimCardTypes(id: 0,name: 'دائمی'),
           new SimCardTypes(id: 1,name: 'اعتباری')
@@ -230,6 +738,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         name: 'رایتل',
         colorImage: 'assets/images/rightel-color.jpg',
         grayImage: 'assets/images/rightel-gray.jpg',
+        color: Color(0xff941063),
         simTypes: [
           new SimCardTypes(id: 0,name: 'دائمی'),
           new SimCardTypes(id: 1,name: 'اعتباری'),
@@ -240,6 +749,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         name: 'شاتل موبایل',
         colorImage: 'assets/images/shatel-color.jpg',
         grayImage: 'assets/images/shatel-gray.jpg',
+        color: Color(0xfff26322),
         simTypes: [
           new SimCardTypes(id: 1,name: 'اعتباری'),
         ]),
@@ -281,7 +791,6 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             onPress: (v){
               setState(() {
                 _selectedPeriod=v;
-
               });
             },
           )
@@ -334,18 +843,6 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                     ),
                     Column(
                       children: [
-/*
-                        Text(
-                          'یکی از دورها زمانی را انتخاب کنید',
-                          textScaleFactor: 0.9,
-                        ),
-                        Divider(
-                          color: PColor.orangeparto,
-                          indent: 5,
-                          endIndent: 5,
-                          thickness: 2,
-                        ),
-*/
                         Container(
                           width: MediaQuery.of(context).size.width,
                           //height: 80,
@@ -402,15 +899,15 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                       CButton(
                         label: 'بعدی',
                         onClick: () {
-/*
-                          if (_mobile.text.length<11) {
+
+                          if (_selectedPackage<0) {
                             showDialog(
                                 context: context,
                                 builder: (context) =>
                                     CAlertDialog(
-                                      content: 'خطا در شماره',
+                                      content: 'خطا در انتخاب',
                                       subContent:
-                                      'شماره موبایل صحیح نیست',
+                                      'یک بسته اینترنتی انتخاب کنید',
                                       buttons: [
                                         CButton(
                                           label: 'بستن',
@@ -420,29 +917,11 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                       ],
                                     ));
                           }
-                          else if (_selectedOperator == -1
-                              ||_selectedSimCard ==-1
-                          ) {
-                            showDialog(
-                                context: context,
-                                builder: (context) => CAlertDialog(
-                                  content: 'خطا در انتخاب اپراتور',
-                                  subContent:
-                                  'اطلاعات مربوط به اپراتور انتخاب نشده است',
-                                  buttons: [
-                                    CButton(
-                                      label: 'بستن',
-                                      onClick: () =>
-                                          Navigator.of(context).pop(),
-                                    )
-                                  ],
-                                ));
-                          }
 
                           else {
-                            // _sendToPayment();
+                            _payChargeWithCardAndSend();
                           }
-*/
+
                         },
                         minWidth: 150,
                       ),
@@ -457,7 +936,8 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                 ),
               ),
             ),
-            //_paymentDialog()
+
+            _paymentDialog()
           ],
         ));
   }
