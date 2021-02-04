@@ -72,10 +72,6 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
 
 
   }
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return

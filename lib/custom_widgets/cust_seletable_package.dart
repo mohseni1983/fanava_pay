@@ -49,14 +49,15 @@ class _CSelectedPackageState extends State<CSelectedPackage> {
             Container(
 
               //margin: EdgeInsets.only(left: 5,right: 5),
-              height: 30,
-              alignment: Alignment.center,
+              height: 40,
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.only(right: 5,left: 5),
               decoration: BoxDecoration(
                 //borderRadius: BorderRadius.vertical(bottom: Radius.circular(50)),
                 color: widget.color,
 
               ),
-              child:                 Text(widget.label.trim(),style: TextStyle(color: Colors.white,fontSize: widget.label.length>70?10:12,fontWeight: FontWeight.bold),textAlign: TextAlign.start,softWrap: true,),
+              child:                Text(widget.label.trim(),style: TextStyle(color: Colors.white,fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.start,softWrap: true,),
 
             ),
             Row(

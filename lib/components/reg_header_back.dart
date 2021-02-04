@@ -6,7 +6,8 @@ class RegPageHeaderBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return
+      Stack(
       children: <Widget>[
         Pinned.fromSize(
           bounds: Rect.fromLTWH(0.0, 0.0, 375.0, 193.0),
