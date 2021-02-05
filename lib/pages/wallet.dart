@@ -231,13 +231,13 @@ class _WalletPageState extends State<WalletPage> {
 //ویجت مربوط به انتخاب عملیات کیف پول-پایان
 
   //ویجت عدد اعتبار
-  int _selectAmountForCharge=500000;
+  int _selectAmountForCharge=100000;
   List<int> _predefinedAmountList=[500000,750000,1000000];
   Widget ChargeAmountSelector(){
     return
         Container(
           margin: EdgeInsets.only(left: 10,right: 10,top: 3,bottom: 3),
-          padding: EdgeInsets.all(7),
+          padding: EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: PColor.orangeparto,
             borderRadius: BorderRadius.circular(10)
@@ -270,7 +270,7 @@ class _WalletPageState extends State<WalletPage> {
                   color: PColor.orangepartoAccent,
                   height: 50,
                   child: Center(
-                    child: Text('${getMoneyByRial(_selectAmountForCharge)} ریال',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.5,),
+                    child: Text('${getMoneyByRial(_selectAmountForCharge)} ریال',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.2,),
                   )
               )),
               GestureDetector(
@@ -681,7 +681,7 @@ class _WalletPageState extends State<WalletPage> {
             left: 5,
             right: 5,
 
-            child: Container(height: 90,
+            child: Container(height: 60,
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                   color: PColor.orangeparto,

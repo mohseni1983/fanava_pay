@@ -14,6 +14,8 @@ class CSelectedGridItem extends StatefulWidget {
   final double paddingHorizontal;
   final double paddingVertical;
   final double width;
+  final double textScaleFactor;
+  final double fontSize;
   const CSelectedGridItem({Key key, this.height=30,  this.selectedColor=PColor.blueparto,
     this.color=PColor.orangeparto,  this.label,this.value=-1,
     this.textColor=PColor.blueparto,this.selectedTextColor=Colors.white,
@@ -21,7 +23,9 @@ class CSelectedGridItem extends StatefulWidget {
     this.selectedValue,
     this.paddingHorizontal=1,
     this.paddingVertical=1,
-    this.width=80
+    this.width=80,
+    this.textScaleFactor=1,
+    this.fontSize=14
 
   }) : super(key: key);
 
@@ -45,8 +49,11 @@ class _CSelectedGridItemState extends State<CSelectedGridItem> {
           margin: EdgeInsets.all(2),
           child: Center(
             child: Text(widget.label,style: TextStyle(
-                color: widget.selectedValue==widget.value?widget.selectedTextColor:widget.textColor,fontSize: 14,fontWeight: widget.selectedValue==widget.value?FontWeight.bold:FontWeight.normal
-            )) ,
+                color: widget.selectedValue==widget.value?widget.selectedTextColor:widget.textColor,fontSize: widget.fontSize,fontWeight: widget.selectedValue==widget.value?FontWeight.bold:FontWeight.normal,
+
+            ),
+              textScaleFactor: widget.textScaleFactor,
+            ) ,
           )
       ),
       onTap: (){

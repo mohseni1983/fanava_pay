@@ -14,7 +14,8 @@ import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:persian_datepicker/persian_datepicker.dart';
 import 'package:persian_datepicker/persian_datetime.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:share/share.dart';
 
 class TransactionsPage extends StatefulWidget {
   @override
@@ -29,9 +30,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
   PersianDatePickerWidget _startPickerWidget;
   PersianDatePickerWidget _endPickerWidget;
   List<TxnInfoListElement> _transList=[];
+  TxnInfoListElement _element=new TxnInfoListElement();
   int _transCount=0;
   PersianDateTime getPersianDate(DateTime dateTime){
-    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    intl.DateFormat formatter = intl.DateFormat('yyyy-MM-dd');
     PersianDateTime todayPersianDate=PersianDateTime.fromGregorian(gregorianDateTime: formatter.format(dateTime));
     return todayPersianDate;
   }
@@ -112,6 +114,165 @@ class _TransactionsPageState extends State<TransactionsPage> {
       );
 
 
+  Widget _reportDialog(TxnInfoListElement _element) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+
+
+
+      ),
+      backgroundColor: PColor.blueparto,
+      child:    Directionality(
+        textDirection: TextDirection.rtl,
+        child:       Material(
+          color: Colors.transparent,
+          child: Container(
+            //height: MediaQuery.of(context).size.height * 0.7 + 30,
+            color: Colors.transparent,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  //width: MediaQuery.of(context).size.width - 30,
+                  padding: EdgeInsets.only(top: 5, left: 5, right: 5),
+                  decoration: BoxDecoration(
+                      color: PColor.blueparto,
+                      borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(25)),
+                      boxShadow: [
+                      ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            Text(
+                              'اطلاعات تراکنش',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                              textScaleFactor: 1.3,
+                              textAlign: TextAlign.center,
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              margin:
+                              EdgeInsets.only(top: 5, left: 0, right: 0),
+                              decoration: BoxDecoration(
+                                color: PColor.blueparto.shade900,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text('شرح تراکنش',style: TextStyle(color: Colors.white,fontSize: 12),),
+
+                                    ],
+                                  ),
+                                  Container(
+                                    child: Text('${_element.description}',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),textAlign: TextAlign.right,),
+                                  ),
+                                  Divider(height: 1,thickness: 0.5,color: Colors.white,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('تاریخ تراکنش',style: TextStyle(color: Colors.white,fontSize: 10),),
+                                      Text('${_element.requestDate}',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),),
+
+
+                                    ],
+                                  ),
+                                  Divider(height: 1,thickness: 0.5,color: Colors.white,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('وضعیت تراکنش',style: TextStyle(color: Colors.white,fontSize: 10),),
+                                      _element.isCharge?Text('موفق',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),):_element.isReverse?Text('برگشت وجه',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),):Text('ناموفق',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),),
+
+
+                                    ],
+                                  ),
+                                  Divider(height: 1,thickness: 0.5,color: Colors.white,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('شناسه تراکنش',style: TextStyle(color: Colors.white,fontSize: 10),),
+                                      Text('${_element.id}',style: TextStyle(color: PColor.orangepartoAccent,fontSize: 10),),
+
+
+                                    ],
+                                  ),
+
+
+
+
+
+                                ],
+                              ),
+                            ),
+
+
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 60,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            CButton(
+                              label: 'اشتراک گذاری',
+                              fontSize: 10,
+                              minWidth: 90,
+
+                              color: PColor.orangeparto,
+                              textColor: Colors.white,
+                              onClick: () async{
+                                String st= _element.isCharge?'موفق':_element.isReverse?'برگشت وجه':'ناموفق';
+
+                                    await Share.share('پرتو پرداخت\r\n'
+                                    '${_element.description}\r\n'
+                                    'نتیجه تراکنش:$st',);
+                              },
+
+
+                            ),
+                            CButton(
+                              label: 'بستن',
+                              fontSize: 12,
+                              minWidth: 90,
+                              color: PColor.orangeparto,
+                              textColor: Colors.white,
+                              onClick: (){
+                                Navigator.of(context).pop();
+
+
+                              },
+                            )
+
+                          ],
+                        ),
+                        //  color: Colors.red,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+      )
+
+    )
+    ;
+
+  }
 
 
 
@@ -231,168 +392,175 @@ class _TransactionsPageState extends State<TransactionsPage> {
             padding: EdgeInsets.zero,
             itemBuilder: (context, index) {
               var _item=_transList[index];
-              return Container(
-                  padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
-                  //height: 100,
-                  //color: Colors.green,
-                  margin: EdgeInsets.only(top: 2),
-                  decoration: BoxDecoration(
-                      color: PColor.orangepartoAccent,
-                      borderRadius: BorderRadius.circular(12)
+              return
+              GestureDetector(
+                child:                 Container(
+                    padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
+                    //height: 100,
+                    //color: Colors.green,
+                    margin: EdgeInsets.only(top: 2),
+                    decoration: BoxDecoration(
+                        color: PColor.orangepartoAccent,
+                        borderRadius: BorderRadius.circular(12)
 
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 67,
-                        decoration: BoxDecoration(
-                            color: _item.isSettle?Colors.green:Colors.red,
-                            borderRadius: BorderRadius.horizontal(left:Radius.circular(12) )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 67,
+                          decoration: BoxDecoration(
+                              color: _item.isCharge?Colors.green:Colors.red,
+                              borderRadius: BorderRadius.horizontal(left:Radius.circular(12) )
+
+                          ),
 
                         ),
+                        Container(
+                          width: 10,
+                        ),
+                        Expanded(child:
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
-                      ),
-                      Container(
-                        width: 20,
-                      ),
-                      Expanded(child:
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('${_item.requestTypeDetails}',textAlign: TextAlign.right,textScaleFactor: 1.1,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
-
-
-
-                              Container(
-
-                                padding: EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: PColor.orangeparto,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text('شناسه: ${_item.id}',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.7,),
-                              )
-
-                            ],
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('${_item.requestDate}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
-
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('${getMoneyByRial(_item.amount.toInt())} ریال',style: TextStyle(color: PColor.blueparto),),
-                                 // Icon(Icons.check_circle,color: Colors.green.shade600,)
-                                ],
-                              ),
-
-
-
-
-                            ],
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8)
-
-                            ),
-                            //height: 60,
-                            child: Row(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                Text('${_item.requestTypeDetails}',textAlign: TextAlign.right,textScaleFactor: 0.9,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
+
+
+
                                 Container(
-                                  width: 80,
-                                  child: Column(
-                                    children: [
-                                      Text('وضعیت پرداخت',textScaleFactor: 0.7,),
-                                     // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
-                                      _item.isSettle?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
 
-
-                                    ],
+                                  padding: EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: PColor.orangeparto,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  child: Icon(Icons.keyboard_arrow_left),
-                                ),
-                                Container(
-                                  width: 80,
-                                  child: Column(
-                                    children: [
-                                      Text('وضعیت عملیات',textScaleFactor: 0.7,),
-                                      // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
-                                      _item.isCharge?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
-
-
-                                    ],
-                                  ),
-
-                                ),
-                                !_item.isCharge?
-                                Container(
-                                  alignment: Alignment.center,
-                                  child: Icon(Icons.keyboard_arrow_left),
+                                  child: Text('شناسه: ${_item.id}',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.7,),
                                 )
-                                    :
-                                    Container(width: 0,),
-                                !_item.isCharge?
-                                Container(
-                                  width: 80,
-                                  child: Column(
-                                    children: [
-                                      Text('برگشت وجه',textScaleFactor: 0.7,),
-                                      //Text('${_item.payRollBackDate}',textScaleFactor: 0.7,),
 
-                                      // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
-                                      _item.isReverse?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+                              ],
+                            ),
 
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('${_item.requestDate}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
 
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('${getMoneyByRial(_item.amount.toInt())} ریال',style: TextStyle(color: PColor.blueparto),),
+                                    // Icon(Icons.check_circle,color: Colors.green.shade600,)
+                                  ],
+                                ),
 
-                                    ],
-                                  ),
-
-                                )
-                                    :
-                                Container(width: 0,),
 
 
 
                               ],
                             ),
-                          )
-                        ],
-                      )
-                      ),
-                      GestureDetector(
-                        child:
+                            Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8)
+
+                              ),
+                              //height: 60,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    //width: 80,
+                                    child: Column(
+                                      children: [
+                                        Text('وضعیت پرداخت',textScaleFactor: 0.7,),
+                                        // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                        _item.isSettle?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+                                      ],
+                                    ),
+
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Icon(Icons.keyboard_arrow_left),
+                                  ),
+                                  Container(
+                                    //width: 80,
+                                    child: Column(
+                                      children: [
+                                        Text('وضعیت عملیات',textScaleFactor: 0.7,),
+                                        // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                        _item.isCharge?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+                                      ],
+                                    ),
+
+                                  ),
+                                  !_item.isCharge?
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Icon(Icons.keyboard_arrow_left),
+                                  )
+                                      :
+                                  Container(width: 0,),
+                                  !_item.isCharge?
+                                  Container(
+                                    // width: 80,
+                                    child: Column(
+                                      children: [
+                                        Text('برگشت وجه',textScaleFactor: 0.7,),
+                                        //Text('${_item.payRollBackDate}',textScaleFactor: 0.7,),
+
+                                        // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                        _item.isReverse?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+
+                                      ],
+                                    ),
+
+                                  )
+                                      :
+                                  Container(width: 0,),
+
+
+
+                                ],
+                              ),
+                            )
+                          ],
+                        )
+                        ),
                         Container(
                           alignment: Alignment.center,
-                          width: 40,
+                          //width: 20,
                           child: Icon(
-                              Icons.arrow_right_outlined,color: PColor.orangeparto,size: 40,
+                            Icons.arrow_right_outlined,color: PColor.orangeparto,size: 20,
                           ),
 
                         ),
 
-                      )
 
-                    ],
-                  )
-              );
+                      ],
+                    )
+                )
+                ,
+                onTap: (){
+                  showDialog(context: context,
+                  builder: (context) => _reportDialog(_item),
+                  );
+                },
+              )
+              ;
             },
           )
       );
@@ -425,7 +593,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
 
-
+Widget buttom=Container(height: 0,);
 
 
   @override
@@ -480,10 +648,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
           _progressing?
           Progress():Container(height: 0,),
 
+          buttom,
+
         ],
       );
 
   }
+
+
 
 
 

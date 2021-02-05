@@ -15,7 +15,7 @@ class CSelectedPackage extends StatefulWidget {
   final double costWithTax;
   final double costWithoutTax;
   
-  const CSelectedPackage({Key key, this.height=50,  this.selectedColor=PColor.blueparto,
+  const CSelectedPackage({Key key, this.height=60,  this.selectedColor=PColor.blueparto,
     this.color=PColor.orangeparto,  this.label,this.value=-1,
     this.textColor=PColor.blueparto,this.selectedTextColor=Colors.white,
     this.onPress,
@@ -36,6 +36,7 @@ class _CSelectedPackageState extends State<CSelectedPackage> {
       child:
       Container(
         //height: 60,
+       // height: widget.height,
         margin: EdgeInsets.all(2),
         //padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
         decoration: BoxDecoration(

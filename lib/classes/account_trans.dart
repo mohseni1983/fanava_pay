@@ -38,6 +38,7 @@ class TxnInfoListElement {
     this.id,
     this.payApproveDate,
     this.payRollBackDate,
+    this.description
 
   });
 
@@ -59,6 +60,7 @@ class TxnInfoListElement {
   int id;
   String payApproveDate;
   String payRollBackDate;
+  String description;
 
   factory TxnInfoListElement.fromJson(Map<String, dynamic> json) => TxnInfoListElement(
     amount: json["Amount"],
@@ -78,7 +80,8 @@ class TxnInfoListElement {
     traceNumber: json["TraceNumber"] == null ? null : json["TraceNumber"],
     id:json['Id'],
     payApproveDate: json['PayApproveDate'],
-      payRollBackDate: json['PayRollBackDate']
+      payRollBackDate: json['PayRollBackDate'],
+    description:json["Description"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -99,6 +102,7 @@ class TxnInfoListElement {
     "TraceNumber": traceNumber == null ? null : traceNumber,
     "Id":id,
     "PayApproveDate":payApproveDate,
-    "PayRollBackDate":payRollBackDate
+    "PayRollBackDate":payRollBackDate,
+    "Description":description,
   };
 }

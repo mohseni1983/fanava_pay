@@ -26,6 +26,7 @@ final bool isAuth;
     ]);
     return
       MaterialApp(
+        debugShowCheckedModeBanner: false,
       title: 'پرداخت پرتو',
       theme: ThemeData(
         primarySwatch: PColor.orangeparto,

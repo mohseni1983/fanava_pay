@@ -235,6 +235,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
       _list.add(CSelectedButton(
         value:e.id ,
         label: e.name,
+
         height: 35,
         selectedValue: _selectedSimCard,
         onPress: (x){
@@ -272,7 +273,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
               // inProgress: _inprogress,
                 wchild: Column(
                   children: [
-                    Padding(padding: EdgeInsets.only(top: 15)),
+                    //Padding(padding: EdgeInsets.only(top: 15)),
                     Text(
                       'بسته های اینترنت',
                       style: Theme.of(context).textTheme.headline1,
@@ -500,7 +501,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
               left: 5,
               right: 5,
               child: Container(
-                height: 90,
+                height: 50,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: PColor.orangeparto,

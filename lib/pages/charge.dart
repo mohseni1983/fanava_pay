@@ -480,6 +480,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                       _walletAmount >= _invoiceAmount
                                   ? CButton(
                                       label: 'پرداخت با کیف پول',
+                                      textScaleFactor: 0.8,
                                       onClick: () {
                                         _payWithWallet();
                                       },
@@ -488,6 +489,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                     )
                                   : CButton(
                                       label: 'پرداخت با درگاه بانکی',
+
                                       onClick: () async {
                                         launch(_paymentLink).then((value) {
                                           setState(() {
@@ -824,7 +826,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                 // inProgress: _inprogress,
                 wchild: Column(
               children: [
-                Padding(padding: EdgeInsets.only(top: 15)),
+            //    Padding(padding: EdgeInsets.only(top: 5)),
                 Text(
                   'شارژ تلفن همراه',
                   style: Theme.of(context).textTheme.headline1,
@@ -1243,12 +1245,12 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                   _sendToPayment();
                                 }
                               },
-                              minWidth: 150,
+                              minWidth: 120,
                             ),
                             CButton(
                               label: 'تکرار خرید قبلی',
                               onClick: () {},
-                              minWidth: 150,
+                              minWidth: 120,
                             ),
                           ],
                         ),

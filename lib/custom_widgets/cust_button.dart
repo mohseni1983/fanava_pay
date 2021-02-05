@@ -8,8 +8,10 @@ class CButton extends StatefulWidget {
   final double minWidth;
   final Color color;
   final Color textColor;
+  final double textScaleFactor;
+  final double fontSize;
 
-  const CButton({Key key, this.onClick, this.label, this.minWidth,this.color=PColor.blueparto,this.textColor=Colors.white,}) :super(key: key);
+  const CButton({Key key, this.textScaleFactor=1,this.fontSize=14,this.onClick, this.label, this.minWidth,this.color=PColor.blueparto,this.textColor=Colors.white,}) :super(key: key);
   @override
   _CButtonState createState() => _CButtonState();
 }
@@ -31,7 +33,7 @@ class _CButtonState extends State<CButton> {
             //side: BorderSide(color: Colors.red)
         ),
         //textTheme: ButtonTextTheme.primary,
-        child: Text(widget.label,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 18),),
+        child: Text(widget.label,style: TextStyle(fontWeight: FontWeight.w700,fontSize:widget.fontSize),textScaleFactor: widget.textScaleFactor,),
         onPressed: widget.onClick);
   }
 }

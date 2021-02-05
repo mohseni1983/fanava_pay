@@ -296,7 +296,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                           '${_invoiceTitle}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>60?9:12,),
+                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>40?8:12,),
                                           softWrap: true,
                                           textScaleFactor: 1,
                                         ),
@@ -691,6 +691,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         CSelectedPackage(
           costWithoutTax: element.priceWithoutTax,
           costWithTax: element.priceWithTax,
+          height: 90,
           value: element.id,
           label: element.title,
           color: _operatorsWithLogo[widget.operatorId].color,
@@ -789,6 +790,8 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
 
           CSelectedGridItem(
             height: 30,
+            fontSize: 12,
+            textScaleFactor: 0.9,
             paddingHorizontal: 10,
             paddingVertical: 5,
             label: element.name,
@@ -832,7 +835,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                 wchild: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(padding: EdgeInsets.only(top: 15)),
+                    //Padding(padding: EdgeInsets.only(top: 15)),
                     Text(
                       'بسته های اینترنت',
                       style: Theme.of(context).textTheme.headline1,
@@ -883,7 +886,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
               left: 5,
               right: 5,
               child: Container(
-                height: 90,
+                height: 50,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: PColor.orangeparto,

@@ -183,12 +183,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 Column(
 
                   children: [
-                    Padding(padding: EdgeInsets.only(top: 15)),
+                    //Padding(padding: EdgeInsets.only(top: 15)),
                     CircleAvatar(
                       minRadius: 30,
                       maxRadius: 40,
                       backgroundColor: PColor.orangeparto,
-                      child: Icon(Icons.person_outline_rounded,color: Colors.white,size: 45,),
+                      child: Icon(Icons.person_outline_rounded,color: Colors.white,size: 35,),
                     ),
                     Text(
                       'اطلاعات پروفایل کاربری',
@@ -203,6 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       thickness: 2,
                     ),
                     Expanded(child: ListView(
+                      padding: EdgeInsets.zero,
                       children: [
 
                         Row(
