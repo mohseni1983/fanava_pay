@@ -296,7 +296,8 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                           '${_invoiceTitle}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>40?9:12),
+                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>60?9:12,),
+                                          softWrap: true,
                                           textScaleFactor: 1,
                                         ),
                                       ],
@@ -312,13 +313,18 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                               fontWeight: FontWeight.normal),
                                           textScaleFactor: 1,
                                         ),
-                                        Text(
+                                        Container(height: 40,
+                                        width: MediaQuery.of(context).size.width/2,
+                                        child:                                         Text(
                                           '${_invoiceSubTitle}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold,fontSize: _invoiceSubTitle.length>40?9:12),
+                                              fontWeight: FontWeight.bold,fontSize: _invoiceSubTitle.length>60?9:12),
                                           textScaleFactor: 1,
+                                          softWrap: true,
                                         ),
+
+                                        )
                                       ],
                                     ),
                                     Row(
@@ -756,7 +762,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   ];
 
   //create list of  packages
-  int _selectedPeriod=0;
+  int _selectedPeriod=3;
   List<DataPlan> _plans=[];
   void filterList({int operatorId,int simCardTypeId,int selectedPeriod=0,List<DataPlan> masterList})
   {
@@ -782,7 +788,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
       _list.add(
 
           CSelectedGridItem(
-            height: 40,
+            height: 30,
             paddingHorizontal: 10,
             paddingVertical: 5,
             label: element.name,
@@ -923,13 +929,13 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                           }
 
                         },
-                        minWidth: 150,
+                        minWidth: 100,
                       ),
 
                       CButton(
                         label: 'تکرار خرید قبلی',
                         onClick: () {},
-                        minWidth: 150,
+                        minWidth: 100,
                       ),
                     ],
                   ),

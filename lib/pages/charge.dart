@@ -910,6 +910,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                           hintText: 'مثال 09123456789'),
                                       keyboardType: TextInputType.phone,
                                       maxLength: 11,
+
                                       controller: _mobile,
                                       onChanged: (v) {
                                         if (v.isNotEmpty &&
@@ -924,6 +925,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                             _topUpOperator = -1;
                                           });
                                         }
+                                        if(v.length==11)
+                                          FocusScope.of(context).unfocus();
                                       },
                                       textAlign: TextAlign.center,
                                     )

@@ -342,6 +342,10 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
                                                   _selectedOperator = -1;
                                                 });
                                               }
+                                              if(v.length==11)
+                                                FocusScope.of(context).unfocus();
+
+
                                             },
                                             textAlign: TextAlign.center,
                                           )
@@ -559,13 +563,13 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
                            // _sendToPayment();
                           }
                         },
-                        minWidth: 150,
+                        minWidth: 100,
                       ),
 
                       CButton(
                         label: 'تکرار خرید قبلی',
                         onClick: () {},
-                        minWidth: 150,
+                        minWidth: 100,
                       ),
                     ],
                   ),

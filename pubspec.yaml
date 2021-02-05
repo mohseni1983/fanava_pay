@@ -35,13 +35,14 @@ dependencies:
   http:
   group_button:
   smart_select:
-  url_launcher:
   fa_stepper:
   flutter_money_formatter:
   contact_picker:
   persian_datepicker:
   intl:
   otp_count_down:
+  url_launcher: 5.4.2
+
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,8 @@ flutter:
     - assets/images/shatel-gray.jpg
     - assets/images/mci-color.jpg
     - assets/images/mci-gray.jpg
+    - assets/images/man.png
+    - assets/images/woman.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

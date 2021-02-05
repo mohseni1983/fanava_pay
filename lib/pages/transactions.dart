@@ -163,7 +163,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             });
             debugPrint(result.body);
             var jres=json.decode(result.body);
-            //debugPrint(jres.toString());
+            debugPrint(jres.toString());
 
 
             if(jres['ResponseCode']==0){
@@ -233,7 +233,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
               var _item=_transList[index];
               return Container(
                   padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
-                  height: 80,
+                  //height: 100,
                   //color: Colors.green,
                   margin: EdgeInsets.only(top: 2),
                   decoration: BoxDecoration(
@@ -269,7 +269,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             children: [
                               Text('${_item.requestTypeDetails}',textAlign: TextAlign.right,textScaleFactor: 1.1,style: TextStyle(fontWeight: FontWeight.bold,color: PColor.blueparto),),
 
-                              _item.isSettle &&  _item.rrn!=null && _item.rrn.length>0?
+
 
                               Container(
 
@@ -278,51 +278,118 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   color: PColor.orangeparto,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Text('پیگیری: ${_item.rrn}',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.9,),
-                              ):
-
-                                  Container(height: 0,width: 0,)
+                                child: Text('شناسه: ${_item.id}',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 0.7,),
+                              )
 
                             ],
                           ),
 
-/*
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text('${_item.description}',style: TextStyle(color: PColor.blueparto.shade300,fontWeight: FontWeight.bold,fontSize: 10),)
-                            ],
-                          ),
-*/
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('${_item.requestDate}',style: TextStyle(fontWeight: FontWeight.bold,color: PColor.orangeparto),textScaleFactor: 0.8,),
-                              _item.isSettle?
+
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text('${getMoneyByRial(_item.amount.toInt())} ریال',style: TextStyle(color: Colors.green.shade700),),
-                                  Icon(Icons.check_circle,color: Colors.green.shade600,)
-                                ],
-                              ):
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('${getMoneyByRial((_item.amount).toInt())} ریال',style: TextStyle(color: Colors.red.shade700),),
-                                  Icon(Icons.block_rounded,color: Colors.red.shade600,)
+                                  Text('${getMoneyByRial(_item.amount.toInt())} ریال',style: TextStyle(color: PColor.blueparto),),
+                                 // Icon(Icons.check_circle,color: Colors.green.shade600,)
                                 ],
                               ),
+
 
 
 
                             ],
                           ),
                           Container(
-                            width: 20,
-                          ),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8)
+
+                            ),
+                            //height: 60,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 80,
+                                  child: Column(
+                                    children: [
+                                      Text('وضعیت پرداخت',textScaleFactor: 0.7,),
+                                     // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                      _item.isSettle?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+                                    ],
+                                  ),
+
+                                ),
+                                Container(
+                                  alignment: Alignment.center,
+                                  child: Icon(Icons.keyboard_arrow_left),
+                                ),
+                                Container(
+                                  width: 80,
+                                  child: Column(
+                                    children: [
+                                      Text('وضعیت عملیات',textScaleFactor: 0.7,),
+                                      // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                      _item.isCharge?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+                                    ],
+                                  ),
+
+                                ),
+                                !_item.isCharge?
+                                Container(
+                                  alignment: Alignment.center,
+                                  child: Icon(Icons.keyboard_arrow_left),
+                                )
+                                    :
+                                    Container(width: 0,),
+                                !_item.isCharge?
+                                Container(
+                                  width: 80,
+                                  child: Column(
+                                    children: [
+                                      Text('برگشت وجه',textScaleFactor: 0.7,),
+                                      //Text('${_item.payRollBackDate}',textScaleFactor: 0.7,),
+
+                                      // Text('${_transList[index].requestType}',textScaleFactor: 0.7,),
+                                      _item.isReverse?Icon(Icons.check,color: Colors.green,):Icon(Icons.block_flipped,color: Colors.red,)
+
+
+
+                                    ],
+                                  ),
+
+                                )
+                                    :
+                                Container(width: 0,),
+
+
+
+                              ],
+                            ),
+                          )
                         ],
-                      ))
+                      )
+                      ),
+                      GestureDetector(
+                        child:
+                        Container(
+                          alignment: Alignment.center,
+                          width: 40,
+                          child: Icon(
+                              Icons.arrow_right_outlined,color: PColor.orangeparto,size: 40,
+                          ),
+
+                        ),
+
+                      )
+
                     ],
                   )
               );
@@ -330,7 +397,18 @@ class _TransactionsPageState extends State<TransactionsPage> {
           )
       );
   }
+/*                               GestureDetector(
+                                child:
+                                Container(
+                                  width: 20,
+                                  child: Icon(
+                                      Icons.arrow_right_outlined
+                                  ),
 
+                                ),
+
+                              )
+*/
 //دریافت رنگ و شرح نوع تراکنش
   TransactionType getTransactionType(int id){
     switch(id){
@@ -370,7 +448,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    ' گزارش تراکنش های بانکی',
+                    ' گزارش تراکنش ها',
                     style: Theme
                         .of(context)
                         .textTheme

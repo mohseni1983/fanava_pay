@@ -21,6 +21,11 @@ class _CTextFieldState extends State<CTextField> {
             counter: Offstage(),
             counterText: ''
         ),
+        onChanged: (v){
+          if(v.length==widget.maxLenght)
+            FocusScope.of(context).unfocus();
+
+        },
 
         controller: widget.controller,
         textAlign: widget.textAlign,
