@@ -454,7 +454,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               _selectedPaymentType == 0 &&
-                                  _walletAmount > _invoiceAmount
+                                  _walletAmount >= _invoiceAmount
                                   ? CButton(
                                 label: 'پرداخت با کیف پول',
                                 onClick: () {

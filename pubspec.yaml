@@ -79,6 +79,8 @@ flutter:
     - assets/images/mci-gray.jpg
     - assets/images/man.png
     - assets/images/woman.png
+    - assets/images/3g4g5g.png
+    - assets/images/sim-Charge.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

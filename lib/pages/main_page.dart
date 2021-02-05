@@ -51,61 +51,22 @@ class _MainPageState extends State<MainPage> {
             isHome: true,
             wchild: GridView.count(
               crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
               padding:
                   EdgeInsets.only(top: 50, left: 15, right: 15, bottom: 50),
               children: [
-                GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ChargeWizardPage(),
-                  )),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: PColor.orangeparto,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                              color: PColor.blueparto,
-                              blurRadius: 5,
-                              spreadRadius: 2,
-                              offset: Offset(0, 0))
-                        ]),
-                    child: Center(
-                      child: Text(
-                        ' خرید شارژ',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                    ),
-                  ),
+                MainIcon(
+                  label: 'شارژ سیم کارت',
+                  image: AssetImage('assets/images/sim-Charge.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),)),
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => InternetPackagePage(),
-                  )),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: PColor.orangeparto,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                              color: PColor.blueparto,
-                              blurRadius: 5,
-                              spreadRadius: 2,
-                              offset: Offset(0, 0))
-                        ]),
-                    child: Center(
-                      child: Text(
-                        ' خرید بسته اینترنت',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                    ),
-                  ),
-                )
+                MainIcon(
+                  label: 'بسته اینترنت',
+                  image: AssetImage('assets/images/3g4g5g.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                ),
+
 
               ],
             )),
@@ -135,5 +96,73 @@ class _MainPageState extends State<MainPage> {
                   ),
                 )) ??
         false;
+  }
+}
+
+
+class MainIcon extends StatefulWidget {
+  final String label;
+  final AssetImage image;
+  final VoidCallback onPress;
+
+  const MainIcon({Key key, this.label, this.image, this.onPress}) : super(key: key);
+  @override
+  _MainIconState createState() => _MainIconState();
+}
+
+class _MainIconState extends State<MainIcon> {
+  @override
+  Widget build(BuildContext context) {
+    return                 GestureDetector(
+      onTap: widget.onPress,
+      child: Container(
+
+          child: Stack(
+            children: [
+              Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 10,left: 10),
+                    height: MediaQuery.of(context).size.width/2.5,
+                    width: MediaQuery.of(context).size.width/2.5,
+                    decoration: BoxDecoration(
+                      color: PColor.orangeparto,
+                      borderRadius: BorderRadius.circular(15),
+
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(child: Container(height: 0,)),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 5,left: 3,right: 3),
+                          child:  Text('${widget.label}',style: TextStyle(color: PColor.blueparto),textScaleFactor: 1.1,),
+                        )
+                      ],
+                    ),
+                  )),
+              Positioned(
+                  top: 0,
+                  left: 0,
+
+                  child: Container(
+                    height: MediaQuery.of(context).size.width/3.1,
+                    width: MediaQuery.of(context).size.width/3.1,
+                    decoration: BoxDecoration(
+                        color: PColor.blueparto.withAlpha(80),
+                        borderRadius: BorderRadius.circular(15),
+                        image: DecorationImage(
+                            image:widget.image,
+                            fit: BoxFit.contain
+                        )
+
+                    ),
+                  )),
+            ],
+
+          )
+      ),
+    );
+
   }
 }
