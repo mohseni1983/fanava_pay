@@ -264,9 +264,9 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-        inAsyncCall: _inprogress,
-        child: Stack(
+    return Scaffold(
+       // inAsyncCall: _inprogress,
+        body: Stack(
           children: [
             MasterTemplateWithoutFooter(
 
@@ -501,7 +501,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
               left: 5,
               right: 5,
               child: Container(
-                height: 50,
+                height: 60,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: PColor.orangeparto,

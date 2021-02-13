@@ -66,6 +66,18 @@ class _MainPageState extends State<MainPage> {
                   image: AssetImage('assets/images/3g4g5g.png'),
                   onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
                 ),
+                MainIcon(
+                  label: 'قبوض خدماتی',
+                  image: AssetImage('assets/images/ghobooz2.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                ),
+                MainIcon(
+                  label: 'نیکوکاری',
+                  image: AssetImage('assets/images/3g4g5g.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                ),
+
+
 
 
               ],

@@ -43,6 +43,7 @@ dependencies:
   otp_count_down:
   url_launcher: 5.4.2
   share:
+  sentry_flutter:
 
 
 dev_dependencies:
@@ -82,6 +83,7 @@ flutter:
     - assets/images/woman.png
     - assets/images/3g4g5g.png
     - assets/images/sim-Charge.png
+    - assets/images/ghobooz2.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

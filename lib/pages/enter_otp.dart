@@ -83,55 +83,59 @@ class _EnterOTPState extends State<EnterOTP> {
   Widget build(BuildContext context) {
 
     return
-    ModalProgressHUD(inAsyncCall: _progress,
+    Scaffold(
+      body:       ModalProgressHUD(inAsyncCall: _progress,
 
-        child:       RegPageTemplate(
-          children: [
-            Text('کد ارسالی به شماره زیر را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('0$_phoneNumber  ',textScaleFactor: 1.3,style: Theme.of(context).textTheme.caption,),
-                GestureDetector(
-                  onTap: ()=>Navigator.of(context).pop(),
-                  child: Text('ویرایش',style: TextStyle(color: PColor.orangeparto),),
-                )
-              ],
-            ),
-            Padding(padding: EdgeInsets.only(top: 4)),
-            CTextField(
-              keyboardType: TextInputType.number,
-              maxLenght: 5,
-              textAlign: TextAlign.center,
-              controller: _otp,
+          child:       RegPageTemplate(
+            children: [
+              Text('کد ارسالی به شماره زیر را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('0$_phoneNumber  ',textScaleFactor: 1.3,style: Theme.of(context).textTheme.caption,),
+                  GestureDetector(
+                    onTap: ()=>Navigator.of(context).pop(),
+                    child: Text('ویرایش',style: TextStyle(color: PColor.orangeparto),),
+                  )
+                ],
+              ),
+              Padding(padding: EdgeInsets.only(top: 4)),
+              CTextField(
+                keyboardType: TextInputType.number,
+                maxLenght: 5,
+                textAlign: TextAlign.center,
+                controller: _otp,
 
-            ),
-            CButton(
-              minWidth: MediaQuery.of(context).size.width,
-              label: 'ورود',
-              onClick: (){
-                _registerOTP();
+              ),
+              CButton(
+                minWidth: MediaQuery.of(context).size.width,
+                label: 'ورود',
+                onClick: (){
+                  _registerOTP();
 
-              },
-            ),
-            Padding(padding: EdgeInsets.only(top: 15)),
+                },
+              ),
+              Padding(padding: EdgeInsets.only(top: 15)),
 
-            !_countEnded ?
-            CircleAvatar(
-              radius: 25,
-              child:             Text('$_countDown',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.1,textAlign: TextAlign.center,)
-              ,
-            ):
-            GestureDetector(
-                onTap: (){sendMobileNumber();},
-                child:
-                Text('ارسال مجدد کد',style: TextStyle(color: PColor.orangeparto),textScaleFactor: 1.1,textAlign: TextAlign.center,)
+              !_countEnded ?
+              CircleAvatar(
+                radius: 25,
+                child:             Text('$_countDown',style: TextStyle(color: PColor.blueparto,fontWeight: FontWeight.bold),textScaleFactor: 1.1,textAlign: TextAlign.center,)
+                ,
+              ):
+              GestureDetector(
+                  onTap: (){sendMobileNumber();},
+                  child:
+                  Text('ارسال مجدد کد',style: TextStyle(color: PColor.orangeparto),textScaleFactor: 1.1,textAlign: TextAlign.center,)
 
-            )
+              )
 
-          ],
-        )
+            ],
+          )
+      )
+      ,
     )
+
 
     ;
     ;

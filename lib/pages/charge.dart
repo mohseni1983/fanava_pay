@@ -16,6 +16,7 @@ import 'package:parto_v/custom_widgets/cust_pre_invoice_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/ui/cust_colors.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
@@ -87,7 +88,13 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
               id: 1,
               name: 'شگفت انگیز',
               coverImage: '',
+              prices: [50000, 100000, 200000]),
+          new ChargeTypesWithPrice(
+              id: 11,
+              name: 'اعتبار خط دائمی',
+              coverImage: '',
               prices: [50000, 100000, 200000])
+
         ]),
     new StraightChargeOperators(
         id: 1,
@@ -641,6 +648,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
           SharedPreferences _p = await SharedPreferences.getInstance();
           String _token = _p.getString('token');
           var jsonTopUp = topUpToJson(topUp);
+          debugPrint(jsonTopUp.toString());
           var result = await http.post(
               'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
               headers: {
@@ -667,7 +675,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                     .name}';
                 _invoiceSubTitle =
                 '${_operatorsWithLogo[_topUpOperator]
-                    .chargeTypes[_selectedTopUpType].name}';
+                    .chargeTypes.firstWhere((element) => element.id==_selectedTopUpType).name}';
                 _invoiceAmount = _selectedAmount.toDouble();
                 _canUseWallet = jres['CanUseWallet'];
                 _paymentLink = jres['Url'];
@@ -710,6 +718,11 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                   ],
                 ),
           );
+        }catch (exception, stackTrace){
+          await Sentry.captureException(
+            exception,
+            stackTrace: stackTrace,
+          );
         }
       }
 
@@ -723,7 +736,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   Widget Prices(int OperatorId, int TopUpId) {
     List<Widget> _widgets = [];
     if (OperatorId != -1 && TopUpId != -1) {
-      var _list = _operatorsWithLogo[OperatorId].chargeTypes[TopUpId].prices;
+      var _list = _operatorsWithLogo[OperatorId].chargeTypes.firstWhere((element) => element.id==TopUpId).prices;
       var _x = _list.asMap();
       _x.forEach((key, value) {
         _widgets.add(
@@ -792,7 +805,24 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
     List<Widget> _wlist = [];
     if (OperatorId != -1) {
       var _list = _operatorsWithLogo[OperatorId].chargeTypes;
-      var _mapedList = _list.asMap();
+
+      _list.forEach((element) {
+        _wlist.add(CSelectedButton(
+          height: 40,
+           label: element.name,
+          value: element.id,
+          selectedValue: _selectedTopUpType,
+          onPress: (t){
+            setState(() {
+              _selectedTopUpType=t;
+            });
+          },
+        ));
+
+      });
+/*      var _mapedList = _list.asMap();
+
+
       _mapedList.forEach((key, value) {
         _wlist.add(CSelectedButton(
           height: 40,
@@ -805,7 +835,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
             });
           },
         ));
-      });
+      });*/
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -817,9 +847,9 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-        inAsyncCall: _inprogress,
-        child: Stack(
+    return Scaffold(
+       // inAsyncCall: _inprogress,
+        body: Stack(
           children: [
             MasterTemplateWithoutFooter(
 
@@ -1184,7 +1214,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                     left: 5,
                     right: 5,
                     child: Container(
-                      height: 90,
+                      height: 60,
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                           color: PColor.orangeparto,

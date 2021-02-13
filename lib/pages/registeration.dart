@@ -130,7 +130,7 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
         RegPageTemplate(
           children: [
-            Text('برای ورود یا ثبت نام شماره همراه خود را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,textScaleFactor: 0.9,),
+            Text('برای ورود یا ثبت نام شماره همراه خود را وارد کنید',style: Theme.of(context).textTheme.caption,textAlign: TextAlign.center,),
             CTextField(textAlign: TextAlign.center,controller: _mobile,maxLenght: 11,keyboardType: TextInputType.phone,),
             Padding(padding: EdgeInsets.only(top: 3)),
             CButton(onClick: (){

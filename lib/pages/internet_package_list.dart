@@ -16,6 +16,7 @@ import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_package.dart';
 import 'package:parto_v/ui/cust_colors.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
@@ -623,8 +624,8 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                  _dataPlans= internetPackageFromJson(result.body).dataPlans;
                });
                //s.retainWhere((element) => element.dataPlanOperator==widget.operatorId && element.dataPlanType==widget.simCardId );
-               debugPrint('SIMCARD: ${widget.simCardId}');
-               debugPrint('OPERATOR: ${widget.operatorId}');
+               //debugPrint('SIMCARD: ${widget.simCardId}');
+               //debugPrint('OPERATOR: ${widget.operatorId}');
 
               s.forEach((dp) {
                 _packs.forEach((pr) {
@@ -657,6 +658,11 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
               content: 'خطای ارتباط با سرور',
               subContent: 'سرور پاسخ نمی دهد، از اتصال اینترنت خود مطمئن شوید',
             ),
+          );
+        }catch (exception, stackTrace){
+          await Sentry.captureException(
+            exception,
+            stackTrace: stackTrace,
           );
         }
       }
@@ -886,7 +892,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
               left: 5,
               right: 5,
               child: Container(
-                height: 50,
+                height: 60,
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: PColor.orangeparto,

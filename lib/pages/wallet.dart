@@ -11,6 +11,7 @@ import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
 import 'package:parto_v/ui/cust_colors.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:parto_v/classes/auth.dart' as auth;
@@ -397,6 +398,11 @@ class _WalletPageState extends State<WalletPage> {
                   )
                 ],
               ),
+        );
+      } catch (exception, stackTrace){
+        await Sentry.captureException(
+          exception,
+          stackTrace: stackTrace,
         );
       }
     });

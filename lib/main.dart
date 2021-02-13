@@ -4,11 +4,18 @@ import 'package:parto_v/Pages/main_page.dart';
 import 'package:parto_v/UI/cust_colors.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:parto_v/Pages/registeration.dart';
-void main() {
+import 'package:sentry_flutter/sentry_flutter.dart';
+void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  auth.checkAuth().then((value) {
-    runApp(MyApp(isAuth: value,),);
+  auth.checkAuth().then((value) async {
+    await SentryFlutter.init(
+          (options) {
+        options.dsn = 'https://87a232be89fe4af1beb7a10c5be27cef@o502350.ingest.sentry.io/5635538';
+      },
+      appRunner: () => runApp(MyApp(isAuth: value,),),
+    );
+    ;
   });
 }
 
