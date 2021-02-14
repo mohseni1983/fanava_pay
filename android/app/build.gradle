@@ -37,6 +37,7 @@ android {
         applicationId "com.samohseni.parto_v"
         minSdkVersion 18
         targetSdkVersion 30
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -55,5 +56,6 @@ flutter {
 }
 
 dependencies {
+    def multidex_version = "2.0.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

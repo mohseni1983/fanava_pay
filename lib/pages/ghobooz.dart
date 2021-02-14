@@ -1,3 +1,4 @@
+import 'package:barcode_scan_fork/barcode_scan_fork.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
@@ -15,6 +16,7 @@ class _BillsPageState extends State<BillsPage> {
   String _billId='';
   String _paymentId='';
   double _billPrice=0;
+  bool _payWithBarcode=false;
 
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -46,25 +48,163 @@ class _BillsPageState extends State<BillsPage> {
       ),
     ),
   );
-
-  Future<void> scanBarcodeNormal() async {
-    String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666", "Cancel", true, ScanMode.BARCODE);
-      print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
+  
+  setBarcodeData(String barcode){
     setState(() {
-      _billId = barcodeScanRes;
+      _billId=barcode.substring(0,5);
+      _paymentId=barcode.substring(10,5);
+     // _billPrice=double.parse(barcode.substring(13,8));
+    });
+  }
+
+
+  Future scan() async {
+    try {
+      String barcode = await BarcodeScanner.scan();
+      setState(() {
+        this._billId=barcode.substring(0,13);
+        this._paymentId=barcode.substring(17);
+      double f=double.parse(barcode.substring(13,21));
+       this._billPrice=(f*1000) ;
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        showDialog(context: context,
+        builder: (context) => CAlertDialog(
+          content: 'خطا در دوربین',
+          subContent: 'اپلیکیشن اجازه دسترسی به دوربین را ندارد',
+          buttons: [
+            CButton(
+              label: 'بستن',
+              onClick: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+        );
+      } else {
+        showDialog(context: context,
+          builder: (context) => CAlertDialog(
+            content: 'خطای ناشناخته',
+            subContent: 'در فرآیند خطایی رخ داده است',
+            buttons: [
+              CButton(
+                label: 'بستن',
+                onClick: (){
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );      }
+    } on FormatException{
+      showDialog(context: context,
+        builder: (context) => CAlertDialog(
+          content: 'خطا در خواندن',
+          subContent: 'قبل از خواندن قبض دکمه برگشت زده شده است',
+          buttons: [
+            CButton(
+              label: 'بستن',
+              onClick: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );    } catch (e) {
+      showDialog(context: context,
+        builder: (context) => CAlertDialog(
+          content: 'خطای بارکد',
+          subContent: 'بارکد اسکن شده معتبر نیست',
+          buttons: [
+            CButton(
+              label: 'بستن',
+              onClick: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );        }
+  }
+
+  Widget PayWithBarcode(){
+    return
+      Container(
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: PColor.orangeparto,
+            width: 2,
+            style: BorderStyle.solid),
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.transparent,
+      ),
+      child: Column(
+        children: [
+          Text(
+            'پرداخت با بارکد',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Divider(
+            color: PColor.orangeparto,
+            indent: 5,
+            endIndent: 5,
+            thickness: 2,
+          ),
+          Row(
+            children: [
+              Expanded(child:
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+                  Text('شناسه قبض:$_billId'),
+                  Text('شناسه پرداخت: $_paymentId'),
+                  Text('مبلغ:${_billPrice}ریال')
+                ],
+              )),
+              GestureDetector(
+                  child: Container(
+                    width: 90,
+                    height: 90,
+                    color: Colors.greenAccent,
+                    child: Icon(Icons.qr_code_scanner_rounded),
+                  ),
+                  onTap: () =>scan()
+              )
+            ],
+          )
+        ],
+      ),
+    );
+
+  }
+
+  Widget PayWithOpetions(){
+    return                   Expanded(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Text('TEST'),
+            Container(
+              height: 90,
+            ),
+          ],
+        ));
+
+  }
+  Widget PageContent;
+
+  @override
+  void initState() {
+
+
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      PageContent=PayWithOpetions();
     });
   }
 
@@ -89,64 +229,10 @@ class _BillsPageState extends State<BillsPage> {
                     color: PColor.orangeparto,
                     thickness: 2,
                   ),
+                  _payWithBarcode?
+                      PayWithBarcode():
+                      PayWithOpetions()
                   // بخش مربوط به اطلاعات اصلی
-                  Expanded(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: PColor.orangeparto,
-                                  width: 2,
-                                  style: BorderStyle.solid),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.transparent,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'پرداخت با بارکد',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Divider(
-                                  color: PColor.orangeparto,
-                                  indent: 5,
-                                  endIndent: 5,
-                                  thickness: 2,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(child:
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                                      children: [
-                                        Text('شناسه قبض:$_billId'),
-                                        Text('شناسه پرداخت: $_paymentId'),
-                                        Text('مبلغ:${_billPrice}ریال')
-                                      ],
-                                    )),
-                                   GestureDetector(
-                                     child: Container(
-                                       width: 90,
-                                       height: 90,
-                                       color: Colors.greenAccent,
-                                       child: Icon(Icons.qr_code_scanner_rounded),
-                                     ),
-                                     onTap: () =>scanBarcodeNormal()
-                                   )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 90,
-                          ),
-                        ],
-                      )),
                 ],
               )),
           _progressing
@@ -184,11 +270,30 @@ class _BillsPageState extends State<BillsPage> {
                       },
                       minWidth: 120,
                     ),
+                    !_payWithBarcode?
                     CButton(
-                      label: 'تکرار خرید قبلی',
-                      onClick: () {},
+                      label: 'پرداخت با بارکد',
+                      onClick: () {
+                        scan();
+                        setState(() {
+                          _payWithBarcode=true;
+                        });
+
+                        },
+                      minWidth: 120,
+                    ):
+                    CButton(
+                      label: 'پرداخت عادی',
+                      onClick: () {
+                       // scan();
+                        setState(() {
+                          _payWithBarcode=false;
+                        });
+
+                      },
                       minWidth: 120,
                     ),
+
                   ],
                 ),
               ),

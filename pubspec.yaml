@@ -45,6 +45,7 @@ dependencies:
   share:
   sentry_flutter:
   flutter_barcode_scanner:
+  barcode_scan_fork:
 
 
 dev_dependencies:
