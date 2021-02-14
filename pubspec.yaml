@@ -44,6 +44,7 @@ dependencies:
   url_launcher: 5.4.2
   share:
   sentry_flutter:
+  flutter_barcode_scanner:
 
 
 dev_dependencies:

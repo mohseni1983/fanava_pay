@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:parto_v/Pages/ghobooz.dart';
 import 'package:parto_v/classes/profile.dart';
 import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/components/maintemplate.dart';
@@ -69,7 +70,7 @@ class _MainPageState extends State<MainPage> {
                 MainIcon(
                   label: 'قبوض خدماتی',
                   image: AssetImage('assets/images/ghobooz2.png'),
-                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillsPage(),)),
                 ),
                 MainIcon(
                   label: 'نیکوکاری',

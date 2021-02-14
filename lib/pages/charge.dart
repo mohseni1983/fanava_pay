@@ -849,7 +849,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
        // inAsyncCall: _inprogress,
-        body: Stack(
+        body:
+        Stack(
           children: [
             MasterTemplateWithoutFooter(
 
@@ -1289,7 +1290,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                   ),
             _paymentDialog()
           ],
-        ));
+        )
+    );
   }
 
   //Detect operator of mobile with 3 number of starting
