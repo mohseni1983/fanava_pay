@@ -86,6 +86,21 @@ flutter:
     - assets/images/3g4g5g.png
     - assets/images/sim-Charge.png
     - assets/images/ghobooz2.png
+    - assets/images/logo/Ab-color.jpg
+    - assets/images/logo/Bargh-gray.jpg
+    - assets/images/logo/gaz-color.jpg
+    - assets/images/logo/maliat-gray.jpg
+    - assets/images/logo/Bargh-color.jpg
+    - assets/images/logo/maliat-color.jpg
+    - assets/images/logo/rahvar-gray2.jpg
+    - assets/images/logo/mokhaberat-color.jpg
+    - assets/images/logo/rahvar-color.jpg
+    - assets/images/logo/mokhaberat-grayr.jpg
+    - assets/images/logo/Ab-gray.jpg
+    - assets/images/logo/gaz-gray.jpg
+    - assets/images/logo/shahrdary-gray.jpg
+    - assets/images/logo/shahrdary-color.jpg
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

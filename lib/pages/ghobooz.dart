@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
+import 'package:parto_v/custom_widgets/cust_selectable_image_grid_btn.dart';
+import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 class BillsPage extends StatefulWidget {
@@ -182,12 +184,114 @@ class _BillsPageState extends State<BillsPage> {
 
   }
 
+  int _selectedItem=-1;
   Widget PayWithOpetions(){
     return                   Expanded(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Text('TEST'),
+            Container(height: 220,
+            child: GridView.count(crossAxisCount: 5,
+            mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+              children: [
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/Ab-color.jpg',
+                  grayImage: 'assets/images/logo/Ab-gray.jpg',
+                  value: 1,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/gaz-color.jpg',
+                  grayImage: 'assets/images/logo/gaz-gray.jpg',
+                  value: 3,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/Bargh-color.jpg',
+                  grayImage: 'assets/images/logo/Bargh-gray.jpg',
+                  value: 2,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/mci-color.jpg',
+                  grayImage: 'assets/images/mci-gray.jpg',
+                  value: 5,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/mokhaberat-color.jpg',
+                  grayImage: 'assets/images/logo/mokhaberat-grayr.jpg',
+                  value: 4,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/maliat-color.jpg',
+                  grayImage: 'assets/images/logo/maliat-gray.jpg',
+                  value: 8,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/shahrdary-color.jpg',
+                  grayImage: 'assets/images/logo/shahrdary-gray.jpg',
+                  value: 7,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+                CSeletableImageGridBtn(
+                  colorImage: 'assets/images/logo/rahvar-color.jpg',
+                  grayImage: 'assets/images/logo/rahvar-gray2.jpg',
+                  value: 9,
+                  selectedValue: _selectedItem,
+                  onPress: (t){
+                    setState(() {
+                      _selectedItem=t;
+                    });
+                  },
+                ),
+
+
+
+
+              ],
+
+
+            ),
+            ),
             Container(
               height: 90,
             ),
