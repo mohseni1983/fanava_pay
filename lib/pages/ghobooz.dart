@@ -5,6 +5,7 @@ import 'package:contact_picker/contact_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:parto_v/classes/bill.dart';
 import 'package:parto_v/classes/wallet.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
@@ -60,7 +61,40 @@ class _BillsPageState extends State<BillsPage> {
     ),
   );
   
+String getOrg(int id){
+  switch(id){
+    case 1:
+      return 'قبض آب';
+      break;
+    case 3:
+      return 'قبض گاز';
+      break;
+    case 2:
+      return 'قبض برق';
+      break;
+    case 4:
+      return 'قبض تلفن ثابت';
+      break;
+    case 5:
+      return 'قبض تلفن همراه';
+      break;
+    case 6:
+    case 7:
+      return 'قبض عوارض شهرداری';
+      break;
+    case 8:
+      return 'قبض مالیات';
+      break;
+    case 9:
+      return 'قبض جریمه رانندگی';
+      break;
+    default:
+      return 'دیگر قبوض';
+      break;
 
+
+  }
+}
 
   Future scan() async {
     try {
@@ -70,6 +104,7 @@ class _BillsPageState extends State<BillsPage> {
         this._paymentId=barcode.substring(17);
       double f=double.parse(barcode.substring(13,21));
        this._billPrice=(f*1000) ;
+       this._selectedItem=int.parse(barcode.substring(11,12));
       });
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
@@ -143,13 +178,13 @@ class _BillsPageState extends State<BillsPage> {
             width: 2,
             style: BorderStyle.solid),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.transparent,
+        color: PColor.orangepartoAccent,
       ),
       child: Column(
         children: [
           //Padding(padding: EdgeInsets.only(top: 20)),
           Text(
-            'پرداخت با بارکد',
+            'اطلاعات قبض',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Divider(
@@ -167,18 +202,11 @@ class _BillsPageState extends State<BillsPage> {
                 children: [
                   Text('شناسه قبض:${_billId.text}'),
                   Text('شناسه پرداخت: $_paymentId'),
-                  Text('مبلغ:${_billPrice}ریال')
+                  Text('مبلغ: ${_billPrice}ریال'),
+                  Text('نوع قبض: ${getOrg(_selectedItem)}'),
+
                 ],
               )),
-              GestureDetector(
-                  child: Container(
-                    width: 90,
-                    height: 90,
-                    color: Colors.greenAccent,
-                    child: Icon(Icons.qr_code_scanner_rounded),
-                  ),
-                  onTap: () =>scan()
-              )
             ],
           )
         ],
@@ -1142,20 +1170,17 @@ class _BillsPageState extends State<BillsPage> {
              debugPrint(jres.toString());
              debugPrint('==========================================================================');
 
-/*             if (jres["ResponseCode"] == 0)
-               showDialog(
-                 context: context,
-                 builder: (context) => CAlertDialog(
-                   content: 'عملیات موفق',
-                   subContent: 'شارژ و پرداخت از کیف پول با موفقیت انجام شد',
-                   buttons: [
-                     CButton(
-                       label: 'بستن',
-                       onClick: () => Navigator.of(context).pop(),
-                     )
-                   ],
-                 ),
-               );
+             if (jres["ResponseCode"] == 0)
+
+               {
+                 var res=billFromJson(result.body);
+                 setState(() {
+                   _billId.text=res.bills[0].billId.toString();
+                   _paymentId=res.bills[0].paymentId;
+                   _billPrice=double.parse(res.bills[0].amount);
+                   _payWithBarcode=true;
+                 });
+               }
              else
                showDialog(
                  context: context,
@@ -1169,7 +1194,7 @@ class _BillsPageState extends State<BillsPage> {
                      )
                    ],
                  ),
-               );*/
+               );
            }
          }
        });

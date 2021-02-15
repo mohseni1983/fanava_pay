@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parto_v/classes/charities.dart';
+import 'package:parto_v/classes/convert.dart';
 import 'package:parto_v/classes/wallet.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
@@ -17,6 +18,7 @@ import 'package:parto_v/ui/cust_colors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DonationPage extends StatefulWidget {
   @override
@@ -26,6 +28,7 @@ class DonationPage extends StatefulWidget {
 class _DonationPageState extends State<DonationPage> {
   bool _progressing = false;
   bool _isSetAmountPage=false;
+  List<FinancingInfoList>_charities=[];
 
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -58,8 +61,10 @@ class _DonationPageState extends State<DonationPage> {
     ),
   );
 
-  Future<List<FinancingInfoList>> getListOfCharities() async {
-    List<FinancingInfoList> _list=[];
+  Future<void> getListOfCharities() async {
+    setState(() {
+      _progressing=true;
+    });
     auth.checkAuth().then((value) async {
       if (value) {
         SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -84,12 +89,17 @@ class _DonationPageState extends State<DonationPage> {
           });
         }
         if (result.statusCode == 200) {
+          debugPrint(result.body);
 
           var jres = json.decode(result.body);
+          debugPrint(jres.toString());
              if (jres["ResponseCode"] == 0)
              {
                var data=charitiesFromJson(result.body);
-                _list=data.charityTerminals.financingInfoLists;
+               setState(() {
+                 _charities=data.charityTerminals.financingInfoLists;
+                 _progressing=false;
+               });
 
 
              }
@@ -111,179 +121,551 @@ class _DonationPageState extends State<DonationPage> {
         }
       }
     });
-    return  _list;
 
   }
+
+  Future<void> getPaymentLink() async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _token = _prefs.getString('token');
+        var _body = {
+          "Amount": double.parse(_amountTxt.text.replaceAll(',', '')),
+          "PspId": _charityPSid,
+          "TermId": _charityTerminalId,
+        "TerminalId": _selectedCharity,
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _prefs.getString('sign'),
+          "UseWallet": true
+        };
+        var jBody = json.encode(_body);
+
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/Charity',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: jBody);
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            getPaymentLink();
+          });
+        }
+        if (result.statusCode == 200) {
+          setState(() {
+            _progressing=false;
+          });
+
+          var jres = json.decode(result.body);
+          debugPrint(jres.toString());
+          if (jres["ResponseCode"] == 0)
+          {
+            setState(() {
+              _paymentLink=jres['Url'];
+              _readyToPay=true;
+
+            });
+/*
+            var data=charitiesFromJson(result.body);
+            setState(() {
+              _charities=data.charityTerminals.financingInfoLists;
+              _progressing=false;
+            });
+*/
+
+
+          }
+          else
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                content: 'عملیات ناموفق',
+                subContent: jres['ResponseMessage'],
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+
+        }
+      }
+    });
+  }
+
   int _selectedCharity=-1;
+  int _charityPSid=-1;
   String _charityTerminalId='';
+  String _charityName='';
   Widget CharityList(){
-    return
-      FutureBuilder<List<FinancingInfoList>>(
-      future: getListOfCharities(),
-      builder: (context, snapshot) {
-      switch(snapshot.connectionState){
-        case ConnectionState.done:{
+    List<Widget> _list=[];
+    _charities.forEach((element) {
+      _list.add(CSelectedGridItem(
+        selectedValue: _selectedCharity,
+        value: element.id,
+        label: element.title,
+        paddingHorizontal: 3,
+        paddingVertical: 3,
+        height:40,
+        width: MediaQuery.of(context).size.width,
+        onPress: (t){
+          setState(() {
+            _selectedCharity=t;
+            _charityTerminalId=element.termId;
+            _charityPSid=element.pspId;
+            _charityName=element.title;
 
+          });
+        },
+      ));
+    });
+    return Column(
+      children: [
+        Text(
+          'یکی از خیریه های زیر را انتخاب نمائید',
+          style: Theme.of(context).textTheme.subtitle1,
+          textAlign: TextAlign.center,
+        ),
+        Divider(
+          color: PColor.orangeparto,
+          thickness: 2,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          child:     SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child:        ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width,
+              ),
+              child: Wrap(
+                children: _list,
+                direction: Axis.horizontal,
+                spacing: 2,
+              ),
+            )
+            ,
+          )
+          ,
+        )
 
-          if(snapshot.hasData)
-            {
-              var item=snapshot.data;
-              return ListView.builder(
-                itemCount: item.length,
-                itemBuilder: (context, index) {
-                  var i=item[index];
-
-
-                   return CSelectedButton(
-                  label: i.title,
-                     value: i.pspId,
-                     selectedValue: _selectedCharity,
-                     onPress: (t){
-                    setState(() {
-                      _selectedCharity=t;
-                      _charityTerminalId=i.termId;
-                    });
-                     },
-                );}
-              );
-
-            }
-        }
-        break;
-        case ConnectionState.waiting:
-        case ConnectionState.none:
-        case ConnectionState.active:
-          return Center(child: Text('test'),);
-        }
-
-      return Container(height: 0,);
-    },)
-    ;
+      ],
+    );
 
   }
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getListOfCharities();
+    _amountTxt.text="100,000";
+  }
+
+  TextEditingController _amountTxt=new TextEditingController();
+  Widget AmountWidget()=>Container(
+    //margin: EdgeInsets.only(top: 10),
+    //height: 150,
+    decoration: BoxDecoration(
+      border: Border.all(color: PColor.orangeparto),
+      color: PColor.orangepartoAccent,
+      borderRadius: BorderRadius.circular(12)
+    ),
+    padding: EdgeInsets.all(15),
+    child: Column(
+      children: [
+        Text(
+          'مبلغ مورد نظر را به ریال وارد نمائید',
+          style: Theme.of(context).textTheme.subtitle1,
+          textAlign: TextAlign.center,
+        ),
+        Divider(
+          color: PColor.orangeparto,
+          thickness: 2,
+        ),
+        TextField(
+          decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius:
+                BorderRadius.circular(10),
+                gapPadding: 2,
+              ),
+              suffixIcon: Icon(
+                MdiIcons.label,
+                color: PColor.orangeparto,
+              ),
+              fillColor: Colors.white,
+              counterText: '',
+              hintText: 'مبلغ به ریال'
+          ),
+          keyboardType: TextInputType.number,
+          inputFormatters: [ThousandsSeparatorInputFormatter()],
+          maxLength: 14,
+
+          controller: _amountTxt,
+
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          'به لحاظ محدودیت های بانکی حداقل تراکنش 10هزار تومان است',
+          style: Theme.of(context).textTheme.subtitle1,
+          textAlign: TextAlign.center,
+        ),
+
+
+
+      ],
+    ),
+  );
+
+  bool  _readyToPay=false;
+  String _paymentLink='';
+
+  Widget _paymentDialog() {
+    return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AnimatedPositioned(
+          duration: Duration(seconds: 2),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.7 + 30,
+              color: Colors.transparent,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    width: MediaQuery.of(context).size.width - 30,
+                    padding: EdgeInsets.only(top: 5, left: 15, right: 15),
+                    decoration: BoxDecoration(
+                        color: PColor.blueparto,
+                        borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(25)),
+                        boxShadow: [
+                        ]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Text(
+                                'تایید اطلاعات تراکنش',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                                textScaleFactor: 1.3,
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'اطلاعات را مطالعه و پس از اطمینان پرداخت نمایید',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textScaleFactor: 0.8,
+                                textAlign: TextAlign.center,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                margin:
+                                EdgeInsets.only(top: 5, left: 0, right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نام محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          'نیکوکاری',
+                                          style: TextStyle(
+                                            color: PColor.orangeparto,
+                                            fontWeight: FontWeight.bold,fontSize: 12,),
+                                          softWrap: true,
+                                          textScaleFactor: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نوع محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          'کمک به  $_charityName',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold,fontSize: _charityName.length>40?9:12),
+                                          textScaleFactor: 1,
+                                          softWrap: true,
+                                        ),
+
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'مبلغ پرداخت:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                        Text(
+                                          '${getMoneyByRial(double.parse(_amountTxt.text.replaceAll(',', '')).toInt())} ریال',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                                   CButton(
+                                label: 'پرداخت با درگاه بانکی',
+                                onClick: () async {
+                                  launch(_paymentLink).then((value) {
+                                    setState(() {
+                                      _readyToPay = false;
+                                    });
+                                  });
+
+                                },
+                                color: Colors.redAccent,
+                                textColor: Colors.white,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    'مبلغ قابل پرداخت',
+                                    style: TextStyle(color: Colors.white70),
+                                    textScaleFactor: 0.9,
+                                  ),
+                                  Text(
+                                    ' ${getMoneyByRial(double.parse(_amountTxt.text.replaceAll(',', '')).toInt())} ریال',
+                                    style: TextStyle(
+                                        color: PColor.orangeparto,
+                                        fontWeight: FontWeight.bold),
+                                    textScaleFactor: 1.2,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          //  color: Colors.red,
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                      top: 10,
+                      child: GestureDetector(
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(150),
+                              color: PColor.orangeparto),
+                          child: Icon(
+                            Icons.close,
+                            size: 35,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _readyToPay = false;
+                          });
+                        },
+                      ))
+                ],
+              ),
+            ),
+          ),
+          bottom: _readyToPay
+              ? 0
+              : (MediaQuery.of(context).size.height * 0.7 + 30) * -1,
+          right: 5,
+          left: 5,
+          curve: Curves.fastLinearToSlowEaseIn,
+        ));
+  }
 
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body:
-        Stack(
-          children: [
-            MasterTemplateWithoutFooter(
+    return         Stack(
+      alignment: Alignment.center,
+      children: [
+        MasterTemplateWithoutFooter(
 
-              // inProgress: _inprogress,
-                wchild: Column(
-                  children: [
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    Text('dfgdfgdfgdfgdfgdfgdg'),
-                    Text('dfgdfgdfgdfgdfgdfgdg'),
-                    Text('dfgdfgdfgdfgdfgdfgdg'),
-
-                    //    Padding(padding: EdgeInsets.only(top: 5)),
-                    Expanded(child:
-                    FutureBuilder<List<FinancingInfoList>>(
-                      future: getListOfCharities(),
-                      builder: (context, snapshot) {
-                        switch(snapshot.connectionState){
-                          case ConnectionState.done:{
-
-
-                            if(snapshot.hasData)
-                            {
-                              var item=snapshot.data;
-                              return ListView.builder(
-                                  itemCount: item.length,
-                                  itemBuilder: (context, index) {
-                                    var i=item[index];
-
-
-                                    return CSelectedButton(
-                                      label: i.title,
-                                      value: i.pspId,
-                                      selectedValue: _selectedCharity,
-                                      onPress: (t){
-                                        setState(() {
-                                          _selectedCharity=t;
-                                          _charityTerminalId=i.termId;
-                                        });
-                                      },
-                                    );}
-                              );
-
-                            }
-                          }
-                          break;
-                          case ConnectionState.waiting:
-                          case ConnectionState.none:
-                          case ConnectionState.active:
-                            return Center(child: Text('test'),);
-                        }
-
-                        return Container(height: 0,);
-                      },)
-
-
-                    )
-
-
-                    // بخش مربوط به اطلاعات اصلی
-                  ],
-                )),
-            _progressing
-                ? Progress()
-                : Positioned(
-              bottom: 0,
-              left: 5,
-              right: 5,
-              child: Container(
-                height: 60,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: PColor.orangeparto,
-                    borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(12)),
-                    boxShadow: [
-                      BoxShadow(
-                          color: PColor.blueparto.shade300,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                          offset: Offset(0, -1))
-                    ]),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CButton(
-                        label: 'بعدی',
-                        onClick: () {
-
-
-                          //    _sendToPayment();
-
-                        },
-                        minWidth: 120,
-                      ),
-                      CButton(
-                        label: 'قبلی',
-                        onClick: () {
-
-                        },
-                        minWidth: 120,
-                      )
-
-                    ],
-                  ),
+          // inProgress: _inprogress,
+            wchild: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(padding: EdgeInsets.only(top: 10)),
+                Text(
+                  'نیکوکاری',
+                  style: Theme.of(context).textTheme.headline1,
+                  textAlign: TextAlign.center,
                 ),
+                Divider(
+                  color: PColor.orangeparto,
+                  thickness: 2,
+                ),
+
+                !_isSetAmountPage?
+                CharityList():
+                AmountWidget()
+
+
+                // بخش مربوط به اطلاعات اصلی
+              ],
+            )),
+        _progressing
+            ? Progress()
+            : Positioned(
+          bottom: 0,
+          left: 5,
+          right: 5,
+          child: Container(
+            height: 60,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: PColor.orangeparto,
+                borderRadius:
+                BorderRadius.vertical(top: Radius.circular(12)),
+                boxShadow: [
+                  BoxShadow(
+                      color: PColor.blueparto.shade300,
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: Offset(0, -1))
+                ]),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CButton(
+                    label: 'بعدی',
+                    onClick: () {
+                      if(!_isSetAmountPage && _selectedCharity>-1)
+                        setState(() {
+                          _isSetAmountPage=true;
+                        });
+                      else if(_selectedCharity==-1)
+                        showDialog(context: context,
+                        builder: (context) => CAlertDialog(
+                          content: 'خطا',
+                          subContent: 'یکی از خیره ها را انتخاب کنید',
+                          buttons: [
+                            CButton(
+                              label: 'بستن',
+                              onClick: ()=>Navigator.of(context).pop(),
+                            )
+                          ],
+                        ),
+                        );
+                      else if(_isSetAmountPage && _amountTxt.text.isNotEmpty) {
+                        if (double.parse(_amountTxt.text.replaceAll(',', '')) >=
+                            100000)
+                          getPaymentLink();
+                        else
+
+                      showDialog(context: context,
+                      builder: (context) => CAlertDialog(
+                      content: 'خطا',
+                      subContent: 'مبلغ باید بیش از ده هزار تومان باشد',
+                      buttons: [
+                      CButton(
+                      label: 'بستن',
+                      onClick: ()=>Navigator.of(context).pop(),
+                      )
+                      ],
+                      ),
+                      );
+
+                      }
+                      else
+                        showDialog(context: context,
+                          builder: (context) => CAlertDialog(
+                            content: 'خطا',
+                            subContent: 'مبلغ خالی است',
+                            buttons: [
+                              CButton(
+                                label: 'بستن',
+                                onClick: ()=>Navigator.of(context).pop(),
+                              )
+                            ],
+                          ),
+                        );
+
+
+                      //    _sendToPayment();
+
+                    },
+                    minWidth: 120,
+                  ),
+                  _isSetAmountPage?
+                  CButton(
+                    label: 'قبلی',
+                    onClick: () {
+                      setState(() {
+                        _isSetAmountPage=false;
+                      });
+
+                    },
+                    minWidth: 120,
+                  ):
+                      Container(width: 0,)
+
+                ],
               ),
             ),
-            // _paymentDialog()
-          ],
-        )
-
+          ),
+        ),
+        _paymentDialog()
+      ],
     );
+
   }
 
 }
