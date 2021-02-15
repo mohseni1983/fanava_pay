@@ -26,7 +26,6 @@ class DonationPage extends StatefulWidget {
 class _DonationPageState extends State<DonationPage> {
   bool _progressing = false;
   bool _isSetAmountPage=false;
-  List<FinancingInfoList> _charities=[];
 
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -59,29 +58,8 @@ class _DonationPageState extends State<DonationPage> {
     ),
   );
 
-
-
-
-
-
-
-
-  @override
-  void initState() {
-
-    getListOfCharities();
-
-    // TODO: implement initState
-    super.initState();
-
-  }
-
   Future<List<FinancingInfoList>> getListOfCharities() async {
-    setState(() {
-      //  _readyToPay = false;
-      _progressing = true;
-    });
-
+    List<FinancingInfoList> _list=[];
     auth.checkAuth().then((value) async {
       if (value) {
         SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -106,25 +84,14 @@ class _DonationPageState extends State<DonationPage> {
           });
         }
         if (result.statusCode == 200) {
-          setState(() {
-            _progressing = false;
-          });
 
-          await setWalletAmount();
-          setState(() {
-
-          });
           var jres = json.decode(result.body);
-          debugPrint('==========================================================================');
-          debugPrint(jres.toString());
-          debugPrint('==========================================================================');
-
              if (jres["ResponseCode"] == 0)
              {
                var data=charitiesFromJson(result.body);
+                _list=data.charityTerminals.financingInfoLists;
 
 
-               return data.charityTerminals.financingInfoLists;
              }
              else
                showDialog(
@@ -140,10 +107,11 @@ class _DonationPageState extends State<DonationPage> {
                    ],
                  ),
                );
-             return null;
+
         }
       }
     });
+    return  _list;
 
   }
   int _selectedCharity=-1;
@@ -155,49 +123,42 @@ class _DonationPageState extends State<DonationPage> {
       builder: (context, snapshot) {
       switch(snapshot.connectionState){
         case ConnectionState.done:{
+
+
           if(snapshot.hasData)
             {
               var item=snapshot.data;
-              return Column(
+              return ListView.builder(
+                itemCount: item.length,
+                itemBuilder: (context, index) {
+                  var i=item[index];
 
-                children: [
-                  Text(
-                    'نیکوکاری',
-                    style: Theme.of(context).textTheme.headline1,
-                    textAlign: TextAlign.center,
-                  ),
-                  Divider(
-                    color: PColor.orangeparto,
-                    thickness: 2,
-                  ),
 
-                  Expanded(child:
-                  ListView.builder(
-                    itemCount: item.length ,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context, i) => CSelectedButton(
-                      label: item[i].title,
-                      value: item[i].pspId,
-                      selectedValue: _selectedCharity,
-                      onPress: (t){
-                        setState(() {
-                          _selectedCharity=t;
-                          _charityTerminalId=item.firstWhere((element) => element.pspId==t).termId;
-                        });
-                      },
-                    ),
-                  )
-                  )
-                ],
+                   return CSelectedButton(
+                  label: i.title,
+                     value: i.pspId,
+                     selectedValue: _selectedCharity,
+                     onPress: (t){
+                    setState(() {
+                      _selectedCharity=t;
+                      _charityTerminalId=i.termId;
+                    });
+                     },
+                );}
               );
 
             }
         }
         break;
+        case ConnectionState.waiting:
+        case ConnectionState.none:
+        case ConnectionState.active:
+          return Center(child: Text('test'),);
         }
 
       return Container(height: 0,);
-    },);
+    },)
+    ;
 
   }
 
@@ -216,8 +177,55 @@ class _DonationPageState extends State<DonationPage> {
                 wchild: Column(
                   children: [
                     Padding(padding: EdgeInsets.only(top: 10)),
+                    Text('dfgdfgdfgdfgdfgdfgdg'),
+                    Text('dfgdfgdfgdfgdfgdfgdg'),
+                    Text('dfgdfgdfgdfgdfgdfgdg'),
+
                     //    Padding(padding: EdgeInsets.only(top: 5)),
-                    CharityList()
+                    Expanded(child:
+                    FutureBuilder<List<FinancingInfoList>>(
+                      future: getListOfCharities(),
+                      builder: (context, snapshot) {
+                        switch(snapshot.connectionState){
+                          case ConnectionState.done:{
+
+
+                            if(snapshot.hasData)
+                            {
+                              var item=snapshot.data;
+                              return ListView.builder(
+                                  itemCount: item.length,
+                                  itemBuilder: (context, index) {
+                                    var i=item[index];
+
+
+                                    return CSelectedButton(
+                                      label: i.title,
+                                      value: i.pspId,
+                                      selectedValue: _selectedCharity,
+                                      onPress: (t){
+                                        setState(() {
+                                          _selectedCharity=t;
+                                          _charityTerminalId=i.termId;
+                                        });
+                                      },
+                                    );}
+                              );
+
+                            }
+                          }
+                          break;
+                          case ConnectionState.waiting:
+                          case ConnectionState.none:
+                          case ConnectionState.active:
+                            return Center(child: Text('test'),);
+                        }
+
+                        return Container(height: 0,);
+                      },)
+
+
+                    )
 
 
                     // بخش مربوط به اطلاعات اصلی
