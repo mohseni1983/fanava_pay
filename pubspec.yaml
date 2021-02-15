@@ -46,6 +46,7 @@ dependencies:
   sentry_flutter:
   flutter_barcode_scanner:
   barcode_scan_fork:
+  material_design_icons_flutter:
 
 
 dev_dependencies:
@@ -100,6 +101,7 @@ flutter:
     - assets/images/logo/gaz-gray.jpg
     - assets/images/logo/shahrdary-gray.jpg
     - assets/images/logo/shahrdary-color.jpg
+    - assets/images/Donation.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

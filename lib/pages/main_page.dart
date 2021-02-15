@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:parto_v/Pages/donation.dart';
 import 'package:parto_v/Pages/ghobooz.dart';
 import 'package:parto_v/classes/profile.dart';
 import 'package:parto_v/classes/topup.dart';
@@ -74,8 +75,8 @@ class _MainPageState extends State<MainPage> {
                 ),
                 MainIcon(
                   label: 'نیکوکاری',
-                  image: AssetImage('assets/images/3g4g5g.png'),
-                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                  image: AssetImage('assets/images/Donation.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DonationPage(),)),
                 ),
 
 
