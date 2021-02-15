@@ -12,7 +12,7 @@ class Charities {
     this.responseMessage,
   });
 
-  int cash;
+  double cash;
   CharityTerminals charityTerminals;
   int responseCode;
   String responseMessage;
