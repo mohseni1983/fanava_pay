@@ -10,38 +10,54 @@ String billToJson(Bill data) => json.encode(data.toJson());
 
 class Bill {
   Bill({
-    this.amount,
-    this.billGroup,
     this.bills,
+    this.canUseWallet,
+    this.cash,
     this.responseCode,
     this.responseMessage,
+    this.signKey,
+    this.txnInfoList,
+    this.url,
   });
 
-  double amount;
-  int billGroup;
-  List<BillElement> bills;
+  String bills;
+  bool canUseWallet;
+  double cash;
   int responseCode;
   String responseMessage;
+  dynamic signKey;
+  dynamic txnInfoList;
+  dynamic url;
 
   factory Bill.fromJson(Map<String, dynamic> json) => Bill(
-    amount: json["Amount"],
-    billGroup: json["BillGroup"],
-    bills: List<BillElement>.from(json["Bills"].map((x) => BillElement.fromJson(x))),
+    bills: json["Bills"],
+    canUseWallet: json["CanUseWallet"],
+    cash: json["Cash"],
     responseCode: json["ResponseCode"],
     responseMessage: json["ResponseMessage"],
+    signKey: json["SignKey"],
+    txnInfoList: json["TxnInfoList"],
+    url: json["Url"],
   );
 
   Map<String, dynamic> toJson() => {
-    "Amount": amount,
-    "BillGroup": billGroup,
-    "Bills": List<dynamic>.from(bills.map((x) => x.toJson())),
+    "Bills": bills,
+    "CanUseWallet": canUseWallet,
+    "Cash": cash,
     "ResponseCode": responseCode,
     "ResponseMessage": responseMessage,
+    "SignKey": signKey,
+    "TxnInfoList": txnInfoList,
+    "Url": url,
   };
 }
 
-class BillElement {
-  BillElement({
+List<BillItems> billItemsFromJson(String str) => List<BillItems>.from(json.decode(str).map((x) => BillItems.fromJson(x)));
+
+String billItemsToJson(List<BillItems> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+class BillItems {
+  BillItems({
     this.billType,
     this.billId,
     this.paymentId,
@@ -53,7 +69,7 @@ class BillElement {
   String paymentId;
   String amount;
 
-  factory BillElement.fromJson(Map<String, dynamic> json) => BillElement(
+  factory BillItems.fromJson(Map<String, dynamic> json) => BillItems(
     billType: json["BillType"],
     billId: json["BillId"],
     paymentId: json["PaymentId"],
@@ -67,3 +83,99 @@ class BillElement {
     "Amount": amount,
   };
 }
+
+
+
+BillOther billOtherFromJson(String str) => BillOther.fromJson(json.decode(str));
+
+String billOtherToJson(BillOther data) => json.encode(data.toJson());
+
+class BillOther {
+  BillOther({
+    this.amount,
+    this.billGroup,
+    this.bills,
+    this.canUseWallet,
+    this.cash,
+    this.responseCode,
+    this.responseMessage,
+  });
+
+  double amount;
+  int billGroup;
+  String bills;
+  bool canUseWallet;
+  double cash;
+  int responseCode;
+  String responseMessage;
+
+  factory BillOther.fromJson(Map<String, dynamic> json) => BillOther(
+    amount: json["Amount"],
+    billGroup: json["BillGroup"],
+    bills: json["Bills"],
+    canUseWallet: json["CanUseWallet"],
+    cash: json["Cash"],
+    responseCode: json["ResponseCode"],
+    responseMessage: json["ResponseMessage"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "Amount": amount,
+    "BillGroup": billGroup,
+    "Bills": bills,
+    "CanUseWallet": canUseWallet,
+    "Cash": cash,
+    "ResponseCode": responseCode,
+    "ResponseMessage": responseMessage,
+  };
+}
+
+
+BillOtherItem billOtherItemFromJson(String str) => BillOtherItem.fromJson(json.decode(str));
+
+String billOtherItemToJson(BillOtherItem data) => json.encode(data.toJson());
+
+class BillOtherItem {
+  BillOtherItem({
+    this.billId,
+    this.payId,
+    this.amount,
+    this.currentCheck,
+    this.paymentDate,
+    this.previousCheck,
+    this.address,
+    this.owner,
+  });
+
+  String billId;
+  String payId;
+  int amount;
+  String currentCheck;
+  String paymentDate;
+  String previousCheck;
+  String address;
+  String owner;
+
+  factory BillOtherItem.fromJson(Map<String, dynamic> json) => BillOtherItem(
+    billId: json["bill_id"],
+    payId: json["pay_id"],
+    amount: json["amount"],
+    currentCheck: json["current_check"],
+    paymentDate: json["payment_date"],
+    previousCheck: json["previous_check"],
+    address: json["address"],
+    owner: json["owner"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "bill_id": billId,
+    "pay_id": payId,
+    "amount": amount,
+    "current_check": currentCheck,
+    "payment_date": paymentDate,
+    "previous_check": previousCheck,
+    "address": address,
+    "owner": owner,
+  };
+}
+
