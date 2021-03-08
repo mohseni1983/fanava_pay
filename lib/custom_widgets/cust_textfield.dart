@@ -6,8 +6,9 @@ class CTextField extends StatefulWidget {
   final TextAlign textAlign;
   final int maxLenght;
   final TextInputType keyboardType;
+  final String hint;
 
-  const CTextField({ Key key, this.controller, this.textAlign,this.maxLenght=50,this.keyboardType=TextInputType.text}):super(key: key) ;
+  const CTextField({ Key key, this.controller, this.textAlign,this.maxLenght=50,this.keyboardType=TextInputType.text,this.hint=''}):super(key: key) ;
   @override
   _CTextFieldState createState() => _CTextFieldState();
 }
@@ -18,6 +19,7 @@ class _CTextFieldState extends State<CTextField> {
     return
       TextField(
         decoration: InputDecoration(
+          hintText: widget.hint,
             counter: Offstage(),
             counterText: ''
         ),

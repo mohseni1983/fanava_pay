@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:parto_v/Pages/wallet.dart';
 import 'package:parto_v/classes/convert.dart';
 import 'package:parto_v/classes/global_variables.dart';
 import 'package:parto_v/classes/profile.dart';
+import 'package:parto_v/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:http/http.dart' as http;
@@ -22,7 +24,7 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
   bool _flag = false;
 
   Future<void> setWalletAmount() async{
-    debugPrint('Start updating wallet amount====================================================');
+   // debugPrint('Start updating wallet amount====================================================');
 
     auth.checkAuth().then((value) async{
       if (value) {
@@ -108,24 +110,53 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
                 child: Row(
                   children: [
                     Expanded(child: Center(child: Text('$globWalletAmount'),)),
-                    CircleAvatar(
-                      backgroundColor: Color.fromRGBO(224, 114, 67, 1),
-                      radius: 13,
+                    Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: PColor.orangeparto,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                              backgroundColor: PColor.blueparto,
+                              radius: 13,
 
 
-                      child: GestureDetector(
-                        child: isWalletAmountUpdating?CircularProgressIndicator():Icon(Icons.refresh,color: Colors.white,size: 18,),
-                        onTap: () async{
+                              child: GestureDetector(
+                                child: Icon(Icons.add,color: Colors.white,size: 18,),
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => WalletPage(),));
 
-                          await setWalletAmount();
-                          setState(() {
-                            isWalletAmountUpdating=false;
-                          });
 
-                        },
-                      )
 
-                      //Icon(Icons.refresh,color: Colors.white,size: 18,),
+                                },
+                              )
+
+                            //Icon(Icons.refresh,color: Colors.white,size: 18,),
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 3),),
+                          CircleAvatar(
+                              backgroundColor: PColor.blueparto,
+                              radius: 13,
+
+
+                              child: GestureDetector(
+                                child: isWalletAmountUpdating?CircularProgressIndicator():Icon(Icons.refresh,color: Colors.white,size: 18,),
+                                onTap: () async{
+
+                                  await setWalletAmount();
+                                  setState(() {
+                                    isWalletAmountUpdating=false;
+                                  });
+
+                                },
+                              )
+
+                            //Icon(Icons.refresh,color: Colors.white,size: 18,),
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),

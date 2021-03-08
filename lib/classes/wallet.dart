@@ -7,7 +7,7 @@ import 'package:parto_v/classes/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:http/http.dart' as http;
-Future<void> setWalletAmount() async{
+Future<void> setWalletAmount(State state) async{
   debugPrint('Start updating wallet amount====================================================');
   auth.checkAuth().then((value) async{
     if (value) {
@@ -28,21 +28,21 @@ Future<void> setWalletAmount() async{
           },
           body: _jBody
       );
-      if (result.statusCode==401)
-      {
-        auth.retryAuth().then((value) {
-          setWalletAmount();
-        });
-      }
       if(result.statusCode==200){
         //debugPrint(result.body);
         var jres=json.decode(result.body);
         if(jres['ResponseCode']==0){
           var x=profileInfoFromJson(result.body);
-          debugPrint('Stop updating wallet amount ==========================================');
+         // debugPrint('Stop updating wallet amount ==========================================');
 
+          state.setState(() {
+            globWalletAmount=x.deviceInfo.credit>0?getMoneyByRial((x.deviceInfo.credit~/10).toInt()):"0" ;
+            _prefs.setString('cellNumber', '0${x.deviceInfo.cellNumber}');
+
+          });
           //_prefs.setDouble('wallet_amount', x.deviceInfo.credit);
-          globWalletAmount=x.deviceInfo.credit>0?getMoneyByRial((x.deviceInfo.credit/10).toInt()):"0" ;
+
+
 
 
 
