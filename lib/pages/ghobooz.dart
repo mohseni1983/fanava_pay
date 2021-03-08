@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parto_v/classes/bill.dart';
+import 'package:parto_v/classes/convert.dart';
+import 'package:parto_v/classes/profile.dart';
 import 'package:parto_v/classes/wallet.dart';
 import 'package:parto_v/components/maintemplate_withoutfooter.dart';
 import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
@@ -17,6 +19,7 @@ import 'package:parto_v/ui/cust_colors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BillsPage extends StatefulWidget {
   @override
@@ -26,9 +29,10 @@ class BillsPage extends StatefulWidget {
 class _BillsPageState extends State<BillsPage> {
   bool _progressing = false;
   TextEditingController _billId=new TextEditingController();
-  String _paymentId='';
+  TextEditingController _paymentId=new TextEditingController();
   double _billPrice=0;
-  bool _payWithBarcode=false;
+  bool _goToBillInfo=false;
+  String _mobile='09353619190';
 
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -101,7 +105,7 @@ String getOrg(int id){
       String barcode = await BarcodeScanner.scan();
       setState(() {
         this._billId.text=barcode.substring(0,13);
-        this._paymentId=barcode.substring(17);
+        this._paymentId.text=barcode.substring(17);
       double f=double.parse(barcode.substring(13,21));
        this._billPrice=(f*1000) ;
        this._selectedItem=int.parse(barcode.substring(11,12));
@@ -200,10 +204,76 @@ String getOrg(int id){
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Text('شناسه قبض:${_billId.text}'),
-                  Text('شناسه پرداخت: $_paymentId'),
-                  Text('مبلغ: ${_billPrice}ریال'),
-                  Text('نوع قبض: ${getOrg(_selectedItem)}'),
+                  Row(children: [
+                    Container(
+                      child:                     Text('شناسه قبض'),
+                      width: MediaQuery.of(context).size.width/3.3,
+                        ),
+                    Expanded(child:
+                    Container(height: 40,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: PColor.blueparto,
+                      borderRadius: BorderRadius.circular(15)
+                    ),
+                    child: Text('${_billId.text}',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                    ))
+
+                  ],),
+                  Padding(padding: EdgeInsets.only(top: 2)),
+                  Row(children: [
+                    Container(child:                     Text('شناسه پرداخت'),
+                      width: MediaQuery.of(context).size.width/3.3,
+                    ),
+                    Expanded(child:
+                    Container(height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: PColor.blueparto,
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child:_billPrice>0? Text('${_paymentId.text}',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),):
+                      Text('پرداخت شده',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                    ))
+
+                  ],),
+                  Padding(padding: EdgeInsets.only(top: 2)),
+
+                  Row(children: [
+                    Container(child:                     Text('مبلغ'),
+                      width: MediaQuery.of(context).size.width/3.3,
+                    ),
+                    Expanded(child:
+                    Container(height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: PColor.blueparto,
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child:_billPrice>0? Text('${getMoneyByRial(_billPrice.toInt())}ریال',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),):
+                      Text('پرداخت شده',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+
+                    ))
+
+                  ],),
+                  Padding(padding: EdgeInsets.only(top: 2)),
+
+                  Row(children: [
+                    Container(child:                     Text('نوع قبض'),
+                      width: MediaQuery.of(context).size.width/3.3,
+                    ),
+                    Expanded(child:
+                    Container(height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: PColor.blueparto,
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: Text('${getOrg(_selectedItem)}',textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                    ))
+
+                  ],),
+
 
                 ],
               )),
@@ -408,6 +478,11 @@ String getOrg(int id){
                         controller: _billId,
 
                         textAlign: TextAlign.center,
+                        onChanged: (v){
+                          if(v.length==14)
+                            FocusScope.of(context).unfocus();
+
+                        },
                       )
                   ),
                   GestureDetector(
@@ -476,6 +551,12 @@ String getOrg(int id){
                         controller: _billId,
 
                         textAlign: TextAlign.center,
+                        onChanged: (v){
+                          if(v.length==14)
+                            FocusScope.of(context).unfocus();
+
+                        },
+
                       )
                   ),
                   GestureDetector(
@@ -544,6 +625,12 @@ String getOrg(int id){
                         controller: _billId,
 
                         textAlign: TextAlign.center,
+                        onChanged: (v){
+                          if(v.length==14)
+                            FocusScope.of(context).unfocus();
+
+                        },
+
                       )
                   ),
                   GestureDetector(
@@ -612,6 +699,12 @@ String getOrg(int id){
                         controller: _billId,
 
                         textAlign: TextAlign.center,
+                        onChanged: (v){
+                          if(v.length==11)
+                            FocusScope.of(context).unfocus();
+
+                        },
+
                       )
                   ),
                   GestureDetector(
@@ -712,6 +805,12 @@ String getOrg(int id){
                         controller: _billId,
 
                         textAlign: TextAlign.center,
+                        onChanged: (v){
+                          if(v.length==11)
+                            FocusScope.of(context).unfocus();
+
+                        },
+
                       )
                   ),
                   GestureDetector(
@@ -787,32 +886,75 @@ String getOrg(int id){
           padding: EdgeInsets.all(3),
           child: Column(
             children: [
-              Text('شناسه قبض عوارض شهرداری را وارد کنید'),
+              Text('شناسه قبض و پرداخت عوارض شهرداری را وارد کنید'),
               Row(
                 children: [
                   Expanded(
                       child:
-                      TextField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.circular(10),
-                              gapPadding: 2,
+                      Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه قبض'
                             ),
-                            suffixIcon: Icon(
-                              MdiIcons.label,
-                              color: PColor.orangeparto,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
+
+                            controller: _billId,
+
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top:2),
+                          ),
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه پرداخت'
                             ),
-                            fillColor: Colors.white,
-                            counterText: '',
-                            hintText: 'شناسه 14 رقمی'
-                        ),
-                        keyboardType: TextInputType.number,
-                        maxLength: 14,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
 
-                        controller: _billId,
+                            controller: _paymentId,
 
-                        textAlign: TextAlign.center,
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+
+
+                        ],
                       )
                   ),
                   GestureDetector(
@@ -855,33 +997,77 @@ String getOrg(int id){
           padding: EdgeInsets.all(3),
           child: Column(
             children: [
-              Text('شناسه قبض مالیات را وارد کنید'),
+              Text('شناسه قبض و شناسه پرداخت مالیات را وارد کنید'),
               Row(
                 children: [
                   Expanded(
                       child:
-                      TextField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.circular(10),
-                              gapPadding: 2,
+                      Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه قبض'
                             ),
-                            suffixIcon: Icon(
-                              MdiIcons.label,
-                              color: PColor.orangeparto,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
+
+                            controller: _billId,
+
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top:2),
+                          ),
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه پرداخت'
                             ),
-                            fillColor: Colors.white,
-                            counterText: '',
-                            hintText: 'شناسه 14 رقمی'
-                        ),
-                        keyboardType: TextInputType.number,
-                        maxLength: 14,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
 
-                        controller: _billId,
+                            controller: _paymentId,
 
-                        textAlign: TextAlign.center,
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+
+
+                        ],
                       )
+
                   ),
                   GestureDetector(
                     child: Container(
@@ -923,32 +1109,75 @@ String getOrg(int id){
           padding: EdgeInsets.all(3),
           child: Column(
             children: [
-              Text('شناسه قبض جریمه رانندگی را وارد کنید'),
+              Text('شناسه قبض و  پرداخت جریمه رانندگی را وارد کنید'),
               Row(
                 children: [
                   Expanded(
                       child:
-                      TextField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.circular(10),
-                              gapPadding: 2,
+                      Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه قبض'
                             ),
-                            suffixIcon: Icon(
-                              MdiIcons.label,
-                              color: PColor.orangeparto,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
+
+                            controller: _billId,
+
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top:2),
+                          ),
+                          TextField(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                  BorderRadius.circular(10),
+                                  gapPadding: 2,
+                                ),
+                                suffixIcon: Icon(
+                                  MdiIcons.label,
+                                  color: PColor.orangeparto,
+                                ),
+                                fillColor: Colors.white,
+                                counterText: '',
+                                hintText: 'شناسه پرداخت'
                             ),
-                            fillColor: Colors.white,
-                            counterText: '',
-                            hintText: 'شناسه 14 رقمی'
-                        ),
-                        keyboardType: TextInputType.number,
-                        maxLength: 14,
+                            keyboardType: TextInputType.number,
+                            maxLength: 14,
 
-                        controller: _billId,
+                            controller: _paymentId,
 
-                        textAlign: TextAlign.center,
+                            textAlign: TextAlign.center,
+                            onChanged: (v){
+                              if(v.length==14)
+                                FocusScope.of(context).unfocus();
+
+                            },
+
+                          ),
+
+
+                        ],
                       )
                   ),
                   GestureDetector(
@@ -1001,9 +1230,10 @@ String getOrg(int id){
 
     // TODO: implement initState
     super.initState();
+    getMobile();
   }
 
-  String createBillData(){
+  String createBillData() {
     switch(_selectedItem){
       case 1:
       case 2:
@@ -1028,10 +1258,17 @@ String getOrg(int id){
             return '';
 
           }
-        else
-          return '$_selectedItem,${_billId.text}';
-        break;
+        else{
+
+          //getMobile().then((value) {
+            return '$_selectedItem,${_billId.text},$_mobile';
+         // });
+
+
+        }
+
       }
+        break;
       case 4:
         if(_billId.text.isEmpty || _billId.text.length<11 || !_billId.text.startsWith('0'))
           {
@@ -1122,85 +1359,422 @@ String getOrg(int id){
 
     }
   }
+  Future<void> getMobile() async{
+    auth.checkAuth().then((value) async{
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _sign = _prefs.getString('sign');
+        String _token = _prefs.get('token');
+        var _body={
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _sign,
+          "UseWallet": true
+        };
+        var _jBody=json.encode(_body);
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: _jBody
+        );
+        if (result.statusCode==401)
+        {
+          auth.retryAuth().then((value) {
+            getMobile();
+          });
+        }
+        if(result.statusCode==200){
+          debugPrint(result.body);
+          var jres=json.decode(result.body);
+          if(jres['ResponseCode']==0){
+            var x=profileInfoFromJson(result.body);
+            setState(() {
+              _mobile=  '0${x.deviceInfo.cellNumber}';
 
-  Future<void> getBillInfo(){
-    String _billInfo=createBillData();
-    if(_billInfo.isNotEmpty)
-     {
-       setState(() {
-         //  _readyToPay = false;
-         _progressing = true;
-       });
+            });
+          }
+        }
+      }
+    });
 
-       auth.checkAuth().then((value) async {
-         if (value) {
-           SharedPreferences _prefs = await SharedPreferences.getInstance();
-           String _token = _prefs.getString('token');
-           var _body = {
-             "BillData": _billInfo,
-             "LocalDate": DateTime.now().toString(),
-             "Sign": _prefs.getString('sign'),
-             "UseWallet": true
-           };
-           var jBody = json.encode(_body);
-
-           var result = await http.post(
-               'https://www.idehcharge.com/Middle/Api/Charge/BillInquiry',
-               headers: {
-                 'Authorization': 'Bearer $_token',
-                 'Content-Type': 'application/json'
-               },
-               body: jBody);
-           if (result.statusCode == 401) {
-             auth.retryAuth().then((value) {
-               getBillInfo();
-             });
-           }
-           if (result.statusCode == 200) {
-             setState(() {
-               _progressing = false;
-             });
-
-             await setWalletAmount();
-             setState(() {
-
-             });
-             var jres = json.decode(result.body);
-             debugPrint('==========================================================================');
-             debugPrint(jres.toString());
-             debugPrint('==========================================================================');
-
-             if (jres["ResponseCode"] == 0)
-
-               {
-                 var res=billFromJson(result.body);
-                 setState(() {
-                   _billId.text=res.bills[0].billId.toString();
-                   _paymentId=res.bills[0].paymentId;
-                   _billPrice=double.parse(res.bills[0].amount);
-                   _payWithBarcode=true;
-                 });
-               }
-             else
-               showDialog(
-                 context: context,
-                 builder: (context) => CAlertDialog(
-                   content: 'عملیات ناموفق',
-                   subContent: jres['ResponseMessage'],
-                   buttons: [
-                     CButton(
-                       label: 'بستن',
-                       onClick: () => Navigator.of(context).pop(),
-                     )
-                   ],
-                 ),
-               );
-           }
-         }
-       });
-     }
 
   }
+
+  bool  _readyToPay=false;
+  String _paymentLink='';
+
+  Widget _paymentDialog() {
+    return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AnimatedPositioned(
+          duration: Duration(seconds: 2),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.7 + 30,
+              color: Colors.transparent,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    width: MediaQuery.of(context).size.width - 30,
+                    padding: EdgeInsets.only(top: 5, left: 15, right: 15),
+                    decoration: BoxDecoration(
+                        color: PColor.blueparto,
+                        borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(25)),
+                        boxShadow: [
+                        ]),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Text(
+                                'تایید اطلاعات تراکنش',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                                textScaleFactor: 1.3,
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'اطلاعات را مطالعه و پس از اطمینان پرداخت نمایید',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textScaleFactor: 0.8,
+                                textAlign: TextAlign.center,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                margin:
+                                EdgeInsets.only(top: 5, left: 0, right: 0),
+                                decoration: BoxDecoration(
+                                  color: PColor.blueparto.shade900,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نام محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          'پرداخت قبض',
+                                          style: TextStyle(
+                                            color: PColor.orangeparto,
+                                            fontWeight: FontWeight.bold,fontSize: 12,),
+                                          softWrap: true,
+                                          textScaleFactor: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'نوع محصول:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1,
+                                        ),
+                                        Text(
+                                          '${getOrg(_selectedItem)}',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold,fontSize: 12),
+                                          textScaleFactor: 1,
+                                          softWrap: true,
+                                        ),
+
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'مبلغ پرداخت:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                        Text(
+                                          '${getMoneyByRial(_billPrice.toInt())}ریال',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              CButton(
+                                label: 'پرداخت با درگاه بانکی',
+                                onClick: () async {
+                                  launch(_paymentLink).then((value) {
+                                    setState(() {
+                                      _readyToPay = false;
+                                    });
+                                  });
+
+                                },
+                                color: Colors.redAccent,
+                                textColor: Colors.white,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    'مبلغ قابل پرداخت',
+                                    style: TextStyle(color: Colors.white70),
+                                    textScaleFactor: 0.9,
+                                  ),
+                                  Text(
+                                    '${getMoneyByRial(_billPrice.toInt())}ریال',
+                                    style: TextStyle(
+                                        color: PColor.orangeparto,
+                                        fontWeight: FontWeight.bold),
+                                    textScaleFactor: 1.2,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          //  color: Colors.red,
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                      top: 10,
+                      child: GestureDetector(
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(150),
+                              color: PColor.orangeparto),
+                          child: Icon(
+                            Icons.close,
+                            size: 35,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _readyToPay = false;
+                          });
+                        },
+                      ))
+                ],
+              ),
+            ),
+          ),
+          bottom: _readyToPay
+              ? 0
+              : (MediaQuery.of(context).size.height * 0.7 + 30) * -1,
+          right: 5,
+          left: 5,
+          curve: Curves.fastLinearToSlowEaseIn,
+        ));
+  }
+
+  Future<void> getBillInfo () async{
+    String _billInfo=createBillData();
+    if(_billInfo.isNotEmpty)
+    {
+      setState(() {
+        //  _readyToPay = false;
+        _progressing = true;
+      });
+
+      auth.checkAuth().then((value) async {
+        if (value) {
+          SharedPreferences _prefs = await SharedPreferences.getInstance();
+          String _token = _prefs.getString('token');
+          var _body = {
+            "BillData": _billInfo,
+            "LocalDate": DateTime.now().toString(),
+            "Sign": _prefs.getString('sign'),
+            "UseWallet": true
+          };
+          var jBody = json.encode(_body);
+
+          var result = await http.post(
+              'https://www.idehcharge.com/Middle/Api/Charge/BillInquiry',
+              headers: {
+                'Authorization': 'Bearer $_token',
+                'Content-Type': 'application/json'
+              },
+              body: jBody);
+          if (result.statusCode == 401) {
+            auth.retryAuth().then((value) {
+              getBillInfo();
+            });
+          }
+          if (result.statusCode == 200) {
+            setState(() {
+              _progressing = false;
+            });
+
+            await setWalletAmount();
+            setState(() {
+
+            });
+            var jres = json.decode(result.body);
+            debugPrint('==========================================================================');
+            debugPrint(jres.toString());
+            debugPrint('==========================================================================');
+
+            if (jres["ResponseCode"] == 0)
+
+            {
+              setState(() {
+                _paymentId.text=null;
+
+              });
+              if(_selectedItem==5 ) {
+                var res = billFromJson(result.body);
+                var bill=billItemsFromJson(res.bills);
+
+               setState(() {
+                  _billId.text = bill[0].billId;
+                  _paymentId.text = bill[0].paymentId;
+                  _billPrice = double.parse(bill[0].amount);
+                  _goToBillInfo = true;
+                });
+              }else{
+                var res=billOtherFromJson(result.body);
+                var bill=billOtherItemFromJson(res.bills);
+                setState(() {
+                  _billId.text=bill.billId;
+                  _paymentId.text=bill.payId;
+                  _billPrice=bill.amount.toDouble() ;
+                  _goToBillInfo=true;
+                });
+              }
+            }
+            else
+              showDialog(
+                context: context,
+                builder: (context) => CAlertDialog(
+                  content: 'عملیات ناموفق',
+                  subContent: jres['ResponseMessage'],
+                  buttons: [
+                    CButton(
+                      label: 'بستن',
+                      onClick: () => Navigator.of(context).pop(),
+                    )
+                  ],
+                ),
+              );
+          }
+        }
+      });
+    }
+
+
+  }
+
+  Future<void> getPaymentLink() async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _prefs = await SharedPreferences.getInstance();
+        String _token = _prefs.getString('token');
+        var _body = {
+          "BillId": _billId.text,
+          "PayId": _paymentId.text,
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _prefs.getString('sign'),
+          "UseWallet": true
+        };
+        var jBody = json.encode(_body);
+
+        var result = await http.post(
+            'https://www.idehcharge.com/Middle/Api/Charge/Bill',
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: jBody);
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            getPaymentLink();
+          });
+        }
+        if (result.statusCode == 200) {
+          setState(() {
+            _progressing=false;
+          });
+
+          var jres = json.decode(result.body);
+          debugPrint(jres.toString());
+          if (jres["ResponseCode"] == 0)
+          {
+            setState(() {
+              _paymentLink=jres['Url'];
+              _readyToPay=true;
+
+            });
+/*
+            var data=charitiesFromJson(result.body);
+            setState(() {
+              _charities=data.charityTerminals.financingInfoLists;
+              _progressing=false;
+            });
+*/
+
+
+          }
+          else
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                content: 'عملیات ناموفق',
+                subContent: jres['ResponseMessage'],
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+
+        }
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1225,7 +1799,7 @@ String getOrg(int id){
                     thickness: 2,
                   ),
 
-                  _payWithBarcode?
+                  _goToBillInfo?
                       PayWithBarcode():
                       PayWithOpetions(),
                   // بخش مربوط به اطلاعات اصلی
@@ -1259,23 +1833,50 @@ String getOrg(int id){
                     CButton(
                       label: 'بعدی',
                       onClick: () {
-                        if(!_payWithBarcode)
+                        if(!_goToBillInfo)
+                          if(_selectedItem<6)
                           getBillInfo();
+                          else
+                            setState(() {
+                              _billPrice=double.parse(_paymentId.text.substring(0,4))*1000;
+                              _goToBillInfo=true;
+
+                            });
+                        else if(_goToBillInfo)
+                          if(_billPrice>0)
+                          getPaymentLink();
+                          else
+                            showDialog(
+                              context: context,
+                              builder: (context) => CAlertDialog(
+                                content: 'عملیات غیرممکن',
+                                subContent: 'قبض قبلا پرداخت شده است',
+                                buttons: [
+                                  CButton(
+                                    label: 'بستن',
+                                    onClick: () => Navigator.of(context).pop(),
+                                  )
+                                ],
+                              ),
+                            );
 
 
-                      //    _sendToPayment();
+
+
+                        //    _sendToPayment();
 
                       },
                       minWidth: 120,
                     ),
-                    !_payWithBarcode?
+                    !_goToBillInfo?
                     CButton(
                       label: 'پرداخت با بارکد',
                       onClick: () {
                         scan();
                         setState(() {
-                          _payWithBarcode=true;
+                          _goToBillInfo=true;
                           _billId.text='';
+                          _paymentId.text='';
 
                         });
 
@@ -1283,13 +1884,13 @@ String getOrg(int id){
                       minWidth: 120,
                     ):
                     CButton(
-                      label: 'پرداخت عادی',
+                      label: 'قبلی',
                       onClick: () {
                        // scan();
                         setState(() {
-                          _payWithBarcode=false;
+                          _goToBillInfo=false;
                           _billId.text='';
-
+                          _paymentId.text='';
                         });
 
                       },
@@ -1301,7 +1902,7 @@ String getOrg(int id){
               ),
             ),
           ),
-         // _paymentDialog()
+          _paymentDialog()
         ],
       )
 

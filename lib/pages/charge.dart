@@ -93,7 +93,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
               id: 11,
               name: 'اعتبار خط دائمی',
               coverImage: '',
-              prices: [50000, 100000, 200000])
+              prices:  [10000, 20000, 50000, 100000, 200000])
 
         ]),
     new StraightChargeOperators(
