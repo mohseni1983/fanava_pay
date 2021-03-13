@@ -1,6 +1,15 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:parto_v/classes/convert.dart';
 import 'package:parto_v/classes/recipt.dart';
+import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/pages/main_page.dart';
+import 'package:parto_v/ui/cust_colors.dart';
+import 'package:share/share.dart';
 
 class ReciptPage extends StatefulWidget {
   final String url;
@@ -13,25 +22,233 @@ class ReciptPage extends StatefulWidget {
 
 class _ReciptPageState extends State<ReciptPage> {
   Recipt _recipt=new Recipt();
+  GlobalKey _globalKey = new GlobalKey();
+
+  Future<Uint8List> _capturePng() async {
+    try {
+      //print('inside');
+      RenderRepaintBoundary boundary =
+      _globalKey.currentContext.findRenderObject();
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData byteData =
+      await image.toByteData(format: ui.ImageByteFormat.png);
+      var pngBytes = byteData.buffer.asUint8List();
+      var bs64 = base64Encode(pngBytes);
+      print(pngBytes);
+      print(bs64);
+      setState(() {});
+      return pngBytes;
+    } catch (e) {
+      print(e);
+    }
+  }
 
 
   @override
   void initState() {
     super.initState();
     setState(() {
-     // _recipt=reciptFromJson(Uri.decodeComponent(widget.url.replaceAll('partov://idehcharge.com?transactiondata=', '')));
+     _recipt=reciptFromJson(Uri.decodeComponent(widget.url.replaceAll('partov://idehcharge.com?transactiondata=', '')));
       debugPrint(widget.url);
      // debugPrint(Uri.decodeComponent(widget.url.replaceAll('partov://idehcharge.com?transactiondata=', '')));
     });
   }
+  bool _progressing = false;
+
+  Widget Progress() => Material(
+    color: Colors.transparent,
+    child: Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      color: PColor.orangeparto.withOpacity(0.8),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 30,
+              width: 30,
+              child: CircularProgressIndicator(),
+            ),
+            Text(
+              'در حال دریافت اطلاعات',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              textScaleFactor: 1.4,
+            )
+          ],
+        ),
+      ),
+    ),
+  );
 
   Widget build(BuildContext context) {
     return 
         WillPopScope(child:       
         Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-          body: Center(
-            child: Text(_recipt.traceNumber??''),
-          ),
+          body:
+                      Stack(
+                alignment: Alignment.center,
+                children: [
+                  RepaintBoundary(
+                    key: _globalKey,
+                    child:
+                    Container(
+                        padding: EdgeInsets.fromLTRB(5, 35, 5, 0),
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        color: PColor.orangeparto,
+                        child:Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('اپلیکیشن پرداخت پرتو',style: TextStyle(color: PColor.blueparto,fontSize: 22,fontWeight: FontWeight.w900),),
+                            Divider(indent: 5,endIndent: 5,thickness: 1,height: 3,),
+                            Text('رسید درگاه پرداخت اینترنتی',style: TextStyle(color: PColor.blueparto,fontSize: 16,fontWeight: FontWeight.w700),),
+                            Divider(indent: 5,endIndent: 5,thickness: 2,height: 3,),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('مبلغ',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+                                  Text('${getMoneyByRial(int.parse(_recipt.amount)) } ریال',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('تاریخ واریز',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+                                  Text('${_recipt.datePaid}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),textDirection: TextDirection.ltr,),
+
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('شماره کارت',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+                                  Text('${_recipt.cardNumber}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),textDirection: TextDirection.ltr,),
+
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('پیگیری',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+                                  Text('${_recipt.traceNumber}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('شماره فاکتور',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+                                  Text('${_recipt.invoiceId}',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+
+                                ],
+                              ),
+                            ),
+
+                          ],
+                        ),
+
+                    ),
+
+
+                  ),
+                  Positioned(
+
+                    bottom: 0,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: PColor.blueparto,
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(12))
+                        ),
+
+                        height: 60,width: MediaQuery.of(context).size.width-20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+
+                          CButton(
+                            color: Colors.blueAccent,
+                            textColor: Colors.white,
+                            label: 'اشتراک گذاری تصویر',
+                            onClick: () async{
+                              _capturePng().then((value) async {
+                                var path=await ImagePickerSaver.saveFile(fileData: value.buffer.asUint8List());
+                                Share.shareFiles([path]);
+
+
+
+                              });
+                            },
+                          ),
+                            CButton(
+                              color: Colors.green,
+                              textColor: Colors.white,
+                              label: 'اشتراک گذاری متن',
+                              onClick: (){},
+                            )
+
+                          ],),
+
+                      )
+                  ),
+                  _progressing?Progress():Container(height: 0,)
+
+                ],
+              )
+
+
 
         )
         ),
@@ -39,3 +256,7 @@ class _ReciptPageState extends State<ReciptPage> {
     );
   }
 }
+
+
+
+

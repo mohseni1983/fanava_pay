@@ -168,8 +168,8 @@ class _WalletPageState extends State<WalletPage> {
           var jres = json.decode(result.body);
           if (jres['ResponseCode'] == 0)
           {
-            if(await canLaunch(jres['Url']))
-              await launch(jres['Url']);
+
+              launch(jres['Url']).then((value) => Navigator.of(context).pop());
           }else{
             showDialog(context: context,
             builder: (context) => CAlertDialog(

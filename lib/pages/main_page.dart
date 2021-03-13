@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                 children: [
                   MainIcon(
                     label: 'شارژ سیم کارت',
-                    image: AssetImage('assets/images/sim-Charge.png'),
+                    image: AssetImage('assets/images/charge.png'),
                     onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),)),
                   ),
                   MainIcon(
