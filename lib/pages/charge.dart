@@ -223,7 +223,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
             _progressing = false;
           });
 
-          await setWalletAmount();
+          await setWalletAmount(this);
           setState(() {
 
           });

@@ -23,7 +23,8 @@ with TickerProviderStateMixin
     return Directionality(textDirection: TextDirection.rtl,
 
         child: Scaffold(
-          body:         Stack(
+          body:
+          Stack(
             children: [
               //Bottom Image
               Transform.translate(

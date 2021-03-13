@@ -1643,7 +1643,7 @@ String getOrg(int id){
               _progressing = false;
             });
 
-            await setWalletAmount();
+            await setWalletAmount(this);
             setState(() {
 
             });

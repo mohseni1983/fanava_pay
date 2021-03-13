@@ -11,8 +11,8 @@ import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/components/maintemplate.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
+//import 'package:parto_v/pages/charge.dart';
 import 'package:parto_v/pages/internet_package.dart';
-import 'package:parto_v/pages/recipt.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -118,54 +118,46 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     debugPrint(_latestLink);
     if(_latestLink!=null)
-      {
-        debugPrint(_latestLink);
-        String link=_latestLink;
-        _latestLink=null;
-        return ReciptPage(url: link,);
-
-      }
-
-    return
-      WillPopScope(
-          child: MasterTemplate(
-              isHome: true,
-              wchild: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                padding:
-                EdgeInsets.only(top: 50, left: 15, right: 15, bottom: 50),
-                children: [
-                  MainIcon(
-                    label: 'شارژ سیم کارت',
-                    image: AssetImage('assets/images/sim-Charge.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),)),
-                  ),
-                  MainIcon(
-                    label: 'بسته اینترنت',
-                    image: AssetImage('assets/images/3g4g5g.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
-                  ),
-                  MainIcon(
-                    label: 'قبوض خدماتی',
-                    image: AssetImage('assets/images/ghobooz2.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillsPage(),)),
-                  ),
-                  MainIcon(
-                    label: 'نیکوکاری',
-                    image: AssetImage('assets/images/Donation.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DonationPage(),)),
-                  ),
+      return Center(
+        child: Text('Link aquired'),
+      );
+    return WillPopScope(
+        child: MasterTemplate(
+            isHome: true,
+            wchild: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              padding:
+                  EdgeInsets.only(top: 50, left: 15, right: 15, bottom: 50),
+              children: [
+                MainIcon(
+                  label: 'شارژ سیم کارت',
+                  image: AssetImage('assets/images/sim-Charge.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),)),
+                ),
+                MainIcon(
+                  label: 'بسته اینترنت',
+                  image: AssetImage('assets/images/3g4g5g.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                ),
+                MainIcon(
+                  label: 'قبوض خدماتی',
+                  image: AssetImage('assets/images/ghobooz2.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillsPage(),)),
+                ),
+                MainIcon(
+                  label: 'نیکوکاری',
+                  image: AssetImage('assets/images/Donation.png'),
+                  onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DonationPage(),)),
+                ),
 
 
 
 
-                ],
-              )),
-          onWillPop: () => _onWillPop())
-
-    ;
+              ],
+            )),
+        onWillPop: () => _onWillPop());
   }
 
   Future<bool> _onWillPop() async {

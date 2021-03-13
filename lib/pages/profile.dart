@@ -183,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Column(
 
                   children: [
-                    //Padding(padding: EdgeInsets.only(top: 15)),
+                    Padding(padding: EdgeInsets.only(top: 15)),
                     CircleAvatar(
                       minRadius: 30,
                       maxRadius: 40,
@@ -270,6 +270,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text('${PersianDateTime.fromGregorian(gregorianDateTime: _info.birthDate.toString().substring(0,10))}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),)
                           ],
                         ),
+
+                        Divider(thickness: 0.5,color: PColor.blueparto.shade200,),
+
+
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            Text('امتیاز:',style: TextStyle(color: PColor.blueparto),),
+                            Text('${_info.point??0}',style: TextStyle(color: PColor.orangeparto,fontWeight: FontWeight.bold),)
+                          ],
+                        ),
+
 
 
 

@@ -90,7 +90,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             _progressing = false;
           });
 
-          await setWalletAmount();
+          await setWalletAmount(this);
           setState(() {
           });
           var jres = json.decode(result.body);

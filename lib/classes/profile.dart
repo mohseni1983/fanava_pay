@@ -44,6 +44,7 @@ class DeviceInfo {
     this.registerCode,
     this.signKey,
     this.urlSchema,
+    this.point
   });
 
   DateTime birthDate;
@@ -64,6 +65,7 @@ class DeviceInfo {
   String registerCode;
   String signKey;
   String urlSchema;
+  double point;
 
   factory DeviceInfo.fromJson(Map<String, dynamic> json) => DeviceInfo(
     birthDate: DateTime.parse(json["BirthDate"]),
@@ -84,6 +86,7 @@ class DeviceInfo {
     registerCode: json["RegisterCode"],
     signKey: json["SignKey"],
     urlSchema: json["UrlSchema"],
+    point: json["Point"]
   );
 
   Map<String, dynamic> toJson() => {

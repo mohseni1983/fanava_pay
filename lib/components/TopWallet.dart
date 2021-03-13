@@ -111,7 +111,7 @@ class _WalletWidgetState extends State<WalletWidget> with TickerProviderStateMix
                   children: [
                     Expanded(child: Center(child: Text('$globWalletAmount'),)),
                     Container(
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(1),
                       decoration: BoxDecoration(
                         color: PColor.orangeparto,
                         borderRadius: BorderRadius.circular(25),
