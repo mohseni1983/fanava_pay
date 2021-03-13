@@ -236,7 +236,17 @@ class _ReciptPageState extends State<ReciptPage> {
                               color: Colors.green,
                               textColor: Colors.white,
                               label: 'اشتراک گذاری متن',
-                              onClick: (){},
+                              onClick: (){
+                                var _msg='اپلیکیشن پرتو پرداخت' +'\r\n';
+                                _msg+='مبلغ: ${getMoneyByRial(int.parse(_recipt.amount))}ریال'+'\r\n';
+                                _msg+='تاریخ: ${_recipt.datePaid}'+'\r\n';
+                                _msg+='کارت: ${_recipt.cardNumber}'+'\r\n';
+                                _msg+='پیگیری: ${_recipt.traceNumber}'+'\r\n';
+                                Share.share(_msg);
+
+
+
+                              },
                             )
 
                           ],),

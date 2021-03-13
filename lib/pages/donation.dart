@@ -265,7 +265,7 @@ class _DonationPageState extends State<DonationPage> {
     // TODO: implement initState
     super.initState();
     getListOfCharities();
-    _amountTxt.text="100,000";
+    _amountTxt.text="10,000";
   }
 
   TextEditingController _amountTxt=new TextEditingController();
@@ -313,7 +313,7 @@ class _DonationPageState extends State<DonationPage> {
           textAlign: TextAlign.center,
         ),
         Text(
-          'به لحاظ محدودیت های بانکی حداقل تراکنش 10هزار تومان است',
+          'به لحاظ محدودیت های بانکی حداقل تراکنش هزار تومان است',
           style: Theme.of(context).textTheme.subtitle1,
           textAlign: TextAlign.center,
         ),
@@ -464,6 +464,8 @@ class _DonationPageState extends State<DonationPage> {
                                     setState(() {
                                       _readyToPay = false;
                                     });
+                                    Navigator.of(context).pop();
+
                                   });
 
                                 },
@@ -606,14 +608,14 @@ class _DonationPageState extends State<DonationPage> {
                         );
                       else if(_isSetAmountPage && _amountTxt.text.isNotEmpty) {
                         if (double.parse(_amountTxt.text.replaceAll(',', '')) >=
-                            100000)
+                            10000)
                           getPaymentLink();
                         else
 
                       showDialog(context: context,
                       builder: (context) => CAlertDialog(
                       content: 'خطا',
-                      subContent: 'مبلغ باید بیش از ده هزار تومان باشد',
+                      subContent: 'مبلغ باید بیش از هزار تومان باشد',
                       buttons: [
                       CButton(
                       label: 'بستن',

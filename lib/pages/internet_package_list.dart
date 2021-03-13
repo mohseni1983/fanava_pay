@@ -471,6 +471,8 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                     setState(() {
                                       _readyToPay = false;
                                     });
+                                    Navigator.of(context).pop();
+
                                   });
 
                                 },

@@ -258,7 +258,12 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-   // getDataPlans();
+    setState(() {
+      _prefs.then((value)  {
+       _mobile.text=value.getString('cellNumber');
+
+      });
+    });
   }
 
 

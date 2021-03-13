@@ -117,7 +117,8 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     debugPrint(_latestLink);
-    if(_latestLink!=null)
+    if(_latestLink!=null )
+      if( !_latestLink.endsWith('Unknown') )
       {
         debugPrint(_latestLink);
         String link=_latestLink;
@@ -144,17 +145,17 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   ),
                   MainIcon(
                     label: 'بسته اینترنت',
-                    image: AssetImage('assets/images/3g4g5g.png'),
+                    image: AssetImage('assets/images/internet.png'),
                     onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
                   ),
                   MainIcon(
                     label: 'قبوض خدماتی',
-                    image: AssetImage('assets/images/ghobooz2.png'),
+                    image: AssetImage('assets/images/ghobooz3.png'),
                     onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillsPage(),)),
                   ),
                   MainIcon(
                     label: 'نیکوکاری',
-                    image: AssetImage('assets/images/Donation.png'),
+                    image: AssetImage('assets/images/donation2.png'),
                     onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DonationPage(),)),
                   ),
 
@@ -212,7 +213,35 @@ class _MainIconState extends State<MainIcon> {
       onTap: widget.onPress,
       child: Container(
 
-          child: Stack(
+
+          child:
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.width/3,
+                width: MediaQuery.of(context).size.width/3,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image:widget.image,
+                      fit: BoxFit.contain
+
+                  )
+                ),
+              ),
+              Text('${widget.label}',style: TextStyle(color: PColor.blueparto),textScaleFactor: 1.1,),
+            ],
+          )
+      ),
+    );
+
+  }
+}
+
+
+
+/*          Stack(
             children: [
               Positioned(
                   right: 0,
@@ -256,8 +285,5 @@ class _MainIconState extends State<MainIcon> {
             ],
 
           )
-      ),
-    );
 
-  }
-}
+*/

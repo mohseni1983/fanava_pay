@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
 import 'package:http/http.dart' as http;
 Future<void> setWalletAmount(State state) async{
-  debugPrint('Start updating wallet amount====================================================');
+
   auth.checkAuth().then((value) async{
     if (value) {
       SharedPreferences _prefs = await SharedPreferences.getInstance();

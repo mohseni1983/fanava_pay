@@ -33,6 +33,7 @@ class _BillsPageState extends State<BillsPage> {
   double _billPrice=0;
   bool _goToBillInfo=false;
   String _mobile='09353619190';
+  Future<SharedPreferences> _prefs= SharedPreferences.getInstance();
 
   Widget Progress() => Material(
     color: Colors.transparent,
@@ -294,7 +295,7 @@ String getOrg(int id){
             BillInfoWidget(_selectedItem),
 
             Container(height: 220,
-            child: GridView.count(crossAxisCount: 5,
+            child: GridView.count(crossAxisCount: 4,
             mainAxisSpacing: 2,
               crossAxisSpacing: 2,
               children: [
@@ -346,7 +347,8 @@ String getOrg(int id){
                   onPress: (t){
                     setState(() {
                       _selectedItem=t;
-                      _billId.text='';
+                      _billId.text=_mobile;
+
                       _selectedOption=-1;
                     });
                   },
@@ -1227,10 +1229,15 @@ String getOrg(int id){
   @override
   void initState() {
 
+    _prefs.then((value) => {
+      setState((){
+        _mobile=value.getString('cellNumber');
+      })
+    });
 
     // TODO: implement initState
     super.initState();
-    getMobile();
+
   }
 
   String createBillData() {
@@ -1541,6 +1548,7 @@ String getOrg(int id){
                                   launch(_paymentLink).then((value) {
                                     setState(() {
                                       _readyToPay = false;
+                                      Navigator.of(context).pop();
                                     });
                                   });
 
@@ -1648,9 +1656,6 @@ String getOrg(int id){
 
             });
             var jres = json.decode(result.body);
-            debugPrint('==========================================================================');
-            debugPrint(jres.toString());
-            debugPrint('==========================================================================');
 
             if (jres["ResponseCode"] == 0)
 
