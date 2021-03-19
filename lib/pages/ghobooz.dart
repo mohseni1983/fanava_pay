@@ -1548,7 +1548,7 @@ String getOrg(int id){
                                   launch(_paymentLink).then((value) {
                                     setState(() {
                                       _readyToPay = false;
-                                      Navigator.of(context).pop();
+                                      Navigator.of(context).popUntil(ModalRoute.withName('/'));
                                     });
                                   });
 

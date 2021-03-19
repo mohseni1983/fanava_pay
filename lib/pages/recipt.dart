@@ -10,6 +10,7 @@ import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/pages/main_page.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:share/share.dart';
+import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 
 class ReciptPage extends StatefulWidget {
   final String url;
@@ -85,6 +86,8 @@ class _ReciptPageState extends State<ReciptPage> {
       ),
     ),
   );
+
+
 
   Widget build(BuildContext context) {
     return 
@@ -222,15 +225,21 @@ class _ReciptPageState extends State<ReciptPage> {
                             color: Colors.blueAccent,
                             textColor: Colors.white,
                             label: 'اشتراک گذاری تصویر',
-                            onClick: () async{
+                            onClick: () {
+                              ShareFilesAndScreenshotWidgets().shareScreenshot(
+                                  _globalKey,
+                                  800,
+                                  "Title",
+                                  "Name.png",
+                                  "image/png",
+                                  text: "رسید پرداخت پرتو");
+                            }
+/*                            async{
                               _capturePng().then((value) async {
                                 var path=await ImagePickerSaver.saveFile(fileData: value.buffer.asUint8List());
                                 Share.shareFiles([path]);
-
-
-
                               });
-                            },
+                            },*/
                           ),
                             CButton(
                               color: Colors.green,

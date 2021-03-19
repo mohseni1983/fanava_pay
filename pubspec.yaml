@@ -43,12 +43,14 @@ dependencies:
   otp_count_down:
   url_launcher: 5.4.2
   share:
+  share_files_and_screenshot_widgets:
   sentry_flutter:
   flutter_barcode_scanner:
   barcode_scan_fork:
   material_design_icons_flutter:
   uni_links:
   image_picker_saver:
+  firebase_messaging:
 
 
 dev_dependencies:
@@ -107,8 +109,10 @@ flutter:
     - assets/images/Donation.png
     - assets/images/internet.png
     - assets/images/donation2.png
+    - assets/images/4GPackages.png
 
 
+  #4GPackages.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

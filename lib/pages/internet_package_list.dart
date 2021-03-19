@@ -15,6 +15,7 @@ import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_package.dart';
+import 'package:parto_v/pages/main_page.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -171,7 +172,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
             if (jres['ResponseCode'] == 0) {
               setState(() {
                 _invoiceTitle =
-                'خرید بسته ${_operatorsWithLogo[widget.operatorId].name} برای شماره ${widget.mobile}';
+                'بسته ${_operatorsWithLogo[widget.operatorId].name} ';
                 _invoiceSubTitle =
                 '${_dp.title}';
                 _invoiceAmount = _dp.priceWithTax;
@@ -297,7 +298,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                           '${_invoiceTitle}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold,fontSize: _invoiceTitle.length>40?8:12,),
+                                              fontWeight: FontWeight.bold,fontSize:12,),
                                           softWrap: true,
                                           textScaleFactor: 1,
                                         ),
@@ -328,6 +329,27 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                         )
                                       ],
                                     ),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'شماره همراه:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                        Text(
+                                          '${widget.mobile}',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                      ],
+                                    ),
+
                                     Row(
                                       mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -470,8 +492,10 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                   launch(_paymentLink).then((value) {
                                     setState(() {
                                       _readyToPay = false;
+                                      Navigator.of(context).popUntil(ModalRoute.withName('/'));
+                                     
+
                                     });
-                                    Navigator.of(context).pop();
 
                                   });
 
@@ -649,7 +673,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
               showDialog(context: context,
                 builder: (context) =>
                     CAlertDialog(content: 'خطا در دریافت اطلاعات',subContent: jResult['ResponseMessage'],buttons: [CButton(label: 'بستن',onClick: ()=>
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => MainPage(),))
+                        Navigator.of(context).popUntil(ModalRoute.withName('/'))
                       ,)],) ,
               );
             }

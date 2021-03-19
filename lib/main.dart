@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parto_v/UI/cust_colors.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:parto_v/classes/internet_package.dart';
+import 'package:parto_v/pages/charge.dart';
+import 'package:parto_v/pages/donation.dart';
+import 'package:parto_v/pages/ghobooz.dart';
+import 'package:parto_v/pages/internet_package.dart';
 import 'package:parto_v/pages/main_page.dart';
+import 'package:parto_v/pages/profile.dart';
 import 'package:parto_v/pages/registeration.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 void main() async {
@@ -63,7 +69,21 @@ void main() async {
             )
 
         ),
-        home:value? new MainPage():new RegisterationPage(),),)
+        routes: {
+          '/':(context)=>MainPage(),
+          '/register':(context)=>RegisterationPage(),
+          '/bill':(context)=>BillsPage(),
+          '/charge': (context)=>ChargeWizardPage(),
+          '/internet':(context)=>InternetPackagePage(),
+          '/wallet':(context)=>ProfilePage(),
+          '/profile':(context)=>ProfilePage(),
+          '/donation':(context)=>DonationPage(),
+        },
+        initialRoute: value?'/':'/register',
+
+
+       // home:value? new MainPage():new RegisterationPage(),
+      ),)
       //appRunner: () => runApp(new MainPage(),),
 
     );

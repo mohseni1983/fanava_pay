@@ -464,7 +464,7 @@ class _DonationPageState extends State<DonationPage> {
                                     setState(() {
                                       _readyToPay = false;
                                     });
-                                    Navigator.of(context).pop();
+                                    Navigator.of(context).popUntil(ModalRoute.withName('/'));
 
                                   });
 

@@ -169,7 +169,7 @@ class _WalletPageState extends State<WalletPage> {
           if (jres['ResponseCode'] == 0)
           {
 
-              launch(jres['Url']).then((value) => Navigator.of(context).pop());
+              launch(jres['Url']).then((value) => Navigator.of(context).popUntil(ModalRoute.withName('/')) );
           }else{
             showDialog(context: context,
             builder: (context) => CAlertDialog(

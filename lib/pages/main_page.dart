@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +15,7 @@ import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
 import 'package:parto_v/pages/internet_package.dart';
 import 'package:parto_v/pages/recipt.dart';
+import 'package:parto_v/push_notifications.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,7 +31,8 @@ class MainPage extends StatefulWidget {
 enum UniLinksType { string, uri }
 
 class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin{
-  String _latestLink = 'Unknown';
+  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();  String _latestLink = 'Unknown';
+  final pushNotificationService = PushNotificationService(_firebaseMessaging);
   Uri _latestUri;
 
   StreamSubscription _sub;
@@ -108,6 +112,8 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     // TODO: implement initState
+    pushNotificationService.initialise();
+
 
     setWalletAmount(this);
     super.initState();
@@ -141,22 +147,22 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                   MainIcon(
                     label: 'شارژ سیم کارت',
                     image: AssetImage('assets/images/charge.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChargeWizardPage(),)),
+                      onPress: ()=>Navigator.of(context).pushNamed('/charge')
                   ),
                   MainIcon(
                     label: 'بسته اینترنت',
-                    image: AssetImage('assets/images/internet.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackagePage(),)),
+                    image: AssetImage('assets/images/4GPackages.png'),
+                    onPress: ()=>Navigator.of(context).pushNamed('/internet')
                   ),
                   MainIcon(
                     label: 'قبوض خدماتی',
                     image: AssetImage('assets/images/ghobooz3.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillsPage(),)),
+                      onPress: ()=>Navigator.of(context).pushNamed('/bill')
                   ),
                   MainIcon(
                     label: 'نیکوکاری',
                     image: AssetImage('assets/images/donation2.png'),
-                    onPress: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => DonationPage(),)),
+                      onPress: ()=>Navigator.of(context).pushNamed('/donation')
                   ),
 
 

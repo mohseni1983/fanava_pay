@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:device_info/device_info.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -26,6 +27,8 @@ class _RegisterationPageState extends State<RegisterationPage> {
   DeviceInfoPlugin plugin=new DeviceInfoPlugin();
   String _deviceId='---';
   int os_id=0;
+  String _referrer='';
+  bool _hasRef=false;
 
   @override
   void initState() {
@@ -85,7 +88,8 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
       "CellNumber": _cellNumber,
       "DeviceKey": _devId,
-      "Os": "$os_id"
+      "Os": "$os_id",
+      "Referral":_referrer
 
 
     });
@@ -162,7 +166,55 @@ class _RegisterationPageState extends State<RegisterationPage> {
                   showDialog(context: context,
                     builder: (context) => CAlertDialog(content:'خطا',subContent: 'شماره موبایل وارد شده صحیح نیست',buttons: [CButton(label: 'اصلاح',onClick: ()=>Navigator.of(context).pop(),)],),
                   );
-              },label: 'ورود',minWidth: 120,)
+              },label: 'ورود',minWidth: 120,),
+              Padding(padding: EdgeInsets.only(top: 15)),
+              GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _hasRef=!_hasRef;
+                  });
+                },
+                child:
+                Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.all(5),
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: PColor.orangepartoAccent,
+                      borderRadius: BorderRadius.circular(10),
+                    boxShadow: [BoxShadow(
+                      color: PColor.blueparto,
+                      blurRadius: 3,
+                      offset: Offset(0,0),
+                      spreadRadius: 1
+                    )]
+
+
+                  ),
+                  child: _hasRef?Row(
+                    children: [
+                      Expanded(child: TextField(
+                        decoration: InputDecoration(
+                            hintText: 'شماره موبایل معرف',
+                           // counter: ,
+                            counterText: ''
+                          //counter: Stage
+
+                        ),
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 11,
+                      )),
+                      IconButton(icon: Icon(Icons.close,color: PColor.blueparto,), onPressed: (){setState(() {
+                        _hasRef=!_hasRef;
+                      });})
+                    ],
+                  ):
+
+                  Text('معرف دارم',style: TextStyle(color: PColor.blueparto),textAlign: TextAlign.center,),
+                )
+                ,
+              )
 
             ],
           ),

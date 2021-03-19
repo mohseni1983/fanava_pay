@@ -359,6 +359,27 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                     ),
                                     Row(
                                       mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'شماره همراه:',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                        Text(
+                                          '${_mobile.text}',
+                                          style: TextStyle(
+                                              color: PColor.orangeparto,
+                                              fontWeight: FontWeight.bold),
+                                          textScaleFactor: 1.2,
+                                        ),
+                                      ],
+                                    ),
+
+                                    Row(
+                                      mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
@@ -502,6 +523,8 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                           setState(() {
                                             _readyToPay = false;
                                           });
+                                          Navigator.of(context).popUntil(ModalRoute.withName('/'));
+
                                         });
                                       },
                                       color: Colors.redAccent,
@@ -1346,6 +1369,18 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
   @override
   void dispose() {
     this.dispose();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+        _prefs.then((value) {
+          setState(() {
+            _mobile.text=value.getString('cellNumber');
+          });
+        });
+
   }
 
   Future<String> getContact() async {
