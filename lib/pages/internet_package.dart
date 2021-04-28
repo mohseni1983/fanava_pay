@@ -178,7 +178,7 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
         });
         try{
           var result=await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/GetDataPlanList',
+              Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetDataPlanList'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'
@@ -572,11 +572,16 @@ class _InternetPackagePageState extends State<InternetPackagePage> {
                         minWidth: 100,
                       ),
 
+/*
                       CButton(
                         label: 'تکرار خرید قبلی',
-                        onClick: () {},
+                        onClick: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => InternetPackageListPage(repeat:true),));
+
+                        },
                         minWidth: 100,
                       ),
+*/
                     ],
                   ),
                 ),

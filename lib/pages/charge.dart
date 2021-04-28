@@ -206,8 +206,9 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
         };
         var jBody = json.encode(_body);
 
+
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove',
+            Uri.parse(('https://www.idehcharge.com/Middle/Api/Charge/WalletApprove')),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -596,7 +597,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
         String _token = _p.getString('token');
         var jsonTopUp = topUpToJson(topUp);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/TopUp'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -673,7 +674,7 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
           var jsonTopUp = topUpToJson(topUp);
           debugPrint(jsonTopUp.toString());
           var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+              Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/TopUp'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'
@@ -843,22 +844,6 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
         ));
 
       });
-/*      var _mapedList = _list.asMap();
-
-
-      _mapedList.forEach((key, value) {
-        _wlist.add(CSelectedButton(
-          height: 40,
-          label: value.name,
-          value: key,
-          selectedValue: _selectedTopUpType,
-          onPress: (t) {
-            setState(() {
-              _selectedTopUpType = t;
-            });
-          },
-        ));
-      });*/
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1161,66 +1146,6 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                                       fontSize: 12),
                                   textAlign: TextAlign.start,
                                 ),
-/*
-                              Container(
-                                alignment: Alignment.center,
-                                color: Colors.transparent,
-                                height: 60,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: _operatorsWithLogo.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      child: Container(
-                                        height: 50,
-                                        width: 50,
-                                        margin: EdgeInsets.all(5),
-                                        padding: EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                                10),
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: index == _topUpOperator
-                                                    ? PColor.blueparto
-                                                    : Colors.grey,
-                                                width: 1),
-                                            boxShadow: index == _topUpOperator
-                                                ? [
-                                              BoxShadow(
-                                                  color: PColor.blueparto,
-                                                  offset: Offset(0, 0),
-                                                  spreadRadius: 1,
-                                                  blurRadius: 1)
-                                            ]
-                                                : [
-                                              BoxShadow(
-                                                  color: PColor.orangeparto,
-                                                  offset: Offset(0, 0),
-                                                  spreadRadius: 0,
-                                                  blurRadius: 0)
-                                            ],
-                                            image: DecorationImage(
-                                              image: AssetImage(
-                                                  index == _topUpOperator
-                                                      ? _operatorsWithLogo[index]
-                                                      .colorImage
-                                                      : _operatorsWithLogo[index]
-                                                      .grayImage),
-                                              fit: BoxFit.fill,
-                                            )),
-                                      ),
-                                      onTap: () {
-                                        setState(() {
-                                          _topUpOperator = index;
-                                          _selectedTopUpType = 0;
-                                        });
-                                      },
-                                    );
-                                  },
-                                ),
-                              )
-*/
                               ],
                             ),
                     ),
@@ -1303,7 +1228,9 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
                             ),
                             CButton(
                               label: 'تکرار خرید قبلی',
-                              onClick: () {},
+                              onClick: ()  {
+                                getLastPurchase();
+                              },
                               minWidth: 120,
                             ),
                           ],
@@ -1396,5 +1323,112 @@ class _ChargeWizardPageState extends State<ChargeWizardPage> {
       _phoneNumber = _phoneNumber.replaceAll(')', '');
     }
     return _phoneNumber;
+  }
+
+  Future<void> getLastPurchase() async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _p = await SharedPreferences.getInstance();
+        String _token = _p.getString('token');
+        var _body = {
+          "RequestType":0,
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _p.getString('sign'),
+          "UseWallet": true
+        };
+
+
+        var result = await http.post(
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/LastTxn'),
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: json.encode(_body));
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            getLastPurchase();
+          });
+        }
+        if (result.statusCode == 200) {
+          debugPrint(result.body);
+          var jres = json.decode(result.body);
+          setState(() {
+            _progressing = false;
+          });
+
+          if (jres['ResponseCode'] == 0){
+            setState(() {
+             // _selectedAmount=(jres['Amount']).toInt();
+            //  _selectedChargeType=jres['ChargeType'];
+            //  _selectedTopUpType=jres['Operator'];
+
+              _mobile.text='0'+jres['CellNumber'];
+              _invoiceTitle =
+              '${_operatorsWithLogo[jres['Operator']].chargeTypes.firstWhere((m) => m.id==jres['ChargeType']).name}  ${_operatorsWithLogo[jres['Operator']]
+                  .name}';
+              _invoiceSubTitle =
+              '${_operatorsWithLogo[jres['Operator']]
+                  .chargeTypes.firstWhere((element) => element.id==jres['ChargeType']).name}';
+              _invoiceAmount = (jres['Amount']);
+              _canUseWallet = jres['CanUseWallet'];
+              _paymentLink = jres['Url'];
+              _walletAmount = jres['Cash'];
+              _progressing=false;
+              _readyToPay=true;
+
+            });
+
+          }
+/*            showDialog(
+              context: context,
+              builder: (context) {
+                return PreInvoice(
+                  title:
+                  '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator].name}',
+                  subTitle:
+                  '${_operatorsWithLogo[_topUpOperator].chargeTypes[_selectedTopUpType].name}',
+                  amount: _selectedAmount.toDouble(),
+                  canUseWallet: jres['CanUseWallet'],
+                  paymentLink: jres['Url'],
+                  walletAmount: 0,
+                );
+              },
+            );*/
+          else if (jres['ResponseCode'] == 5) {
+            auth.retryAuth().then((value) {
+              getLastPurchase();
+            });
+          } else
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                subContent: jres['ResponseMessage'],
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+        }
+      } else
+        showDialog(
+          context: context,
+          builder: (context) => CAlertDialog(
+            content: 'خطا در احراز هویت',
+            buttons: [
+              CButton(
+                label: 'بستن',
+                onClick: () => Navigator.of(context).pop(),
+              )
+            ],
+          ),
+        );
+    });
   }
 }

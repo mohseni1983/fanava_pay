@@ -84,7 +84,7 @@ class _RegisterationPageState extends State<RegisterationPage> {
     });
     var _cellNumber=_mobile.text.substring(1,11);
     var _devId=_deviceId;
-    var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Register',body: {
+    var result=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Register'),body: {
 
       "CellNumber": _cellNumber,
       "DeviceKey": _devId,
@@ -123,6 +123,21 @@ class _RegisterationPageState extends State<RegisterationPage> {
         );
       }
 
+    }
+    else {
+      setState(() {
+        _progressing=false;
+        showDialog(context: context, builder: (context) => CAlertDialog(
+          content: 'خطای سرور ${result.statusCode}',
+          subContent: 'خطا در برقراری ارتباط با سرور',
+          buttons: [CButton(onClick: (){
+            Navigator.of(context).pop();
+
+          },
+            label: 'بستن',
+          )],
+        ),);
+      });
     }
   }
 

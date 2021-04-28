@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:parto_v/classes/global_variables.dart' as globalVars;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:parto_v/custom_widgets/cust_textfield.dart';
 import 'package:parto_v/components/reg_page_template.dart';
+
+import '../push_notifications.dart';
 class EnterOTP extends StatefulWidget {
   @override
   _EnterOTPState createState() => _EnterOTPState();
@@ -23,12 +26,16 @@ class _EnterOTPState extends State<EnterOTP> {
   String _phoneNumber='';
   String _deviceId='';
   int _OS_id=0;
+ // static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+ // final pushNotificationService = PushNotificationService(_firebaseMessaging);
+
 
 
 
   TextEditingController _otp=new TextEditingController();
   bool _progress=false;
   bool _countEnded=false;
+  String _fdm='';
 
   String _countDown='';
   OTPCountDown _otpCountDown;
@@ -67,6 +74,14 @@ class _EnterOTPState extends State<EnterOTP> {
     // TODO: implement initState
 
     super.initState();
+/*
+    pushNotificationService.initialise().then((value) {
+      setState(() {
+        _fdm=value;
+      });
+    });
+*/
+
     _prefs.then((value) {
       setState(() {
         _phoneNumber=value.getString('username');
@@ -144,7 +159,7 @@ class _EnterOTPState extends State<EnterOTP> {
 
 
   Future<void> sendMobileNumber() async {
-    var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Register',body: {
+    var result=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Register'),body: {
 
       "CellNumber": _phoneNumber,
       "DeviceKey": _deviceId,
@@ -166,19 +181,26 @@ class _EnterOTPState extends State<EnterOTP> {
     String _usename='';
     String _device_id='';
     int os_id=0;
+    String _fcmKey='';
+
+
+
     _prefs.then((value) {
       setState(() {
         _usename=value.getString('username');
         _device_id=value.getString('device_id');
         os_id=value.getInt('os');
+        _fcmKey=value.getString('fcmKey');
 
       });
     }).then((value) async {
-      var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Active',body: {
+      var result=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Active'),body: {
         "CellNumber": _usename,
         "DeviceKey": _device_id,
         "Os": os_id.toString(),
-        "RegisterCode":_otp.text
+        "RegisterCode":_otp.text,
+        "FcmKey": _fcmKey
+
       });
       if(result.statusCode==200){
         var res=json.decode(result.body);
@@ -188,7 +210,7 @@ class _EnterOTPState extends State<EnterOTP> {
           value.setString('password', _device_id);
           value.setString('sign',_body['SignKey'] );
         }).then((value) async{
-          var token_result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Login',
+          var token_result=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Login'),
             body: {
               'username':'$_usename',
               'password':'$_device_id',

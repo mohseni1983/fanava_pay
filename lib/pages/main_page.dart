@@ -11,6 +11,7 @@ import 'package:parto_v/Pages/ghobooz.dart';
 import 'package:parto_v/classes/profile.dart';
 import 'package:parto_v/classes/topup.dart';
 import 'package:parto_v/components/maintemplate.dart';
+import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
 import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_pre_invoice.dart';
 import 'package:parto_v/pages/internet_package.dart';
@@ -25,15 +26,21 @@ import 'charge.dart';
 import 'package:uni_links/uni_links.dart';
 
 class MainPage extends StatefulWidget {
+  final FirebaseMessaging firebaseMessaging;
+
+  const MainPage({Key key, this.firebaseMessaging}) : super(key: key);
   @override
   _MainPageState createState() => _MainPageState();
 }
 enum UniLinksType { string, uri }
 
 class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin{
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();  String _latestLink = 'Unknown';
-  final pushNotificationService = PushNotificationService(_firebaseMessaging);
+//  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  //var pushNotificationService = PushNotificationService(_firebaseMessaging);
+  String _latestLink = 'Unknown';
+
   Uri _latestUri;
+  bool _hasMessage=false;
 
   StreamSubscription _sub;
   UniLinksType _type = UniLinksType.string;
@@ -112,12 +119,73 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     // TODO: implement initState
-    pushNotificationService.initialise();
+
+  //  pushNotificationService.initialise().then((value) => print(value));
 
 
     setWalletAmount(this);
+
     super.initState();
+
+    Future.delayed(Duration(seconds: 2)).then((value) {
+      widget.firebaseMessaging.configure(
+        onBackgroundMessage: (Map<String,dynamic> message) async{
+          setState(() {
+            _hasMessage=true;
+          });
+        },
+        onMessage: (Map<String, dynamic> message) async {
+          // Navigator.of(context).pushNamed('/notifications');
+          // Navigator.of(context).pushNamed('/notifications');
+          debugPrint('******************************************************////////////////////////******************************');
+          showDialog(context: context, builder: (context) {
+            return CAlertDialog(
+              content: 'پیام جدید',
+              subContent: 'پیام جدیدی دارید، آیا مشاهده می کنید؟',
+              buttons: [
+                CButton(
+                  label: 'مشاهده',
+                  onClick: (){
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed('/notifications');
+                  },
+                ),
+                CButton(
+                  label: 'بستن',
+                  onClick: (){
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },);
+        },
+
+        onLaunch: (Map<String, dynamic> message) async {
+          //Navigator.of(context).pushNamed('/notifications');
+          debugPrint('******************************************************////////////////////////******************************');
+
+          //Navigator.of(context).pushNamed('/notifications');
+/*          setState(() {
+            _hasMessage=true;
+          });*/
+        },
+        onResume: (Map<String, dynamic> message) async {
+          // Navigator.of(context).pushNamed('/notifications');
+          debugPrint('******************************************************////////////////////////******************************');
+
+          //Navigator.of(context).pushNamed('/notifications');
+          setState(() {
+            _hasMessage=true;
+          });
+        },
+      );
+
+    });
+
+
     initPlatformState();
+
   }
 
   @override
@@ -136,6 +204,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     return
       WillPopScope(
           child: MasterTemplate(
+            hasMessage: _hasMessage,
               isHome: true,
               wchild: GridView.count(
                 crossAxisCount: 2,

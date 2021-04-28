@@ -52,7 +52,7 @@ Future<void> _payWithWallet() async{
       var jBody = json.encode(_body);
 
       var result = await http.post(
-          'https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+         Uri.parse( 'https://www.idehcharge.com/Middle/Api/Charge/TopUp'),
           headers: {
             'Authorization': 'Bearer $_token',
             'Content-Type': 'application/json'

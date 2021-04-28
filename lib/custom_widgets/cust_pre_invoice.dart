@@ -39,7 +39,7 @@ class _PreInvoiceState extends State<PreInvoice> {
         SharedPreferences _p=await SharedPreferences.getInstance();
         String _token=_p.getString('token');
         var sss=topUpToJson(topUp);
-        var result=await http.post('https://www.idehcharge.com/Middle/Api/Charge/TopUp',
+        var result=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/TopUp'),
 
             headers: {
               'Authorization': 'Bearer $_token',

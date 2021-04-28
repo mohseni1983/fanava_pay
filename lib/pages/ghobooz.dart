@@ -1379,7 +1379,7 @@ String getOrg(int id){
         };
         var _jBody=json.encode(_body);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -1635,7 +1635,7 @@ String getOrg(int id){
           var jBody = json.encode(_body);
 
           var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/BillInquiry',
+             Uri.parse( 'https://www.idehcharge.com/Middle/Api/Charge/BillInquiry'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'
@@ -1725,7 +1725,7 @@ String getOrg(int id){
         var jBody = json.encode(_body);
 
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/Bill',
+           Uri.parse( 'https://www.idehcharge.com/Middle/Api/Charge/Bill'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'

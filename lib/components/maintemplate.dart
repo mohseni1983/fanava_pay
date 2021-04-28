@@ -9,12 +9,13 @@ import 'package:parto_v/pages/wallet.dart';
 import 'TopWallet.dart';
 class MasterTemplate extends StatefulWidget {
   final Widget wchild;
+  final hasMessage;
 
   final bool isHome;
 
 
 
-  const MasterTemplate({Key key, this.wchild,this.isHome=false}) : super(key: key);
+  const MasterTemplate({Key key, this.wchild,this.isHome=false,this.hasMessage=false}) : super(key: key);
   @override
   _MasterTemplateState createState() => _MasterTemplateState();
 }
@@ -111,14 +112,27 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
                             ),
                             GestureDetector(
                               onTap: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => WalletPage(),));
+                                Navigator.of(context).pushNamed('/notifications');
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.account_balance_wallet_rounded,color: Colors.white,size: 30,),
-                                  Text('کیف پول',style: Theme.of(context).textTheme.subtitle1,)
+                                  Stack(
+                                    children: [
+                                      Icon(Icons.notifications_active,color: Colors.white,size: 30,),
+                                      widget.hasMessage?                                      Positioned(
+
+                                        child: CircleAvatar(backgroundColor: Colors.red,maxRadius: 8,child: Icon(Icons.message,color: Colors.white,size: 10,),),
+                                        top: 0,
+                                        right: 0,
+                                      ):Container(height: 0,width: 0,)
+
+
+
+                                    ],
+                                  ),
+                                  Text('پیام ها',style: Theme.of(context).textTheme.subtitle1,)
                                 ],
                               ),
 
@@ -183,7 +197,7 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
                               Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: const AssetImage('assets/images/home.png'),
+                                    image: const AssetImage('assets/images/wallet.png'),
                                     fit: BoxFit.fill,
                                   ),
 
@@ -200,8 +214,8 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
                         ),
                       ),
                       onTap: (){
-                        if(!widget.isHome)
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MainPage(),));
+                       // if(!widget.isHome)
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => WalletPage(),));
                       },
 
                     )

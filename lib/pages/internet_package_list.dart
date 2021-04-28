@@ -27,8 +27,9 @@ class InternetPackageListPage extends StatefulWidget {
   final int operatorId;
   final int simCardId;
   final String mobile;
+  final bool repeat;
 
-  const InternetPackageListPage({Key key,  this.operatorId, this.simCardId,this.mobile}) : super(key: key);
+  const InternetPackageListPage({Key key, this.operatorId=-1, this.simCardId=-1, this.mobile='', this.repeat=false,}) : super(key: key);
   @override
   _InternetPackageListPageState createState() => _InternetPackageListPageState();
 }
@@ -49,6 +50,9 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   double _walletAmount = 0;
   String  _uniqCode='';
   bool _canUseWallet=false;
+
+  //repeated
+  String repeateMobile='';
 
 
 
@@ -75,7 +79,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         };
         var jBody = json.encode(_body);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove',
+          Uri.parse(  'https://www.idehcharge.com/Middle/Api/Charge/WalletApprove'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -151,7 +155,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
           String _token = _p.getString('token');
           var jsonTopUp = json.encode(body);
           var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/DataPlan',
+             Uri.parse( 'https://www.idehcharge.com/Middle/Api/Charge/DataPlan'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'
@@ -321,7 +325,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                           '${_invoiceSubTitle}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
-                                              fontWeight: FontWeight.bold,fontSize: _invoiceSubTitle.length>60?9:12),
+                                              fontWeight: FontWeight.bold,fontSize:10),
                                           textScaleFactor: 1,
                                           softWrap: true,
                                         ),
@@ -341,7 +345,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                                           textScaleFactor: 1.2,
                                         ),
                                         Text(
-                                          '${widget.mobile}',
+                                          '${widget.mobile.isNotEmpty?widget.mobile:repeateMobile}',
                                           style: TextStyle(
                                               color: PColor.orangeparto,
                                               fontWeight: FontWeight.bold),
@@ -600,13 +604,129 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
   List<DataPlan> _listOfPlans;
   @override
   void initState() {
-    
+
+
     // TODO: implement initState
     super.initState();
-    getDataPlans();
+
+/*    if(widget.repeat){
+      getLastPurchase().then((value) {
+
+        setState(() {
+          _progressing=false;
+          _readyToPay=true;
+
+        });
+
+      });
+    }
+else*/
+getDataPlans();
 
 
   }
+
+  Future<void> getLastPurchase() async{
+    setState(() {
+      _progressing=true;
+    });
+    auth.checkAuth().then((value) async {
+      if (value) {
+        SharedPreferences _p = await SharedPreferences.getInstance();
+        String _token = _p.getString('token');
+        var _body = {
+          "RequestType":1,
+          "LocalDate": DateTime.now().toString(),
+          "Sign": _p.getString('sign'),
+          "UseWallet": true
+        };
+
+
+        var result = await http.post(
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/LastTxn'),
+            headers: {
+              'Authorization': 'Bearer $_token',
+              'Content-Type': 'application/json'
+            },
+            body: json.encode(_body));
+        if (result.statusCode == 401) {
+          auth.retryAuth().then((value) {
+            getLastPurchase();
+          });
+        }
+        if (result.statusCode == 200) {
+          debugPrint(result.body);
+          var jres = json.decode(result.body);
+          setState(() {
+            _progressing = false;
+          });
+
+          if (jres['ResponseCode'] == 0){
+            setState(() {
+
+
+              repeateMobile='0'+jres['CellNumber'];
+              _invoiceTitle =
+              'بسته ${_operatorsWithLogo[jres['Operator']].name} ';
+              _invoiceSubTitle = jres['Title'];
+            _invoiceAmount = (jres['PriceWithTax']);
+              _canUseWallet = jres['CanUseWallet'];
+              _paymentLink = jres['Url'];
+              _walletAmount = jres['Cash'];
+
+
+            });
+
+          }
+/*            showDialog(
+              context: context,
+              builder: (context) {
+                return PreInvoice(
+                  title:
+                  '${_chargeTypes[_selectedChargeType]}  ${_operatorsWithLogo[_topUpOperator].name}',
+                  subTitle:
+                  '${_operatorsWithLogo[_topUpOperator].chargeTypes[_selectedTopUpType].name}',
+                  amount: _selectedAmount.toDouble(),
+                  canUseWallet: jres['CanUseWallet'],
+                  paymentLink: jres['Url'],
+                  walletAmount: 0,
+                );
+              },
+            );*/
+          else if (jres['ResponseCode'] == 5) {
+            auth.retryAuth().then((value) {
+             // getLastPurchase();
+            });
+          } else
+            showDialog(
+              context: context,
+              builder: (context) => CAlertDialog(
+                subContent: jres['ResponseMessage'],
+                buttons: [
+                  CButton(
+                    label: 'بستن',
+                    onClick: () => Navigator.of(context).pop(),
+                  )
+                ],
+              ),
+            );
+        }
+      } else
+        showDialog(
+          context: context,
+          builder: (context) => CAlertDialog(
+            content: 'خطا در احراز هویت',
+            buttons: [
+              CButton(
+                label: 'بستن',
+                onClick: () => Navigator.of(context).pop(),
+              )
+            ],
+          ),
+        );
+    });
+  }
+
 
   // get the list of packages;
   List<DataPlan> _dataPlans=[];
@@ -625,7 +745,7 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
         });
         try{
           var result=await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/GetDataPlanList',
+              Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetDataPlanList'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'
@@ -967,11 +1087,13 @@ class _InternetPackageListPageState extends State<InternetPackageListPage> {
                         minWidth: 100,
                       ),
 
+/*
                       CButton(
                         label: 'تکرار خرید قبلی',
                         onClick: () {},
                         minWidth: 100,
                       ),
+*/
                     ],
                   ),
                 ),

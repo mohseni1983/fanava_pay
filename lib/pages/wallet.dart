@@ -149,7 +149,7 @@ class _WalletPageState extends State<WalletPage> {
           };
         var jBody=json.encode(_body);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/Wallet',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Wallet'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -350,7 +350,7 @@ class _WalletPageState extends State<WalletPage> {
         };
         var _jBody=json.encode(_body);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/GetFinancingInfo',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetFinancingInfo'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'

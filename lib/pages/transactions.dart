@@ -304,7 +304,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
           };
           var _jBody=json.encode(_body);
           var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/GetTxnInfo',
+              Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetTxnInfo'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'

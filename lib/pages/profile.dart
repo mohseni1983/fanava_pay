@@ -45,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
         };
         var _jBody=json.encode(_body);
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
           };
           var _jBody = json.encode(_body);
           var result = await http.post(
-              'https://www.idehcharge.com/Middle/Api/Charge/ChangeProfile',
+              Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/ChangeProfile'),
               headers: {
                 'Authorization': 'Bearer $_token',
                 'Content-Type': 'application/json'

@@ -21,7 +21,7 @@ Future<void> setWalletAmount(State state) async{
       };
       var _jBody=json.encode(_body);
       var result = await http.post(
-          'https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo',
+          Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetOwnerInfo'),
           headers: {
             'Authorization': 'Bearer $_token',
             'Content-Type': 'application/json'

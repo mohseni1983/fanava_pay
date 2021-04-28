@@ -77,7 +77,7 @@ class _DonationPageState extends State<DonationPage> {
         var jBody = json.encode(_body);
 
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/GetCharityInfo',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/GetCharityInfo'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ class _DonationPageState extends State<DonationPage> {
         var jBody = json.encode(_body);
 
         var result = await http.post(
-            'https://www.idehcharge.com/Middle/Api/Charge/Charity',
+            Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Charity'),
             headers: {
               'Authorization': 'Bearer $_token',
               'Content-Type': 'application/json'
@@ -203,10 +203,11 @@ class _DonationPageState extends State<DonationPage> {
   int _charityPSid=-1;
   String _charityTerminalId='';
   String _charityName='';
-  Widget CharityList(){
+ Widget CharityList(){
     List<Widget> _list=[];
     _charities.forEach((element) {
-      _list.add(CSelectedGridItem(
+      _list.add(
+          CSelectedGridItem(
         selectedValue: _selectedCharity,
         value: element.id,
         label: element.title,
@@ -223,40 +224,68 @@ class _DonationPageState extends State<DonationPage> {
 
           });
         },
-      ));
+      )
+      );
     });
-    return Column(
-      children: [
-        Text(
-          'یکی از خیریه های زیر را انتخاب نمائید',
-          style: Theme.of(context).textTheme.subtitle1,
-          textAlign: TextAlign.center,
-        ),
-        Divider(
-          color: PColor.orangeparto,
-          thickness: 2,
-        ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          child:     SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child:        ConstrainedBox(
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width,
-              ),
-              child: Wrap(
-                children: _list,
-                direction: Axis.horizontal,
-                spacing: 2,
-              ),
-            )
-            ,
-          )
-          ,
-        )
+    return
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(padding: EdgeInsets.only(top: 10)),
+          Text(
+            'نیکوکاری',
+            style: Theme.of(context).textTheme.headline1,
+            textAlign: TextAlign.center,
+          ),
+          Divider(
+            color: PColor.orangeparto,
+            thickness: 2,
+          ),
 
-      ],
-    );
+          Text(
+            'یکی از خیریه های زیر را انتخاب نمائید',
+            style: Theme.of(context).textTheme.subtitle1,
+            textAlign: TextAlign.center,
+          ),
+          Divider(
+            color: PColor.orangeparto,
+            thickness: 2,
+          ),
+          Expanded(child:
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: _charities.length,
+            itemBuilder: (context, index) {
+              var element=_charities[index];
+              return
+                CSelectedGridItem(
+                selectedValue: _selectedCharity,
+                value: element.id,
+                label: element.title,
+                paddingHorizontal: 3,
+                paddingVertical: 3,
+                height:40,
+                width: MediaQuery.of(context).size.width,
+                onPress: (t){
+                  setState(() {
+                    _selectedCharity=t;
+                    _charityTerminalId=element.termId;
+                    _charityPSid=element.pspId;
+                    _charityName=element.title;
+
+                  });
+                },
+              );
+
+            },)),
+          Container(height: 60,)
+
+
+          // بخش مربوط به اطلاعات اصلی
+        ],
+      );
+
+
 
   }
 
@@ -269,60 +298,81 @@ class _DonationPageState extends State<DonationPage> {
   }
 
   TextEditingController _amountTxt=new TextEditingController();
-  Widget AmountWidget()=>Container(
-    //margin: EdgeInsets.only(top: 10),
-    //height: 150,
-    decoration: BoxDecoration(
-      border: Border.all(color: PColor.orangeparto),
-      color: PColor.orangepartoAccent,
-      borderRadius: BorderRadius.circular(12)
-    ),
-    padding: EdgeInsets.all(15),
-    child: Column(
-      children: [
-        Text(
-          'مبلغ مورد نظر را به ریال وارد نمائید',
-          style: Theme.of(context).textTheme.subtitle1,
-          textAlign: TextAlign.center,
-        ),
-        Divider(
-          color: PColor.orangeparto,
-          thickness: 2,
-        ),
-        TextField(
-          decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius:
-                BorderRadius.circular(10),
-                gapPadding: 2,
-              ),
-              suffixIcon: Icon(
-                MdiIcons.label,
-                color: PColor.orangeparto,
-              ),
-              fillColor: Colors.white,
-              counterText: '',
-              hintText: 'مبلغ به ریال'
+  Widget AmountWidget()=>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(padding: EdgeInsets.only(top: 10)),
+          Text(
+            'نیکوکاری',
+            style: Theme.of(context).textTheme.headline1,
+            textAlign: TextAlign.center,
           ),
-          keyboardType: TextInputType.number,
-          inputFormatters: [ThousandsSeparatorInputFormatter()],
-          maxLength: 14,
+          Divider(
+            color: PColor.orangeparto,
+            thickness: 2,
+          ),
 
-          controller: _amountTxt,
+  Container(
+  decoration: BoxDecoration(
+  border: Border.all(color: PColor.orangeparto),
+  color: PColor.orangepartoAccent,
+  borderRadius: BorderRadius.circular(12)
+  ),
+  padding: EdgeInsets.all(15),
+  child: Column(
+  children: [
+  Text(
+  'مبلغ مورد نظر را به ریال وارد نمائید',
+  style: Theme.of(context).textTheme.subtitle1,
+  textAlign: TextAlign.center,
+  ),
+  Divider(
+  color: PColor.orangeparto,
+  thickness: 2,
+  ),
+  TextField(
+  decoration: InputDecoration(
+  border: OutlineInputBorder(
+  borderRadius:
+  BorderRadius.circular(10),
+  gapPadding: 2,
+  ),
+  suffixIcon: Icon(
+  MdiIcons.label,
+  color: PColor.orangeparto,
+  ),
+  fillColor: Colors.white,
+  counterText: '',
+  hintText: 'مبلغ به ریال'
+  ),
+  keyboardType: TextInputType.number,
+  inputFormatters: [ThousandsSeparatorInputFormatter()],
+  maxLength: 14,
 
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          'به لحاظ محدودیت های بانکی حداقل تراکنش هزار تومان است',
-          style: Theme.of(context).textTheme.subtitle1,
-          textAlign: TextAlign.center,
-        ),
+  controller: _amountTxt,
+
+  textAlign: TextAlign.center,
+  ),
+  Text(
+  'به لحاظ محدودیت های بانکی حداقل تراکنش هزار تومان است',
+  style: Theme.of(context).textTheme.subtitle1,
+  textAlign: TextAlign.center,
+  ),
 
 
 
-      ],
-    ),
-  );
+  ],
+  ),
+  )
+
+
+          // بخش مربوط به اطلاعات اصلی
+        ],
+      );
+
+
+
 
   bool  _readyToPay=false;
   String _paymentLink='';
@@ -539,28 +589,11 @@ class _DonationPageState extends State<DonationPage> {
         MasterTemplateWithoutFooter(
 
           // inProgress: _inprogress,
-            wchild: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(padding: EdgeInsets.only(top: 10)),
-                Text(
-                  'نیکوکاری',
-                  style: Theme.of(context).textTheme.headline1,
-                  textAlign: TextAlign.center,
-                ),
-                Divider(
-                  color: PColor.orangeparto,
-                  thickness: 2,
-                ),
-
-                !_isSetAmountPage?
-                CharityList():
-                AmountWidget()
-
-
-                // بخش مربوط به اطلاعات اصلی
-              ],
-            )),
+            wchild:
+            !_isSetAmountPage?
+            CharityList():
+            AmountWidget()
+        ),
         _progressing
             ? Progress()
             : Positioned(
@@ -582,7 +615,9 @@ class _DonationPageState extends State<DonationPage> {
                       offset: Offset(0, -1))
                 ]),
             child: Center(
-              child: Row(
+              child:
+              _isSetAmountPage?
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -646,7 +681,7 @@ class _DonationPageState extends State<DonationPage> {
                     },
                     minWidth: 120,
                   ),
-                  _isSetAmountPage?
+
                   CButton(
                     label: 'قبلی',
                     onClick: () {
@@ -656,11 +691,79 @@ class _DonationPageState extends State<DonationPage> {
 
                     },
                     minWidth: 120,
-                  ):
-                      Container(width: 0,)
+                  )
+
+                ],
+              ):
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CButton(
+                    label: 'بعدی',
+                    onClick: () {
+                      if(!_isSetAmountPage && _selectedCharity>-1)
+                        setState(() {
+                          _isSetAmountPage=true;
+                        });
+                      else if(_selectedCharity==-1)
+                        showDialog(context: context,
+                          builder: (context) => CAlertDialog(
+                            content: 'خطا',
+                            subContent: 'یکی از خیره ها را انتخاب کنید',
+                            buttons: [
+                              CButton(
+                                label: 'بستن',
+                                onClick: ()=>Navigator.of(context).pop(),
+                              )
+                            ],
+                          ),
+                        );
+                      else if(_isSetAmountPage && _amountTxt.text.isNotEmpty) {
+                        if (double.parse(_amountTxt.text.replaceAll(',', '')) >=
+                            10000)
+                          getPaymentLink();
+                        else
+
+                          showDialog(context: context,
+                            builder: (context) => CAlertDialog(
+                              content: 'خطا',
+                              subContent: 'مبلغ باید بیش از هزار تومان باشد',
+                              buttons: [
+                                CButton(
+                                  label: 'بستن',
+                                  onClick: ()=>Navigator.of(context).pop(),
+                                )
+                              ],
+                            ),
+                          );
+
+                      }
+                      else
+                        showDialog(context: context,
+                          builder: (context) => CAlertDialog(
+                            content: 'خطا',
+                            subContent: 'مبلغ خالی است',
+                            buttons: [
+                              CButton(
+                                label: 'بستن',
+                                onClick: ()=>Navigator.of(context).pop(),
+                              )
+                            ],
+                          ),
+                        );
+
+
+                      //    _sendToPayment();
+
+                    },
+                    minWidth: 120,
+                  ),
+
 
                 ],
               ),
+
             ),
           ),
         ),

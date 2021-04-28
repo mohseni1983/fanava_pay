@@ -13,7 +13,7 @@ Future<bool> checkAuth() async{
     {
       String _username=_prefs.getString('username');
       String _password=_prefs.getString('device_id');
-      var _tokenResult=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Login',
+      var _tokenResult=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Login'),
         body: {
           'username':'$_username',
           'password':'$_password',
@@ -39,7 +39,7 @@ Future<void> retryAuth() async{
 
     String _username=_prefs.getString('username');
     String _password=_prefs.getString('device_id');
-    var _tokenResult=await http.post('https://www.idehcharge.com/Middle/Api/Charge/Login',
+    var _tokenResult=await http.post(Uri.parse('https://www.idehcharge.com/Middle/Api/Charge/Login'),
       body: {
         'username':'$_username',
         'password':'$_password',
