@@ -20,95 +20,10 @@ class _IntroPageState extends State<IntroPage> {
 
    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
-
-/*
-  if (Platform.isIOS) {
-    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings());
-  }
-*/
-
-
-
-
-
-
-
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
-/*    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        // Navigator.of(context).pushNamed('/notifications');
-       // Navigator.of(context).pushNamed('/notifications');
-        showDialog(context: context, builder: (context) {
-          return CAlertDialog(
-            content: 'پیام جدید',
-            subContent: 'پیام جدیدی دارید، آیا مشاهده می کنید؟',
-            buttons: [
-              CButton(
-                label: 'مشاهده',
-                onClick: (){
-                  Navigator.of(context).pushNamed('/notifications');
-                },
-              ),
-              CButton(
-                label: 'بستن',
-                onClick: (){
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },);
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        //Navigator.of(context).pushNamed('/notifications');
-        showDialog(context: context, builder: (context) {
-          return CAlertDialog(
-            content: 'پیام جدید',
-            subContent: 'پیام جدیدی دارید، آیا مشاهده می کنید؟',
-            buttons: [
-              CButton(
-                label: 'مشاهده',
-                onClick: (){
-                  Navigator.of(context).pushNamed('/notifications');
-                },
-              ),
-              CButton(
-                label: 'بستن',
-                onClick: (){
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },);
-      },
-      onResume: (Map<String, dynamic> message) async {
-       // Navigator.of(context).pushNamed('/notifications');
-        showDialog(context: context, builder: (context) {
-          return CAlertDialog(
-            content: 'پیام جدید',
-            subContent: 'پیام جدیدی دارید، آیا مشاهده می کنید؟',
-            buttons: [
-              CButton(
-              label: 'مشاهده',
-              onClick: (){
-                Navigator.of(context).pushNamed('/notifications');
-              },
-            ),
-              CButton(
-                label: 'بستن',
-                onClick: (){
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        },);
-      },
-    );*/
    _firebaseMessaging.requestNotificationPermissions(   );
 
     _firebaseMessaging.getToken().then((value) {

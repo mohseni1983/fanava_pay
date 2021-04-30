@@ -22,13 +22,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.0"
-  barcode_scan_fork:
-    dependency: "direct main"
-    description:
-      name: barcode_scan_fork
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -36,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  camerakit:
+    dependency: "direct main"
+    description:
+      name: camerakit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.75"
   characters:
     dependency: transitive
     description:
@@ -84,7 +84,7 @@ packages:
       name: crypto
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -167,13 +167,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_barcode_scanner:
-    dependency: "direct main"
-    description:
-      name: flutter_barcode_scanner
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   flutter_driver:
     dependency: transitive
     description: flutter
@@ -186,13 +179,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.3"
-  flutter_plugin_android_lifecycle:
-    dependency: transitive
-    description:
-      name: flutter_plugin_android_lifecycle
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.11"
   flutter_svg:
     dependency: transitive
     description:
@@ -415,7 +401,7 @@ packages:
       name: process
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.1"
   provider:
     dependency: transitive
     description:
@@ -560,7 +546,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.19"
+    version: "0.3.0"
   typed_data:
     dependency: transitive
     description:
@@ -617,13 +603,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  visibility_detector:
+    dependency: transitive
+    description:
+      name: visibility_detector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
   vm_service:
     dependency: transitive
     description:
       name: vm_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.1-nullsafety.1"
+    version: "6.1.0+1"
   webdriver:
     dependency: transitive
     description:

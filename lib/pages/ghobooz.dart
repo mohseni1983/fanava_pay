@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:barcode_scan_fork/barcode_scan_fork.dart';
+//import 'package:barcode_scan_fork/barcode_scan_fork.dart';
+import 'package:camerakit/camerakit.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:parto_v/custom_widgets/cust_button.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_buttonbar.dart';
 import 'package:parto_v/custom_widgets/cust_selectable_image_grid_btn.dart';
 import 'package:parto_v/custom_widgets/cust_seletable_grid_item.dart';
+import 'package:parto_v/pages/barcode.dart';
 import 'package:parto_v/ui/cust_colors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:parto_v/classes/auth.dart' as auth;
@@ -102,6 +104,17 @@ String getOrg(int id){
 }
 
   Future scan() async {
+  String barcode=await Navigator.push(context, MaterialPageRoute(builder: (context) => BarcodeScanner(),));
+  if(barcode=='no barcode'){
+    return;
+  }
+  this._billId.text=barcode.substring(0,13);
+  this._paymentId.text=barcode.substring(17);
+  double f=double.parse(barcode.substring(13,21));
+  this._billPrice=(f*1000) ;
+  this._selectedItem=int.parse(barcode.substring(11,12));
+
+/*
     try {
       String barcode = await BarcodeScanner.scan();
       setState(() {
@@ -171,6 +184,7 @@ String getOrg(int id){
           ],
         ),
       );        }
+*/
   }
 
   Widget PayWithBarcode(){
