@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 //import 'package:barcode_scan_fork/barcode_scan_fork.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:camerakit/camerakit.dart';
 import 'package:contact_picker/contact_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -104,8 +105,9 @@ String getOrg(int id){
 }
 
   Future scan() async {
-  String barcode=await Navigator.push(context, MaterialPageRoute(builder: (context) => BarcodeScanner(),));
-  if(barcode=='no barcode'){
+  //String barcode=await Navigator.push(context, MaterialPageRoute(builder: (context) => BarcodeScanner(),));
+String barcode=await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
+    if(barcode=='no barcode'){
     return;
   }
   this._billId.text=barcode.substring(0,13);

@@ -199,7 +199,7 @@ class _EnterOTPState extends State<EnterOTP> {
         "DeviceKey": _device_id,
         "Os": os_id.toString(),
         "RegisterCode":_otp.text,
-        "FcmKey": _fcmKey??'iphonetestfcm'
+        "FcmKey": _fcmKey
 
       });
       if(result.statusCode==200){

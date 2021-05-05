@@ -47,7 +47,7 @@ dependencies:
   share:
   share_files_and_screenshot_widgets:
   sentry_flutter:
-  #flutter_barcode_scanner:
+  flutter_barcode_scanner:
   #barcode_scan_fork:
   material_design_icons_flutter:
   uni_links:
