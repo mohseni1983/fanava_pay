@@ -30,7 +30,7 @@ class _ReciptPageState extends State<ReciptPage> {
       //print('inside');
       RenderRepaintBoundary boundary =
       _globalKey.currentContext.findRenderObject();
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ui.Image image = await boundary.toImage(pixelRatio: 6.0);
       ByteData byteData =
       await image.toByteData(format: ui.ImageByteFormat.png);
       var pngBytes = byteData.buffer.asUint8List();
@@ -61,7 +61,7 @@ class _ReciptPageState extends State<ReciptPage> {
     child: Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      color: PColor.orangeparto.withOpacity(0.8),
+      color: PColor.orangeparto.shade200,
       child: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -104,11 +104,22 @@ class _ReciptPageState extends State<ReciptPage> {
                         padding: EdgeInsets.fromLTRB(5, 35, 5, 0),
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height,
-                        color: PColor.orangeparto,
+                        color: PColor.orangeparto.shade200,
                         child:Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            Container(
+                              height: 120,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage('assets/logo.png'),
+                                    alignment: Alignment.center,
+
+                                  )
+                              ),
+                            ),
                             Text('اپلیکیشن پرداخت پرتو',style: TextStyle(color: PColor.blueparto,fontSize: 22,fontWeight: FontWeight.w900),),
                             Divider(indent: 5,endIndent: 5,thickness: 1,height: 3,),
                             Text('رسید درگاه پرداخت اینترنتی',style: TextStyle(color: PColor.blueparto,fontSize: 16,fontWeight: FontWeight.w700),),
@@ -198,6 +209,32 @@ class _ReciptPageState extends State<ReciptPage> {
                                 ],
                               ),
                             ),
+                            Container(
+                              padding:EdgeInsets.all(4),
+                              margin: EdgeInsets.all(2),
+                              //height: 80,
+                              decoration: BoxDecoration(
+                                  color: PColor.orangepartoAccent,
+                                  borderRadius: BorderRadius.circular(15)
+                              ),
+                              child:
+                                Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text('شرح',style: TextStyle(color: PColor.blueparto,fontSize: 14,fontWeight: FontWeight.w900),),
+
+                                      ],
+                                    ),
+                                    Text('${_recipt.description}',style: TextStyle(color: PColor.blueparto,fontSize: 11,fontWeight: FontWeight.w900),softWrap: true,),
+
+
+                                  ],
+                                )
+                            ),
+
 
                           ],
                         ),

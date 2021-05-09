@@ -21,6 +21,7 @@ class Recipt {
     this.respMsg,
     this.issuerBank,
     this.urlSchema,
+    this.description
   });
 
   String rrn;
@@ -34,6 +35,7 @@ class Recipt {
   String respMsg;
   String issuerBank;
   String urlSchema;
+  String description;
 
   factory Recipt.fromJson(Map<String, dynamic> json) => Recipt(
     rrn: json["Rrn"],
@@ -47,6 +49,7 @@ class Recipt {
     respMsg: json["RespMsg"],
     issuerBank: json["IssuerBank"],
     urlSchema: json["UrlSchema"],
+    description: json["Description"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,5 +64,6 @@ class Recipt {
     "RespMsg": respMsg,
     "IssuerBank": issuerBank,
     "UrlSchema": urlSchema,
+    "Description": description
   };
 }

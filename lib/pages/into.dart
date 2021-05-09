@@ -53,9 +53,19 @@ class _IntroPageState extends State<IntroPage> {
       body:       Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        color: PColor.orangeparto,
+        color: PColor.orangeparto.shade200,
         child: Center(
-          child: Text('پرتو پرداخت',style: TextStyle(color: Colors.white,fontSize: 22,fontWeight: FontWeight.bold),),
+          child: Container(
+            height: 130,
+            width: 130,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/logo.png'),
+                alignment: Alignment.center,
+
+              )
+            ),
+          )
         ),
       )
       ,

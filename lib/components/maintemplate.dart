@@ -285,6 +285,7 @@ class _MasterTemplateState extends State<MasterTemplate> with TickerProviderStat
                         ),
                       ),
 
+
                       Center(child: Container(
                         height: 120,
                         width: 140,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:parto_v/pages/main_page.dart';
 import 'package:parto_v/pages/profile.dart';
+import 'package:parto_v/ui/cust_colors.dart';
 
 import 'TopWallet.dart';
 class MasterTemplateWithoutFooter extends StatefulWidget {
@@ -92,6 +93,23 @@ class _MasterTemplateState extends State<MasterTemplateWithoutFooter> with Ticke
                           fit: BoxFit.fill,
                         ),
                       ),
+                      Positioned(
+                          right: 0,
+                          top: 100,
+                          child: GestureDetector(
+                            onTap:()=> Navigator.of(context).pop(),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.horizontal(left: Radius.circular(15)),
+                                color: PColor.blueparto.withOpacity(0.5),
+                              ),
+                              height: 30,
+                              width: 40,
+
+                              child: Icon(Icons.arrow_forward,color: Colors.white,),
+                            ),
+                          )),
+
 
                       Center(child: Container(
                         height: 120,
