@@ -21,7 +21,13 @@ class Recipt {
     this.respMsg,
     this.issuerBank,
     this.urlSchema,
-    this.description
+    this.description,
+    this.requestType,
+    this.billId,
+    this.payId,
+    this.cellNumber,
+    this.billGroup,
+
   });
 
   String rrn;
@@ -30,12 +36,17 @@ class Recipt {
   String amount;
   String cardNumber;
   String traceNumber;
-  DateTime datePaid;
+  String datePaid;
   String respCode;
   String respMsg;
   String issuerBank;
   String urlSchema;
   String description;
+  String requestType;
+  String billId;
+  String payId;
+  String cellNumber;
+  String billGroup;
 
   factory Recipt.fromJson(Map<String, dynamic> json) => Recipt(
     rrn: json["Rrn"],
@@ -44,12 +55,19 @@ class Recipt {
     amount: json["Amount"],
     cardNumber: json["CardNumber"],
     traceNumber: json["TraceNumber"],
-    datePaid: DateTime.parse(json["DatePaid"]),
+    datePaid: json["DatePaid"],
     respCode: json["RespCode"],
     respMsg: json["RespMsg"],
     issuerBank: json["IssuerBank"],
     urlSchema: json["UrlSchema"],
-    description: json["Description"]
+    description: json["Description"],
+    requestType: json["RequestType"].toString(),
+    billId: json["BillId"],
+    payId: json["PayId"],
+    cellNumber: json["CellNumber"],
+    billGroup: json["BillGroup"].toString()
+
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -59,7 +77,7 @@ class Recipt {
     "Amount": amount,
     "CardNumber": cardNumber,
     "TraceNumber": traceNumber,
-    "DatePaid": datePaid.toIso8601String(),
+    "DatePaid": datePaid,
     "RespCode": respCode,
     "RespMsg": respMsg,
     "IssuerBank": issuerBank,

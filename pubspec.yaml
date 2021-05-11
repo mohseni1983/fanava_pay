@@ -54,6 +54,9 @@ dependencies:
   image_picker_saver:
   firebase_messaging:
   camerakit:
+  connectivity:
+  root_access:
+  check_vpn_connection: ^0.0.1
 
 
 dev_dependencies:

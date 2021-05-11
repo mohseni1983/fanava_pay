@@ -116,6 +116,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
 
 
 
+  //final NavigationService _navigationService = locator<NavigationService>();
   @override
   void initState() {
     // TODO: implement initState
@@ -137,7 +138,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
         onMessage: (Map<String, dynamic> message) async {
           // Navigator.of(context).pushNamed('/notifications');
           // Navigator.of(context).pushNamed('/notifications');
-          debugPrint('******************************************************////////////////////////******************************');
+          //debugPrint('******************************************************////////////////////////******************************');
           showDialog(context: context, builder: (context) {
             return CAlertDialog(
               content: 'پیام جدید',
@@ -163,15 +164,16 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
 
         onLaunch: (Map<String, dynamic> message) async {
           //Navigator.of(context).pushNamed('/notifications');
-          debugPrint('******************************************************////////////////////////******************************');
+          //debugPrint('******************************************************////////////////////////******************************');
 
+          await Navigator.of(context).pushNamed('/notifications');
           //Navigator.of(context).pushNamed('/notifications');
 /*          setState(() {
             _hasMessage=true;
           });*/
         },
         onResume: (Map<String, dynamic> message) async {
-          // Navigator.of(context).pushNamed('/notifications');
+          await Navigator.of(context).pushNamed('/notifications');
           debugPrint('******************************************************////////////////////////******************************');
 
           //Navigator.of(context).pushNamed('/notifications');

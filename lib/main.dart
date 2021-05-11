@@ -24,7 +24,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
 
+  
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await SentryFlutter.init(
           (options) {
         options.dsn = 'https://87a232be89fe4af1beb7a10c5be27cef@o502350.ingest.sentry.io/5635538';
