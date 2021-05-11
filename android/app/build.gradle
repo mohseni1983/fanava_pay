@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.samohseni.parto_v"
+        applicationId "com.samohseni.fanava_v"
         minSdkVersion 21
         targetSdkVersion 30
         multiDexEnabled true

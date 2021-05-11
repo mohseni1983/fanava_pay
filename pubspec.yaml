@@ -1,5 +1,5 @@
-name: parto_v
-description: Parto App
+name: fanava_payment
+description: Payment application for Fanava co.
 module:
   androidX: true
 
