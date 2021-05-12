@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:parto_v/classes/convert.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/classes/convert.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 
 class CSelectedPackage extends StatefulWidget {
   final double height;

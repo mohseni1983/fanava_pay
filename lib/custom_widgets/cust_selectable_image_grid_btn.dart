@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 
 class CSeletableImageGridBtn extends StatefulWidget {
   final double height;

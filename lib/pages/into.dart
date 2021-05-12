@@ -6,11 +6,11 @@ import 'package:root_access/root_access.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/pages/main_page.dart';
-import 'package:parto_v/ui/cust_colors.dart';
-import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:fanava_payment/custom_widgets/cust_alert_dialog.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/pages/main_page.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
+import 'package:fanava_payment/classes/auth.dart' as auth;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity/connectivity.dart';
 

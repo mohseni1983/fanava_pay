@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:parto_v/classes/notification.dart';
-import 'package:parto_v/components/maintemplate_withoutfooter.dart';
-import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/classes/notification.dart';
+import 'package:fanava_payment/components/maintemplate_withoutfooter.dart';
+import 'package:fanava_payment/custom_widgets/cust_alert_dialog.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:fanava_payment/classes/auth.dart' as auth;
 import 'package:http/http.dart' as http;
 class NotificationsPage extends StatefulWidget {
   @override

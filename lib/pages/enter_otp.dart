@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:parto_v/classes/global_variables.dart' as globalVars;
+import 'package:fanava_payment/classes/global_variables.dart' as globalVars;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:otp_count_down/otp_count_down.dart';
-import 'package:parto_v/pages//main_page.dart';
-import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/pages//main_page.dart';
+import 'package:fanava_payment/custom_widgets/cust_alert_dialog.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:parto_v/ui/cust_colors.dart';
-import 'package:parto_v/custom_widgets/cust_textfield.dart';
-import 'package:parto_v/components/reg_page_template.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
+import 'package:fanava_payment/custom_widgets/cust_textfield.dart';
+import 'package:fanava_payment/components/reg_page_template.dart';
 
 import '../push_notifications.dart';
 class EnterOTP extends StatefulWidget {

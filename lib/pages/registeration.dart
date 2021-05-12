@@ -4,16 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:parto_v/components/reg_page_template.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/components/reg_page_template.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
-import 'package:parto_v/classes/auth.dart' as auth;
-import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/custom_widgets/cust_textfield.dart';
-import 'package:parto_v/pages/enter_otp.dart';
+import 'package:fanava_payment/classes/auth.dart' as auth;
+import 'package:fanava_payment/custom_widgets/cust_alert_dialog.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/custom_widgets/cust_textfield.dart';
+import 'package:fanava_payment/pages/enter_otp.dart';
 
 class RegisterationPage extends StatefulWidget {
   @override

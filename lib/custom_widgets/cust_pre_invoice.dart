@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:parto_v/classes/auth.dart' as auth;
+import 'package:fanava_payment/classes/auth.dart' as auth;
 import 'package:flutter/material.dart';
-import 'package:parto_v/classes/topup.dart';
-import 'package:parto_v/custom_widgets/cust_alert_dialog.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/classes/topup.dart';
+import 'package:fanava_payment/custom_widgets/cust_alert_dialog.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';

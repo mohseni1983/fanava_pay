@@ -53,7 +53,7 @@ dependencies:
   uni_links:
   image_picker_saver:
   firebase_messaging:
-  camerakit:
+  #camerakit:
   connectivity:
   root_access:
   check_vpn_connection: ^0.0.1

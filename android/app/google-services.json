@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "513344410280",
-    "project_id": "parto-payment",
-    "storage_bucket": "parto-payment.appspot.com"
+    "project_number": "891421344364",
+    "project_id": "fanava-payment-app",
+    "storage_bucket": "fanava-payment-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:513344410280:android:7a1339104ec56659e2e89d",
+        "mobilesdk_app_id": "1:891421344364:android:f91a125da725f23f4cce49",
         "android_client_info": {
-          "package_name": "com.samohseni.parto_v"
+          "package_name": "com.samohseni.fanava_v"
         }
       },
       "oauth_client": [
         {
-          "client_id": "513344410280-hvmgrir1uie8qdidf62ilgi1t5s1dhi6.apps.googleusercontent.com",
+          "client_id": "891421344364-uvdi2nvqiv3b56opgrntc0q78ao72tph.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCHGyYW6Qw3jaAKqacof6RjNBKXANAmTlw"
+          "current_key": "AIzaSyCrBFwjP0zYvM9s8Mngt4Aisx0kr6rgfsY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "513344410280-hvmgrir1uie8qdidf62ilgi1t5s1dhi6.apps.googleusercontent.com",
+              "client_id": "891421344364-uvdi2nvqiv3b56opgrntc0q78ao72tph.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

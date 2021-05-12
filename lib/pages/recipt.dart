@@ -4,12 +4,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
-import 'package:parto_v/classes/convert.dart';
-import 'package:parto_v/classes/recipt.dart';
-import 'package:parto_v/custom_widgets/cust_button.dart';
-import 'package:parto_v/pages/main_page.dart';
-import 'package:parto_v/pages/transactions.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/classes/convert.dart';
+import 'package:fanava_payment/classes/recipt.dart';
+import 'package:fanava_payment/custom_widgets/cust_button.dart';
+import 'package:fanava_payment/pages/main_page.dart';
+import 'package:fanava_payment/pages/transactions.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 import 'package:share/share.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 

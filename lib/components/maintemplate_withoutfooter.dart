@@ -1,9 +1,9 @@
 import 'package:adobe_xd/pinned.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:parto_v/pages/main_page.dart';
-import 'package:parto_v/pages/profile.dart';
-import 'package:parto_v/ui/cust_colors.dart';
+import 'package:fanava_payment/pages/main_page.dart';
+import 'package:fanava_payment/pages/profile.dart';
+import 'package:fanava_payment/ui/cust_colors.dart';
 
 import 'TopWallet.dart';
 class MasterTemplateWithoutFooter extends StatefulWidget {
