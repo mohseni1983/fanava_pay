@@ -580,11 +580,29 @@ class _TransactionsPageState extends State<TransactionsPage> {
 //دریافت رنگ و شرح نوع تراکنش
   TransactionType getTransactionType(int id){
     switch(id){
-      case 6:
-        return TransactionType(color: Colors.blue,name: 'شارژ کیف پول');
-        break;
       case 0:
         return TransactionType(color: Colors.green,name: 'شارژ موبایل');
+        break;
+      case 1:
+        return TransactionType(color: Colors.green,name: 'بسته های اینترنتی');
+        break;
+      case 2:
+        return TransactionType(color: Colors.green,name: 'پرداخت قبض خدماتی');
+        break;
+      case 3:
+        return TransactionType(color: Colors.green,name: 'کارت شارژ');
+        break;
+      case 4:
+        return TransactionType(color: Colors.green,name: 'استعلام قبض خدماتی');
+        break;
+      case 5:
+        return TransactionType(color: Colors.green,name: 'استعلام بسته های اینترنتی');
+        break;
+      case 6:
+        return TransactionType(color: Colors.green,name: 'شارژ حساب کیف پول');
+        break;
+      case 14:
+        return TransactionType(color: Colors.green,name: 'نیکوکاری');
         break;
       default:
         return TransactionType(color: PColor.blueparto,name: 'تراکنش مدل $id');

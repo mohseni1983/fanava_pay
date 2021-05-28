@@ -29,7 +29,7 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await SentryFlutter.init(
           (options) {
-        options.dsn = 'https://87a232be89fe4af1beb7a10c5be27cef@o502350.ingest.sentry.io/5635538';
+        options.dsn = 'https://e91d232e331d420cbf4d21334ced93f7@o502350.ingest.sentry.io/5760381';
       },
       appRunner: () {
 

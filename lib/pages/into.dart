@@ -163,13 +163,13 @@ class _IntroPageState extends State<IntroPage> {
                   width: 130,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/logo.png'),
+                        image: AssetImage('assets/fanava-logo.png'),
                         alignment: Alignment.center,
 
                       )
                   ),
                 ),
-                Text('پرتو پرداخت')
+                Text('فن آوا پرداخت')
 
               ],
             )

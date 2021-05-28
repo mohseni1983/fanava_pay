@@ -40,7 +40,7 @@ class RegPageHeader extends StatelessWidget {
           fixedWidth: true,
           fixedHeight: true,
           child: Text(
-            'پرتو پرداخت',
+            'فن آوا پرداخت',
             style: TextStyle(
               fontFamily: 'IRANSans(FaNum)',
               fontSize: 18,
